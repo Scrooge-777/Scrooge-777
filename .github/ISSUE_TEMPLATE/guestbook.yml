@@ -1,0 +1,29 @@
+name: "💬 Sign Terminal Visitor Log"
+description: "Broadcast an operator transmission to the Cyberpunk Terminal wall."
+title: "[Guestbook]: <Your Handle / Greeting>"
+labels: ["guestbook"]
+body:
+  - type: markdown
+    attributes:
+      value: "### 📡 Incoming Transmission\nEnter your message below to broadcast to the Cyberpunk Terminal wall."
+  - type: input
+    id: handle
+    attributes:
+      label: "Caller ID / Handle"
+      placeholder: "e.g. @netrunner or Neo"
+    validations:
+      required: true
+  - type: input
+    id: role
+    attributes:
+      label: "Node / Affiliation / System"
+      placeholder: "e.g. Systems Engineer @ NightCity"
+    validations:
+      required: false
+  - type: textarea
+    id: message
+    attributes:
+      label: "Transmission Payload"
+      placeholder: "e.g. Clean terminal architecture! Love the telemetry cockpit."
+    validations:
+      required: true
