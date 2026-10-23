@@ -94,45 +94,39 @@
 <text x="862.8" y="278.6" font-size="14" font-weight="700" text-anchor="end" class="strong">4</text>
 <text x="54" y="552" font-size="16" font-weight="700" class="fg">Top languages</text>
 <g id="donut-hologram" class="donut-dial">
-<path d="M150.00,573.00A90,90,0,0,1,172.65,750.10L163.09,713.33A52,52,0,0,0,150.00,611.00Z" class="donut-slice" fill="#f1e05a" stroke="none"><title>JavaScript 348.6 KB</title><animate attributeName="fill-opacity" values="0;1" dur="1.2s" fill="freeze"/></path>
-<path d="M172.65,750.10A90,90,0,0,1,89.56,596.31L115.08,624.47A52,52,0,0,0,163.09,713.33Z" class="donut-slice" fill="#3572A5" stroke="none"><title>Python 321.1 KB</title><animate attributeName="fill-opacity" values="0;1" dur="1.2s" fill="freeze"/></path>
-<path d="M89.56,596.31A90,90,0,0,1,129.91,575.27L138.39,612.31A52,52,0,0,0,115.08,624.47Z" class="donut-slice" fill="#563d7c" stroke="none"><title>CSS 61.7 KB</title><animate attributeName="fill-opacity" values="0;1" dur="1.2s" fill="freeze"/></path>
-<path d="M129.91,575.27A90,90,0,0,1,149.24,573.00L149.56,611.00A52,52,0,0,0,138.39,612.31Z" class="donut-slice" fill="#e34c26" stroke="none"><title>HTML 26.2 KB</title><animate attributeName="fill-opacity" values="0;1" dur="1.2s" fill="freeze"/></path>
-<path d="M149.24,573.00A90,90,0,0,1,149.62,573.00L149.78,611.00A52,52,0,0,0,149.56,611.00Z" class="donut-slice" fill="#427819" stroke="none"><title>Makefile 526 B</title><animate attributeName="fill-opacity" values="0;1" dur="1.2s" fill="freeze"/></path>
-<path d="M149.62,573.00A90,90,0,0,1,150.00,573.00L150.00,611.00A52,52,0,0,0,149.78,611.00Z" class="donut-slice" fill="#C1F12E" stroke="none"><title>Batchfile 521 B</title><animate attributeName="fill-opacity" values="0;1" dur="1.2s" fill="freeze"/></path>
-<text x="150" y="667" font-size="26" font-weight="800" text-anchor="middle" class="fg">6</text>
+<path d="M150.00,573.00A90,90,0,0,1,169.91,750.77L161.50,713.71A52,52,0,0,0,150.00,611.00Z" class="donut-slice" fill="#f1e05a" stroke="none"><title>JavaScript 348.6 KB</title><animate attributeName="fill-opacity" values="0;1" dur="1.2s" fill="freeze"/></path>
+<path d="M169.91,750.77A90,90,0,0,1,89.03,596.80L114.77,624.75A52,52,0,0,0,161.50,713.71Z" class="donut-slice" fill="#3572A5" stroke="none"><title>Python 313.0 KB</title><animate attributeName="fill-opacity" values="0;1" dur="1.2s" fill="freeze"/></path>
+<path d="M89.03,596.80A90,90,0,0,1,129.69,575.32L138.27,612.34A52,52,0,0,0,114.77,624.75Z" class="donut-slice" fill="#563d7c" stroke="none"><title>CSS 61.7 KB</title><animate attributeName="fill-opacity" values="0;1" dur="1.2s" fill="freeze"/></path>
+<path d="M129.69,575.32A90,90,0,0,1,149.23,573.00L149.55,611.00A52,52,0,0,0,138.27,612.34Z" class="donut-slice" fill="#e34c26" stroke="none"><title>HTML 26.2 KB</title><animate attributeName="fill-opacity" values="0;1" dur="1.2s" fill="freeze"/></path>
+<path d="M149.23,573.00A90,90,0,0,1,150.00,573.00L150.00,611.00A52,52,0,0,0,149.55,611.00Z" class="donut-slice" fill="#8b949e" stroke="none"><title>Others 1.0 KB</title><animate attributeName="fill-opacity" values="0;1" dur="1.2s" fill="freeze"/></path>
+<text x="150" y="667" font-size="26" font-weight="800" text-anchor="middle" class="fg">5</text>
 <text x="150" y="685" font-size="11" text-anchor="middle" class="weak">LANGUAGES</text>
 </g>
-<rect x="270" y="567" width="13" height="13" rx="3" fill="#f1e05a"/>
-<text x="292" y="578" font-size="14" class="fg">JavaScript</text>
-<text x="424" y="578" font-size="14" font-weight="700" text-anchor="end" class="weak">46%</text>
-<rect x="292" y="584" width="132" height="3" rx="1.5" fill="#ffffff" fill-opacity="0.08"/>
-<rect x="292" y="584" width="61" height="3" rx="1.5" fill="#f1e05a"/>
-<rect x="270" y="597" width="13" height="13" rx="3" fill="#3572A5"/>
-<text x="292" y="608" font-size="14" class="fg">Python</text>
-<text x="424" y="608" font-size="14" font-weight="700" text-anchor="end" class="weak">42%</text>
-<rect x="292" y="614" width="132" height="3" rx="1.5" fill="#ffffff" fill-opacity="0.08"/>
-<rect x="292" y="614" width="56" height="3" rx="1.5" fill="#3572A5"/>
-<rect x="270" y="627" width="13" height="13" rx="3" fill="#563d7c"/>
-<text x="292" y="638" font-size="14" class="fg">CSS</text>
-<text x="424" y="638" font-size="14" font-weight="700" text-anchor="end" class="weak">8%</text>
-<rect x="292" y="644" width="132" height="3" rx="1.5" fill="#ffffff" fill-opacity="0.08"/>
-<rect x="292" y="644" width="11" height="3" rx="1.5" fill="#563d7c"/>
-<rect x="270" y="657" width="13" height="13" rx="3" fill="#e34c26"/>
-<text x="292" y="668" font-size="14" class="fg">HTML</text>
-<text x="424" y="668" font-size="14" font-weight="700" text-anchor="end" class="weak">3%</text>
-<rect x="292" y="674" width="132" height="3" rx="1.5" fill="#ffffff" fill-opacity="0.08"/>
-<rect x="292" y="674" width="5" height="3" rx="1.5" fill="#e34c26"/>
-<rect x="270" y="687" width="13" height="13" rx="3" fill="#427819"/>
-<text x="292" y="698" font-size="14" class="fg">Makefile</text>
-<text x="424" y="698" font-size="14" font-weight="700" text-anchor="end" class="weak">0.1%</text>
-<rect x="292" y="704" width="132" height="3" rx="1.5" fill="#ffffff" fill-opacity="0.08"/>
-<rect x="292" y="704" width="2" height="3" rx="1.5" fill="#427819"/>
-<rect x="270" y="717" width="13" height="13" rx="3" fill="#C1F12E"/>
-<text x="292" y="728" font-size="14" class="fg">Batchfile</text>
-<text x="424" y="728" font-size="14" font-weight="700" text-anchor="end" class="weak">0.1%</text>
-<rect x="292" y="734" width="132" height="3" rx="1.5" fill="#ffffff" fill-opacity="0.08"/>
-<rect x="292" y="734" width="2" height="3" rx="1.5" fill="#C1F12E"/>
+<rect x="270" y="572" width="13" height="13" rx="3" fill="#f1e05a"/>
+<text x="292" y="583" font-size="14" class="fg">JavaScript</text>
+<text x="424" y="583" font-size="14" font-weight="700" text-anchor="end" class="weak">46%</text>
+<rect x="292" y="589" width="132" height="3" rx="1.5" fill="#ffffff" fill-opacity="0.08"/>
+<rect x="292" y="589" width="61" height="3" rx="1.5" fill="#f1e05a"/>
+<rect x="270" y="602" width="13" height="13" rx="3" fill="#3572A5"/>
+<text x="292" y="613" font-size="14" class="fg">Python</text>
+<text x="424" y="613" font-size="14" font-weight="700" text-anchor="end" class="weak">42%</text>
+<rect x="292" y="619" width="132" height="3" rx="1.5" fill="#ffffff" fill-opacity="0.08"/>
+<rect x="292" y="619" width="55" height="3" rx="1.5" fill="#3572A5"/>
+<rect x="270" y="632" width="13" height="13" rx="3" fill="#563d7c"/>
+<text x="292" y="643" font-size="14" class="fg">CSS</text>
+<text x="424" y="643" font-size="14" font-weight="700" text-anchor="end" class="weak">8%</text>
+<rect x="292" y="649" width="132" height="3" rx="1.5" fill="#ffffff" fill-opacity="0.08"/>
+<rect x="292" y="649" width="11" height="3" rx="1.5" fill="#563d7c"/>
+<rect x="270" y="662" width="13" height="13" rx="3" fill="#e34c26"/>
+<text x="292" y="673" font-size="14" class="fg">HTML</text>
+<text x="424" y="673" font-size="14" font-weight="700" text-anchor="end" class="weak">3%</text>
+<rect x="292" y="679" width="132" height="3" rx="1.5" fill="#ffffff" fill-opacity="0.08"/>
+<rect x="292" y="679" width="5" height="3" rx="1.5" fill="#e34c26"/>
+<rect x="270" y="692" width="13" height="13" rx="3" fill="#8b949e"/>
+<text x="292" y="703" font-size="14" class="fg">Others</text>
+<text x="424" y="703" font-size="14" font-weight="700" text-anchor="end" class="weak">0.1%</text>
+<rect x="292" y="709" width="132" height="3" rx="1.5" fill="#ffffff" fill-opacity="0.08"/>
+<rect x="292" y="709" width="2" height="3" rx="1.5" fill="#8b949e"/>
 <rect x="30" y="786" width="200" height="46" rx="14" class="card kpi-pill"/>
 <text x="48" y="818" font-size="26" font-weight="800" class="strong">243</text>
 <text x="104" y="817" font-size="14" class="weak">contributions</text>

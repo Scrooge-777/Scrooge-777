@@ -6,11 +6,10 @@ def fetch_languages(username, token=None):
         headers['Authorization'] = f'Bearer {token}'
     default_langs = [
         ('JavaScript', 356975, '#f1e05a'),
-        ('Python', 319953, '#3572A5'),
+        ('Python', 320500, '#3572A5'),
         ('CSS', 63193, '#563d7c'),
         ('HTML', 26792, '#e34c26'),
-        ('Makefile', 526, '#427819'),
-        ('Batchfile', 521, '#C1F12E')
+        ('Others', 1047, '#8b949e')
     ]
     try:
         req = urllib.request.Request(f'https://api.github.com/users/{username}/repos?per_page=100', headers=headers)
@@ -23,8 +22,10 @@ def fetch_languages(username, token=None):
                     'Python': '#3572A5',
                     'CSS': '#563d7c',
                     'HTML': '#e34c26',
-                    'Makefile': '#427819',
-                    'Batchfile': '#C1F12E'
+                    'TypeScript': '#3178c6',
+                    'Rust': '#dea584',
+                    'C++': '#f34b7d',
+                    'Go': '#00ADD8'
                 }
                 for r in repos_data:
                     lang_url = r.get('languages_url')
@@ -39,7 +40,14 @@ def fetch_languages(username, token=None):
                             pass
                 if lang_totals:
                     sorted_langs = sorted(lang_totals.items(), key=lambda x: x[1], reverse=True)
-                    return [(name, b_cnt, color_map.get(name, '#8b949e')) for name, b_cnt in sorted_langs[:6]]
+                    top_4 = [
+                        (name, b_cnt, color_map.get(name, '#8b949e'))
+                        for name, b_cnt in sorted_langs[:4]
+                    ]
+                    other_bytes = sum(b_cnt for _, b_cnt in sorted_langs[4:])
+                    if other_bytes > 0:
+                        return top_4 + [('Others', other_bytes, '#8b949e')]
+                    return top_4
     except Exception:
         pass
     return default_langs

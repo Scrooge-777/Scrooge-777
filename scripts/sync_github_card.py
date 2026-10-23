@@ -19,8 +19,7 @@ def fetch_stats_and_languages(username, token=None):
             ('Python', 320500, '#3572A5'),
             ('CSS', 63193, '#563d7c'),
             ('HTML', 26792, '#e34c26'),
-            ('Makefile', 526, '#427819'),
-            ('Batchfile', 521, '#C1F12E')
+            ('Others', 1047, '#8b949e')
         ]
     }
 
@@ -39,8 +38,6 @@ def fetch_stats_and_languages(username, token=None):
                     'Python': '#3572A5',
                     'CSS': '#563d7c',
                     'HTML': '#e34c26',
-                    'Makefile': '#427819',
-                    'Batchfile': '#C1F12E',
                     'TypeScript': '#3178c6',
                     'Rust': '#dea584',
                     'C++': '#f34b7d',
@@ -60,10 +57,15 @@ def fetch_stats_and_languages(username, token=None):
                 
                 if lang_totals:
                     sorted_langs = sorted(lang_totals.items(), key=lambda x: x[1], reverse=True)
-                    stats['languages'] = [
+                    top_4 = [
                         (name, b_cnt, color_map.get(name, '#8b949e'))
-                        for name, b_cnt in sorted_langs[:6]
+                        for name, b_cnt in sorted_langs[:4]
                     ]
+                    other_bytes = sum(b_cnt for _, b_cnt in sorted_langs[4:])
+                    if other_bytes > 0:
+                        stats['languages'] = top_4 + [('Others', other_bytes, '#8b949e')]
+                    else:
+                        stats['languages'] = top_4
     except Exception as e:
         print(f"REST fetch exception: {e}")
 
@@ -149,7 +151,7 @@ def generate_languages_svg(languages):
     donut_xml = f'<g id="donut-hologram" class="donut-dial">\n{donut_sub}\n</g>'
 
     legend_rows = []
-    y_start = 567
+    y_start = 572
     for i, (name, bytes_cnt, color) in enumerate(languages):
         pct = (bytes_cnt / total_bytes) * 100
         pct_str = f"{pct:.1f}%" if pct < 1 else f"{round(pct)}%"
