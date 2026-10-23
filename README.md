@@ -26,7 +26,7 @@
 
 <p align="center">
   <a href="#readme-top">
-    <img src="https://skillicons.dev/icons?i=python,c,cpp,rust,ts,fastapi,docker,linux,git&theme=dark" alt="Core Arsenal" />
+    <img src="https://skillicons.dev/icons?i=python,js,html,css,git&theme=dark" alt="Core Arsenal" />
   </a>
 </p>
 

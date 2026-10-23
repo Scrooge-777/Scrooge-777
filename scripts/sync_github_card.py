@@ -14,6 +14,7 @@ def fetch_stats_and_languages(username, token=None):
         'repos': 4,
         'stars': 0,
         'forks': 0,
+        'raw_languages': ['Python', 'JavaScript', 'HTML', 'CSS'],
         'languages': [
             ('JavaScript', 356975, '#f1e05a'),
             ('Python', 320500, '#3572A5'),
@@ -41,7 +42,14 @@ def fetch_stats_and_languages(username, token=None):
                     'TypeScript': '#3178c6',
                     'Rust': '#dea584',
                     'C++': '#f34b7d',
-                    'Go': '#00ADD8'
+                    'C': '#555555',
+                    'Go': '#00ADD8',
+                    'Java': '#b07219',
+                    'Kotlin': '#A97BFF',
+                    'PHP': '#4F5D95',
+                    'Ruby': '#701516',
+                    'Swift': '#F05138',
+                    'Dart': '#00B4AB'
                 }
                 for r in repos_data:
                     lang_url = r.get('languages_url')
@@ -57,6 +65,7 @@ def fetch_stats_and_languages(username, token=None):
                 
                 if lang_totals:
                     sorted_langs = sorted(lang_totals.items(), key=lambda x: x[1], reverse=True)
+                    stats['raw_languages'] = [name for name, _ in sorted_langs]
                     top_4 = [
                         (name, b_cnt, color_map.get(name, '#8b949e'))
                         for name, b_cnt in sorted_langs[:4]
@@ -107,6 +116,57 @@ def fetch_stats_and_languages(username, token=None):
 
     return stats
 
+def update_readme_arsenal(readme_path, languages_found):
+    if not os.path.exists(readme_path):
+        return
+
+    icon_map = {
+        'Python': 'python',
+        'JavaScript': 'js',
+        'HTML': 'html',
+        'CSS': 'css',
+        'TypeScript': 'ts',
+        'Rust': 'rust',
+        'C': 'c',
+        'C++': 'cpp',
+        'C#': 'cs',
+        'Go': 'go',
+        'Java': 'java',
+        'Kotlin': 'kotlin',
+        'PHP': 'php',
+        'Ruby': 'ruby',
+        'Swift': 'swift',
+        'Dart': 'dart',
+        'Shell': 'bash',
+        'Bash': 'bash',
+        'Dockerfile': 'docker',
+        'Solidity': 'solidity'
+    }
+
+    icons = []
+    for lang in languages_found:
+        icon = icon_map.get(lang)
+        if icon and icon not in icons:
+            icons.append(icon)
+
+    if 'git' not in icons:
+        icons.append('git')
+
+    icons_str = ','.join(icons)
+    with open(readme_path, 'r', encoding='utf-8') as f:
+        content = f.read()
+
+    new_content = re.sub(
+        r'https://skillicons\.dev/icons\?i=[^&"\s]+(&theme=[^"\s]+)',
+        rf'https://skillicons.dev/icons?i={icons_str}\g<1>',
+        content
+    )
+
+    if new_content != content:
+        with open(readme_path, 'w', encoding='utf-8') as f:
+            f.write(new_content)
+        print(f"Updated README.md Core Arsenal to: {icons_str}")
+
 def generate_languages_svg(languages):
     total_bytes = sum(b for _, b, _ in languages)
     if total_bytes == 0:
@@ -145,9 +205,6 @@ def generate_languages_svg(languages):
         )
 
     donut_sub = "\n".join(donut_paths)
-    donut_sub += f'\n<text x="150" y="667" font-size="26" font-weight="800" text-anchor="middle" class="fg">{len(languages)}</text>'
-    donut_sub += f'\n<text x="150" y="685" font-size="11" text-anchor="middle" class="weak">LANGUAGES</text>'
-
     donut_xml = f'<g id="donut-hologram" class="donut-dial">\n{donut_sub}\n</g>'
 
     legend_rows = []
@@ -248,7 +305,10 @@ def main():
     repo_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
     svg_path = os.path.join(repo_dir, 'assets', 'github_card_v2.svg')
     green_path = os.path.join(repo_dir, 'assets', 'profile-night-green.svg')
+    readme_path = os.path.join(repo_dir, 'README.md')
+
     update_svg(svg_path, green_path, stats)
+    update_readme_arsenal(readme_path, stats.get('raw_languages', []))
 
 if __name__ == '__main__':
     main()
