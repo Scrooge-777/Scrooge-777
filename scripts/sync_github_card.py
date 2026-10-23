@@ -5,10 +5,9 @@ def fetch_stats_and_languages(username, token=None):
     if token:
         headers['Authorization'] = f'Bearer {token}'
     
-    # Baseline defaults matching Scrooge-777 verified profile
     stats = {
-        'contributions': 237,
-        'commits': 174,
+        'contributions': 241,
+        'commits': 177,
         'prs': 3,
         'reviews': 0,
         'issues': 0,
@@ -17,7 +16,7 @@ def fetch_stats_and_languages(username, token=None):
         'forks': 0,
         'languages': [
             ('JavaScript', 356975, '#f1e05a'),
-            ('Python', 319953, '#3572A5'),
+            ('Python', 320500, '#3572A5'),
             ('CSS', 63193, '#563d7c'),
             ('HTML', 26792, '#e34c26'),
             ('Makefile', 526, '#427819'),
@@ -25,12 +24,8 @@ def fetch_stats_and_languages(username, token=None):
         ]
     }
 
-    # Fetch live repos via public REST API
     try:
-        req = urllib.request.Request(
-            f'https://api.github.com/users/{username}/repos?per_page=100',
-            headers=headers
-        )
+        req = urllib.request.Request(f'https://api.github.com/users/{username}/repos?per_page=100', headers=headers)
         with urllib.request.urlopen(req, timeout=12) as resp:
             repos_data = json.loads(resp.read().decode('utf-8'))
             if isinstance(repos_data, list):
@@ -38,7 +33,6 @@ def fetch_stats_and_languages(username, token=None):
                 stats['stars'] = sum(r.get('stargazers_count', 0) for r in repos_data)
                 stats['forks'] = sum(r.get('forks_count', 0) for r in repos_data)
 
-                # Aggregate languages
                 lang_totals = {}
                 color_map = {
                     'JavaScript': '#f1e05a',
@@ -73,7 +67,6 @@ def fetch_stats_and_languages(username, token=None):
     except Exception as e:
         print(f"REST fetch exception: {e}")
 
-    # Fetch GraphQL contribution numbers if token available
     if token:
         query = """
         query($login: String!) {
@@ -149,9 +142,11 @@ def generate_languages_svg(languages):
             f'<animate attributeName="fill-opacity" values="0;1" dur="1.2s" fill="freeze"/></path>'
         )
 
-    donut_xml = "\n".join(donut_paths)
-    donut_xml += f'\n<text x="150" y="667" font-size="26" font-weight="800" text-anchor="middle" class="fg">{len(languages)}</text>'
-    donut_xml += f'\n<text x="150" y="685" font-size="11" text-anchor="middle" class="weak">LANGUAGES</text>'
+    donut_sub = "\n".join(donut_paths)
+    donut_sub += f'\n<text x="150" y="667" font-size="26" font-weight="800" text-anchor="middle" class="fg">{len(languages)}</text>'
+    donut_sub += f'\n<text x="150" y="685" font-size="11" text-anchor="middle" class="weak">LANGUAGES</text>'
+
+    donut_xml = f'<g id="donut-hologram" class="donut-dial">\n{donut_sub}\n</g>'
 
     legend_rows = []
     y_start = 567
@@ -198,11 +193,24 @@ def update_svg(svg_path, green_path, stats):
                 cols_processed = cols_processed.replace(f'class="cont-left-{i}"', f'class="c{i}l"')
                 cols_processed = cols_processed.replace(f'class="cont-right-{i}"', f'class="c{i}r"')
 
-            v2_first_col = svg.find('<g class="iso-col" transform="translate(140 154.18)">')
+            def add_pulse(match):
+                c_xml = match.group(0)
+                dur = "3s" if "c4t" in c_xml else ("3.8s" if "c3t" in c_xml else "4.6s")
+                h = "-7" if "c4t" in c_xml else ("-5" if "c3t" in c_xml else "-3")
+                anim = f'<animateTransform attributeName="transform" type="translate" values="0,0; 0,{h}; 0,0" dur="{dur}" repeatCount="indefinite" additive="sum"/>'
+                return c_xml[:-4] + anim + '</g>'
+
+            cols_processed = re.sub(r'<g class="iso-col" transform="translate\([^\)]+\)">.*?class="c[432]t".*?</g>', add_pulse, cols_processed, flags=re.DOTALL)
+            wrapped_island = f'<g id="terrain-island" class="terrain-3d">\n{cols_processed}\n</g>\n'
+
+            v2_first_col = svg.find('<g id="terrain-island"')
+            if v2_first_col == -1:
+                v2_first_col = svg.find('<g class="iso-col" transform="translate(140 154.18)">')
             v2_grid_end = svg.find('<rect x="780" y="96"')
+
             if v2_first_col != -1 and v2_grid_end != -1:
-                svg = svg[:v2_first_col] + cols_processed + '\n' + svg[v2_grid_end:]
-                print("Synced 3D contribution columns from profile-night-green.svg!")
+                svg = svg[:v2_first_col] + wrapped_island + svg[v2_grid_end:]
+                print("Synced 3D contribution columns with dynamic animations!")
 
     # 2. Sync Top Languages section
     langs_start = svg.find('Top languages</text>')
