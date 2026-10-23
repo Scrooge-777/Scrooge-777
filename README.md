@@ -21,7 +21,7 @@
 <hr/>
 
 <!-- Minimal Core Arsenal -->
-<h2 align="center">⚡ Core Arsenal</h2>
+<h2 align="center">Core Arsenal</h2>
 <br/>
 
 <p align="center">
