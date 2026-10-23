@@ -424,6 +424,45 @@
 <circle cx="975.4" cy="297.1" r="4.5" fill="#57da69" stroke="#02020c" stroke-width="2"/>
 <text x="862.8" y="260.6" font-size="16" font-weight="600" text-anchor="end" class="fg">Repo</text>
 <text x="862.8" y="278.6" font-size="14" font-weight="700" text-anchor="end" class="strong">4</text>
+<text x="54" y="552" font-size="16" font-weight="700" class="fg">Top languages</text>
+<path d="M150.00,575.00A90,90,0,0,1,226.18,712.92L194.02,692.69A52,52,0,0,0,150.00,613.00Z" fill="#3572A5" stroke="#080a22" stroke-width="2.5"><title>Python 75</title><animate attributeName="fill-opacity" values="0;1" dur="1.2s" fill="freeze"/></path>
+<path d="M226.18,712.92A90,90,0,0,1,125.99,751.74L136.13,715.11A52,52,0,0,0,194.02,692.69Z" fill="#dea584" stroke="#080a22" stroke-width="2.5"><title>Rust 45</title><animate attributeName="fill-opacity" values="0;1" dur="1.2s" fill="freeze"/></path>
+<path d="M125.99,751.74A90,90,0,0,1,64.17,692.08L100.41,680.65A52,52,0,0,0,136.13,715.11Z" fill="#f34b7d" stroke="#080a22" stroke-width="2.5"><title>C++ 35</title><animate attributeName="fill-opacity" values="0;1" dur="1.2s" fill="freeze"/></path>
+<path d="M64.17,692.08A90,90,0,0,1,73.15,618.17L105.60,637.94A52,52,0,0,0,100.41,680.65Z" fill="#3178c6" stroke="#080a22" stroke-width="2.5"><title>TypeScript 30</title><animate attributeName="fill-opacity" values="0;1" dur="1.2s" fill="freeze"/></path>
+<path d="M73.15,618.17A90,90,0,0,1,110.46,584.15L127.15,618.29A52,52,0,0,0,105.60,637.94Z" fill="#00ADD8" stroke="#080a22" stroke-width="2.5"><title>Go 20</title><animate attributeName="fill-opacity" values="0;1" dur="1.2s" fill="freeze"/></path>
+<path d="M110.46,584.15A90,90,0,0,1,150.00,575.00L150.00,613.00A52,52,0,0,0,127.15,618.29Z" fill="#f1e05a" stroke="#080a22" stroke-width="2.5"><title>JavaScript 16</title><animate attributeName="fill-opacity" values="0;1" dur="1.2s" fill="freeze"/></path>
+<text x="150" y="667" font-size="26" font-weight="800" text-anchor="middle" class="fg">6</text>
+<text x="150" y="685" font-size="11" text-anchor="middle" class="weak">LANGUAGES</text>
+<rect x="270" y="567" width="13" height="13" rx="3" fill="#3572A5"/>
+<text x="292" y="578" font-size="14" class="fg">Python</text>
+<text x="424" y="578" font-size="14" font-weight="700" text-anchor="end" class="weak">34%</text>
+<rect x="292" y="584" width="132" height="3" rx="1.5" fill="#ffffff" fill-opacity="0.08"/>
+<rect x="292" y="584" width="132" height="3" rx="1.5" fill="#3572A5"/>
+<rect x="270" y="597" width="13" height="13" rx="3" fill="#dea584"/>
+<text x="292" y="608" font-size="14" class="fg">Rust</text>
+<text x="424" y="608" font-size="14" font-weight="700" text-anchor="end" class="weak">20%</text>
+<rect x="292" y="614" width="132" height="3" rx="1.5" fill="#ffffff" fill-opacity="0.08"/>
+<rect x="292" y="614" width="79" height="3" rx="1.5" fill="#dea584"/>
+<rect x="270" y="627" width="13" height="13" rx="3" fill="#f34b7d"/>
+<text x="292" y="638" font-size="14" class="fg">C++</text>
+<text x="424" y="638" font-size="14" font-weight="700" text-anchor="end" class="weak">16%</text>
+<rect x="292" y="644" width="132" height="3" rx="1.5" fill="#ffffff" fill-opacity="0.08"/>
+<rect x="292" y="644" width="62" height="3" rx="1.5" fill="#f34b7d"/>
+<rect x="270" y="657" width="13" height="13" rx="3" fill="#3178c6"/>
+<text x="292" y="668" font-size="14" class="fg">TypeScript</text>
+<text x="424" y="668" font-size="14" font-weight="700" text-anchor="end" class="weak">14%</text>
+<rect x="292" y="674" width="132" height="3" rx="1.5" fill="#ffffff" fill-opacity="0.08"/>
+<rect x="292" y="674" width="53" height="3" rx="1.5" fill="#3178c6"/>
+<rect x="270" y="687" width="13" height="13" rx="3" fill="#00ADD8"/>
+<text x="292" y="698" font-size="14" class="fg">Go</text>
+<text x="424" y="698" font-size="14" font-weight="700" text-anchor="end" class="weak">9%</text>
+<rect x="292" y="704" width="132" height="3" rx="1.5" fill="#ffffff" fill-opacity="0.08"/>
+<rect x="292" y="704" width="35" height="3" rx="1.5" fill="#00ADD8"/>
+<rect x="270" y="717" width="13" height="13" rx="3" fill="#f1e05a"/>
+<text x="292" y="728" font-size="14" class="fg">JavaScript</text>
+<text x="424" y="728" font-size="14" font-weight="700" text-anchor="end" class="weak">7%</text>
+<rect x="292" y="734" width="132" height="3" rx="1.5" fill="#ffffff" fill-opacity="0.08"/>
+<rect x="292" y="734" width="28" height="3" rx="1.5" fill="#f1e05a"/>
 <rect x="30" y="786" width="200" height="46" rx="14" class="card"/>
 <text x="48" y="818" font-size="26" font-weight="800" class="strong">228</text>
 <text x="104" y="817" font-size="14" class="weak">contributions</text>
