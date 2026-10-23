@@ -12,7 +12,7 @@
 <!-- Interactive 3D GitHub Activity Card (Isometric Terrain + Radar + Languages + KPIs) -->
 <p align="center">
   <a href="#readme-top">
-    <img alt="Interactive 3D Activity Landscape" src="assets/github_card_v2.svg?v=noglow" width="90%" />
+    <img alt="Interactive 3D Activity Landscape" src="assets/github_card_v2.svg?v=wave" width="90%" />
   </a>
 </p>
 
@@ -26,7 +26,7 @@
 
 <p align="center">
   <a href="#readme-top">
-    <img src="https://skillicons.dev/icons?i=js,python,css,html,docker,git&theme=dark" alt="Core Arsenal" />
+    <img src="https://skillicons.dev/icons?i=python,js,html,css,git&theme=dark" alt="Core Arsenal" />
   </a>
 </p>
 

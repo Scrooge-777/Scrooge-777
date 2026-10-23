@@ -226,6 +226,75 @@ def generate_languages_svg(languages):
     legend_xml = "\n".join(legend_rows)
     return f'Top languages</text>\n{donut_xml}\n{legend_xml}\n'
 
+def build_active_wave_terrain(green_svg):
+    first_g = green_svg.find('<g transform="translate(140 154.18)">')
+    last_close = green_svg.find('</g></g><g transform="translate(980, 284.5)">')
+    if first_g == -1 or last_close == -1:
+        return None
+
+    raw_grid = green_svg[first_g:last_close + 4]
+    col_pattern = re.compile(r'<g transform="translate\(([^)]+)\)">(.*?)</g>', re.DOTALL)
+    matches = list(col_pattern.finditer(raw_grid))
+    if not matches:
+        return None
+
+    # Inception week: week 49 (late Sept / Oct 1st, 2026 onwards)
+    start_week = 49
+    start_idx = start_week * 7
+    active_matches = matches[start_idx:] if len(matches) > start_idx else matches
+
+    coords = [list(map(float, m.group(1).split())) for m in active_matches]
+    xs = [c[0] for c in coords]
+    ys = [c[1] for c in coords]
+    raw_cx = (min(xs) + max(xs)) / 2.0
+    raw_cy = (min(ys) + max(ys)) / 2.0
+
+    target_cx = 390.0
+    target_cy = 280.0
+    scale = 1.6
+    wave_period = 3.0
+
+    processed_cols = []
+    for i, m in enumerate(active_matches):
+        global_idx = start_idx + i
+        w = global_idx // 7
+        d = global_idx % 7
+        rel_w = w - start_week
+
+        orig_x, orig_y = coords[i]
+        new_x = target_cx + (orig_x - raw_cx) * scale
+        new_y = target_cy + (orig_y - raw_cy) * scale
+
+        content = m.group(2)
+        content = re.sub(r'<animateTransform[^>]*repeatCount="1"[^>]*>.*?</animateTransform>', '', content)
+        content = re.sub(r'<animateTransform[^>]*repeatCount="1"[^>]*/>', '', content)
+        content = content.replace('stroke="none"', '')
+
+        for lvl in range(5):
+            content = content.replace(
+                f'class="cont-top-{lvl}"',
+                f'class="c{lvl}t" stroke="#fff" stroke-opacity="0.06" stroke-width="0.5"'
+            )
+            content = content.replace(f'class="cont-left-{lvl}"', f'class="c{lvl}l"')
+            content = content.replace(f'class="cont-right-{lvl}"', f'class="c{lvl}r"')
+
+        float_h = -14 if "c4t" in content else (-12 if "c3t" in content else (-10 if "c2t" in content else -7))
+        phase = ((rel_w * 0.42) + (d * 0.26)) % wave_period
+
+        wave_anim = (
+            f'<animateTransform attributeName="transform" type="translate" '
+            f'values="0,0; 0,{float_h}; 0,0" dur="{wave_period}s" begin="-{phase:.2f}s" '
+            f'repeatCount="indefinite" additive="sum" calcMode="spline" '
+            f'keySplines="0.45 0 0.55 1; 0.45 0 0.55 1" keyTimes="0; 0.5; 1"/>'
+        )
+
+        col_xml = f'<g class="iso-col" transform="translate({new_x:.2f} {new_y:.2f}) scale({scale})">{content}{wave_anim}</g>'
+        processed_cols.append(col_xml)
+
+    all_cols_xml = "\n".join(processed_cols)
+    wrapped = f'<g id="terrain-island" class="terrain-3d">\n{all_cols_xml}\n</g>'
+    return wrapped
+
 def update_svg(svg_path, green_path, stats):
     if not os.path.exists(svg_path):
         print(f"SVG not found at {svg_path}")
@@ -238,38 +307,17 @@ def update_svg(svg_path, green_path, stats):
     if os.path.exists(green_path):
         with open(green_path, 'r', encoding='utf-8') as gf:
             green_svg = gf.read()
-        first_g = green_svg.find('<g transform="translate(140 154.18)">')
-        last_close = green_svg.find('</g></g><g transform="translate(980, 284.5)">')
-        if first_g != -1 and last_close != -1:
-            raw_grid = green_svg[first_g:last_close + 4]
-            cols_processed = raw_grid.replace('stroke="none"', '')
-            cols_processed = cols_processed.replace('<g transform=', '<g class="iso-col" transform=')
-            for i in range(5):
-                cols_processed = cols_processed.replace(
-                    f'class="cont-top-{i}"',
-                    f'class="c{i}t" stroke="#fff" stroke-opacity="0.05" stroke-width="0.5"'
-                )
-                cols_processed = cols_processed.replace(f'class="cont-left-{i}"', f'class="c{i}l"')
-                cols_processed = cols_processed.replace(f'class="cont-right-{i}"', f'class="c{i}r"')
-
-            def add_pulse(match):
-                c_xml = match.group(0)
-                dur = "3s" if "c4t" in c_xml else ("3.8s" if "c3t" in c_xml else "4.6s")
-                h = "-7" if "c4t" in c_xml else ("-5" if "c3t" in c_xml else "-3")
-                anim = f'<animateTransform attributeName="transform" type="translate" values="0,0; 0,{h}; 0,0" dur="{dur}" repeatCount="indefinite" additive="sum"/>'
-                return c_xml[:-4] + anim + '</g>'
-
-            cols_processed = re.sub(r'<g class="iso-col" transform="translate\([^\)]+\)">.*?class="c[432]t".*?</g>', add_pulse, cols_processed, flags=re.DOTALL)
-            wrapped_island = f'<g id="terrain-island" class="terrain-3d">\n{cols_processed}\n</g>\n'
-
+        wrapped_island = build_active_wave_terrain(green_svg)
+        if wrapped_island:
             v2_first_col = svg.find('<g id="terrain-island"')
             if v2_first_col == -1:
-                v2_first_col = svg.find('<g class="iso-col" transform="translate(140 154.18)">')
+                v2_first_col = svg.find('<g class="iso-col"')
             v2_grid_end = svg.find('<rect x="780" y="96"')
 
             if v2_first_col != -1 and v2_grid_end != -1:
-                svg = svg[:v2_first_col] + wrapped_island + svg[v2_grid_end:]
-                print("Synced 3D contribution columns with dynamic animations!")
+                svg = svg[:v2_first_col] + wrapped_island + "\n" + svg[v2_grid_end:]
+                svg = re.sub(r'>Last 12 months<', '>Activity since Oct 2026<', svg)
+                print("Synced active 3D wave columns!")
 
     # 2. Sync Top Languages section
     langs_start = svg.find('Top languages</text>')
