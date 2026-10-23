@@ -70,8 +70,8 @@
 <text x="862.8" y="260.6" font-size="16" font-weight="600" text-anchor="end" class="fg">Repo</text>
 <text x="862.8" y="278.6" font-size="14" font-weight="700" text-anchor="end" class="strong">4</text>
 <text x="54" y="552" font-size="16" font-weight="700" class="fg">Top languages</text>
-<path d="M150.00,573.00A90,90,0,0,1,172.44,750.16L162.97,713.36A52,52,0,0,0,150.00,611.00Z" class="donut-slice" fill="#f1e05a" stroke="none"><title>JavaScript 348.6 KB</title><animate attributeName="fill-opacity" values="0;1" dur="1.2s" fill="freeze"/></path>
-<path d="M172.44,750.16A90,90,0,0,1,89.52,596.35L115.06,624.49A52,52,0,0,0,162.97,713.36Z" class="donut-slice" fill="#3572A5" stroke="none"><title>Python 320.5 KB</title><animate attributeName="fill-opacity" values="0;1" dur="1.2s" fill="freeze"/></path>
+<path d="M150.00,573.00A90,90,0,0,1,172.44,750.16L162.96,713.36A52,52,0,0,0,150.00,611.00Z" class="donut-slice" fill="#f1e05a" stroke="none"><title>JavaScript 348.6 KB</title><animate attributeName="fill-opacity" values="0;1" dur="1.2s" fill="freeze"/></path>
+<path d="M172.44,750.16A90,90,0,0,1,89.52,596.35L115.06,624.49A52,52,0,0,0,162.96,713.36Z" class="donut-slice" fill="#3572A5" stroke="none"><title>Python 320.5 KB</title><animate attributeName="fill-opacity" values="0;1" dur="1.2s" fill="freeze"/></path>
 <path d="M89.52,596.35A90,90,0,0,1,129.89,575.28L138.38,612.31A52,52,0,0,0,115.06,624.49Z" class="donut-slice" fill="#563d7c" stroke="none"><title>CSS 61.7 KB</title><animate attributeName="fill-opacity" values="0;1" dur="1.2s" fill="freeze"/></path>
 <path d="M129.89,575.28A90,90,0,0,1,149.24,573.00L149.56,611.00A52,52,0,0,0,138.38,612.31Z" class="donut-slice" fill="#e34c26" stroke="none"><title>HTML 26.2 KB</title><animate attributeName="fill-opacity" values="0;1" dur="1.2s" fill="freeze"/></path>
 <path d="M149.24,573.00A90,90,0,0,1,149.62,573.00L149.78,611.00A52,52,0,0,0,149.56,611.00Z" class="donut-slice" fill="#427819" stroke="none"><title>Makefile 526 B</title><animate attributeName="fill-opacity" values="0;1" dur="1.2s" fill="freeze"/></path>
