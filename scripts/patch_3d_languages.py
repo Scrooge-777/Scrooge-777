@@ -1,18 +1,54 @@
-import math, os, shutil, xml.etree.ElementTree as ET
+import math, os, shutil, urllib.request, json, xml.etree.ElementTree as ET
 
-def patch_file(path):
+def fetch_languages(username, token=None):
+    headers = {'User-Agent': 'GitHub-Profile-Sync'}
+    if token:
+        headers['Authorization'] = f'Bearer {token}'
+    default_langs = [
+        ('JavaScript', 356975, '#f1e05a'),
+        ('Python', 319953, '#3572A5'),
+        ('CSS', 63193, '#563d7c'),
+        ('HTML', 26792, '#e34c26'),
+        ('Makefile', 526, '#427819'),
+        ('Batchfile', 521, '#C1F12E')
+    ]
+    try:
+        req = urllib.request.Request(f'https://api.github.com/users/{username}/repos?per_page=100', headers=headers)
+        with urllib.request.urlopen(req, timeout=12) as resp:
+            repos_data = json.loads(resp.read().decode('utf-8'))
+            if isinstance(repos_data, list):
+                lang_totals = {}
+                color_map = {
+                    'JavaScript': '#f1e05a',
+                    'Python': '#3572A5',
+                    'CSS': '#563d7c',
+                    'HTML': '#e34c26',
+                    'Makefile': '#427819',
+                    'Batchfile': '#C1F12E'
+                }
+                for r in repos_data:
+                    lang_url = r.get('languages_url')
+                    if lang_url:
+                        try:
+                            l_req = urllib.request.Request(lang_url, headers=headers)
+                            with urllib.request.urlopen(l_req, timeout=10) as l_resp:
+                                l_data = json.loads(l_resp.read().decode('utf-8'))
+                                for l_name, l_bytes in l_data.items():
+                                    lang_totals[l_name] = lang_totals.get(l_name, 0) + l_bytes
+                        except Exception:
+                            pass
+                if lang_totals:
+                    sorted_langs = sorted(lang_totals.items(), key=lambda x: x[1], reverse=True)
+                    return [(name, b_cnt, color_map.get(name, '#8b949e')) for name, b_cnt in sorted_langs[:6]]
+    except Exception:
+        pass
+    return default_langs
+
+def patch_file(path, username, token=None):
     with open(path, 'r', encoding='utf-8') as f:
         svg = f.read()
 
-    langs = [
-        ('Python', 75, '#3572A5'),
-        ('Rust', 45, '#dea584'),
-        ('C++', 35, '#f34b7d'),
-        ('TypeScript', 30, '#3178c6'),
-        ('Go', 20, '#00ADD8'),
-        ('JavaScript', 16, '#f1e05a')
-    ]
-
+    langs = fetch_languages(username, token)
     total = sum(c for _, c, _ in langs)
     cur_angle = -math.pi / 2
     paths_xml, legend_xml = [], []
@@ -59,17 +95,20 @@ def patch_file(path):
         print(f"Markers not found in {path}")
 
 def main():
-    target_file = 'profile-3d-contrib/profile-night-green.svg'
+    username = os.environ.get('USERNAME', 'Scrooge-777')
+    token = os.environ.get('GITHUB_TOKEN')
+    repo_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    target_file = os.path.join(repo_dir, 'profile-3d-contrib', 'profile-night-green.svg')
+    dest_file = os.path.join(repo_dir, 'assets', 'profile-night-green.svg')
+
     if os.path.exists(target_file):
-        patch_file(target_file)
-        os.makedirs('assets', exist_ok=True)
-        dest_file = 'assets/profile-night-green.svg'
+        patch_file(target_file, username, token)
+        os.makedirs(os.path.dirname(dest_file), exist_ok=True)
         shutil.copy(target_file, dest_file)
         print(f"Copied {target_file} to {dest_file}")
-        shutil.rmtree('profile-3d-contrib', ignore_errors=True)
-        print("Purged profile-3d-contrib/ directory")
-    elif os.path.exists('assets/profile-night-green.svg'):
-        patch_file('assets/profile-night-green.svg')
+        shutil.rmtree(os.path.dirname(target_file), ignore_errors=True)
+    elif os.path.exists(dest_file):
+        patch_file(dest_file, username, token)
 
 if __name__ == '__main__':
     main()
