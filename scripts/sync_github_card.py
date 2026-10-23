@@ -144,7 +144,7 @@ def generate_languages_svg(languages):
         size_str = f"{bytes_cnt/1024:.1f} KB" if bytes_cnt > 1024 else f"{bytes_cnt} B"
 
         donut_paths.append(
-            f'<path d="{d}" class="donut-slice" fill="{color}" stroke="#0d1117" stroke-width="2.5">'
+            f'<path d="{d}" class="donut-slice" fill="{color}" stroke="none">'
             f'<title>{name} {size_str}</title>'
             f'<animate attributeName="fill-opacity" values="0;1" dur="1.2s" fill="freeze"/></path>'
         )

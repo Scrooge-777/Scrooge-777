@@ -12,7 +12,7 @@
 <!-- Interactive 3D GitHub Activity Card (Isometric Terrain + Radar + Languages + KPIs) -->
 <p align="center">
   <a href="#readme-top">
-    <img alt="Interactive 3D Activity Landscape" src="https://raw.githubusercontent.com/Scrooge-777/Scrooge-777/main/assets/github_card_v2.svg" width="90%" />
+    <img alt="Interactive 3D Activity Landscape" src="assets/github_card_v2.svg" width="90%" />
   </a>
 </p>
 
