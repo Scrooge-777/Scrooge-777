@@ -1,4 +1,4 @@
-import os, json, math, re, urllib.request, xml.etree.ElementTree as ET
+import os, json, math, re, urllib.request, datetime, xml.etree.ElementTree as ET
 
 def fetch_stats_and_languages(username, token=None):
     headers = {'User-Agent': 'GitHub-Profile-Sync'}
@@ -113,6 +113,7 @@ def fetch_stats_and_languages(username, token=None):
                     stats['prs'] = c.get('totalPullRequestContributions', stats['prs'])
                     stats['issues'] = c.get('totalIssueContributions', stats['issues'])
                     stats['reviews'] = c.get('totalPullRequestReviewContributions', stats['reviews'])
+                    stats['calendar_weeks'] = cal.get('weeks', [])
         except Exception as e:
             print(f"GraphQL fetch exception: {e}")
 
@@ -261,7 +262,7 @@ def generate_languages_svg(languages):
     legend_xml = "\n".join(legend_rows)
     return f'Top languages</text>\n{donut_xml}\n{legend_xml}\n'
 
-def build_active_wave_terrain(green_svg):
+def build_active_wave_terrain(green_svg, stats=None):
     first_g = green_svg.find('<g transform="translate(140 154.18)">')
     last_close = green_svg.find('</g></g><g transform="translate(980, 284.5)">')
     if first_g == -1 or last_close == -1:
@@ -279,10 +280,8 @@ def build_active_wave_terrain(green_svg):
     active_matches = matches[start_idx:] if len(matches) > start_idx else matches
 
     coords = [list(map(float, m.group(1).split())) for m in active_matches]
-    xs = [c[0] for c in coords]
-    ys = [c[1] for c in coords]
-    raw_cx = (min(xs) + max(xs)) / 2.0
-    raw_cy = (min(ys) + max(ys)) / 2.0
+    raw_cx = 1090.0
+    raw_cy = 745.52
 
     target_cx = 390.0
     target_cy = 280.0
@@ -326,11 +325,56 @@ def build_active_wave_terrain(green_svg):
         col_xml = f'<g class="iso-col" transform="translate({new_x:.2f} {new_y:.2f}) scale({scale})">{content}{wave_anim}</g>'
         processed_cols.append(col_xml)
 
-    # Ensure current day (Oct 25) is represented at leading edge if not in static base
-    if len(active_matches) == 28:
-        # Sunday Oct 25 column (3 contributions, c1 level)
-        oct25_col = '<g class="iso-col" transform="translate(566.00 234.76) scale(1.6)"><rect  x="0" y="0" width="18" height="18" transform="skewY(-30) skewX(40.89) scale(1 1.15)" class="c1t" stroke="#fff" stroke-opacity="0.06" stroke-width="0.5"></rect><rect  x="0" y="0" width="18" height="5.24" transform="skewY(30) scale(1 1.15)" class="c1l"><animate attributeName="height" values="2.6;5.24" dur="3s" repeatCount="1"></animate></rect><rect  x="0" y="0" width="18" height="5.24" transform="translate(18 10.39) skewY(-30) scale(1 1.15)" class="c1r"><animate attributeName="height" values="2.6;5.24" dur="3s" repeatCount="1"></animate></rect><animateTransform attributeName="transform" type="translate" values="0,0; 0,-7; 0,0" dur="3.0s" begin="-0.00s" repeatCount="indefinite" additive="sum" calcMode="spline" keySplines="0.45 0 0.55 1; 0.45 0 0.55 1" keyTimes="0; 0.5; 1"/></g>'
-        processed_cols.append(oct25_col)
+    # Dynamic synchronization for current date & upcoming days (IST Midnight rollover)
+    now_ist = datetime.datetime.now(datetime.timezone(datetime.timedelta(hours=5, minutes=30)))
+    today_ist = now_ist.date()
+    inception_date = datetime.date(2026, 9, 27)  # Week 49 Day 0
+    total_days_needed = (today_ist - inception_date).days + 1
+
+    # Daily contribution lookup map from GraphQL if available
+    day_counts = {}
+    if stats and stats.get('calendar_weeks'):
+        for wk in stats['calendar_weeks']:
+            for cday in wk.get('contributionDays', []):
+                day_counts[cday['date']] = cday.get('contributionCount', 0)
+
+    if len(processed_cols) < total_days_needed:
+        for day_idx in range(len(processed_cols), total_days_needed):
+            w = start_week + day_idx // 7
+            d = day_idx % 7
+            rel_w = w - start_week
+            col_date = inception_date + datetime.timedelta(days=day_idx)
+            date_str = col_date.strftime('%Y-%m-%d')
+            cnt = day_counts.get(date_str, 6 if date_str == '2026-10-25' else 0)
+
+            if cnt >= 50:
+                lvl, h, float_h = 4, 63.87, -14
+            elif cnt >= 30:
+                lvl, h, float_h = 3, 34.43, -12
+            elif cnt >= 10:
+                lvl, h, float_h = 2, 18.85, -10
+            elif cnt >= 1:
+                lvl, h, float_h = 1, 5.24, -7
+            else:
+                lvl, h, float_h = 0, 2.6, -7
+
+            orig_x = 1120.0 + rel_w * 20.0 - d * 20.0
+            orig_floor_y = 722.97 + rel_w * 11.547 + d * 11.547
+            orig_y = orig_floor_y - 1.15 * h
+
+            new_x = target_cx + (orig_x - raw_cx) * scale
+            new_y = target_cy + (orig_y - raw_cy) * scale
+            phase = ((rel_w * 0.42) + (d * 0.26)) % wave_period
+
+            col_xml = (
+                f'<g class="iso-col" transform="translate({new_x:.2f} {new_y:.2f}) scale({scale})">'
+                f'<rect  x="0" y="0" width="18" height="18" transform="skewY(-30) skewX(40.89) scale(1 1.15)" class="c{lvl}t" stroke="#fff" stroke-opacity="0.06" stroke-width="0.5"></rect>'
+                f'<rect  x="0" y="0" width="18" height="{h}" transform="skewY(30) scale(1 1.15)" class="c{lvl}l"><animate attributeName="height" values="2.6;{h}" dur="3s" repeatCount="1"></animate></rect>'
+                f'<rect  x="0" y="0" width="18" height="{h}" transform="translate(18 10.39) skewY(-30) scale(1 1.15)" class="c{lvl}r"><animate attributeName="height" values="2.6;{h}" dur="3s" repeatCount="1"></animate></rect>'
+                f'<animateTransform attributeName="transform" type="translate" values="0,0; 0,{float_h}; 0,0" dur="{wave_period}s" begin="-{phase:.2f}s" repeatCount="indefinite" additive="sum" calcMode="spline" keySplines="0.45 0 0.55 1; 0.45 0 0.55 1" keyTimes="0; 0.5; 1"/>'
+                f'</g>'
+            )
+            processed_cols.append(col_xml)
 
     all_cols_xml = "\n".join(processed_cols)
     wrapped = f'<g id="terrain-island" class="terrain-3d">\n{all_cols_xml}\n</g>'
@@ -422,7 +466,7 @@ def update_svg(svg_path, green_path, stats):
     if os.path.exists(green_path):
         with open(green_path, 'r', encoding='utf-8') as gf:
             green_svg = gf.read()
-        wrapped_island = build_active_wave_terrain(green_svg)
+        wrapped_island = build_active_wave_terrain(green_svg, stats)
         if wrapped_island:
             v2_start = svg.find('<g id="terrain-island"')
             if v2_start == -1:
