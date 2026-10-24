@@ -281,9 +281,23 @@ def generate_languages_svg(languages):
 def build_rolling_terrain(stats):
     """Isometric terrain for the last WINDOW_WEEKS weeks, straight from the contribution calendar."""
     weeks = (stats or {}).get('calendar_weeks') or []
-    weeks = weeks[-WINDOW_WEEKS:]
     if not weeks:
         return None
+
+    # Pad current week if incomplete (e.g. Sunday/early week) so the island has a complete grid floor
+    if weeks and len(weeks[-1].get('contributionDays', [])) < 7:
+        last_days = weeks[-1]['contributionDays']
+        if last_days:
+            last_date = datetime.date.fromisoformat(last_days[-1]['date'])
+            for i in range(1, 8 - len(last_days)):
+                next_date = last_date + datetime.timedelta(days=i)
+                last_days.append({
+                    'date': next_date.isoformat(),
+                    'contributionCount': 0,
+                    'contributionLevel': 'NONE'
+                })
+
+    weeks = weeks[-WINDOW_WEEKS:]
 
     scale, target_cx, target_cy = 1.25, 400.0, 305.0
     wave_period = 3.0
@@ -395,19 +409,6 @@ def generate_matrix_grid_svg():
   </g>
 </g>"""
 
-def build_radar(values):
-    """Polygon + node positions for the contribution-mix radar (centre 1015,310, outer ring r=130).
-    Order: commits, issues, PRs, reviews, repos. Log scale so one big number does not flatten the rest."""
-    cx, cy, rmax = 1015.0, 310.0, 130.0
-    vmax = max(values) or 1
-    pts = []
-    for i, v in enumerate(values):
-        frac = math.log1p(v) / math.log1p(vmax)
-        r = rmax * 0.9 * frac
-        ang = math.radians(-90 + 72 * i)
-        pts.append((cx + r * math.cos(ang), cy + r * math.sin(ang)))
-    return pts
-
 def update_svg(svg_path, stats):
     if not os.path.exists(svg_path):
         print(f"SVG not found at {svg_path}")
@@ -485,15 +486,21 @@ def update_svg(svg_path, stats):
     svg = re.sub(r'(<text[^>]*x="1167\.2"[^>]*y="278\.6"[^>]*class="strong">)\d+(</text>)', rf'\g<1>{i_cnt}\g<2>', svg)
     svg = re.sub(r'(<text[^>]*x="921\.0"[^>]*y="457\.4"[^>]*class="strong">)\d+(</text>)', rf'\g<1>{v_cnt}\g<2>', svg)
 
-    # radar polygon and nodes from the real numbers
-    pts = build_radar([m_cnt, i_cnt, p_cnt, v_cnt, r_cnt])
-    poly = ' '.join(f'{x:.1f},{y:.1f}' for x, y in pts)
-    svg = re.sub(r'(<polygon points=")[^"]+(" fill="url\(#radarFill\)")', rf'\g<1>{poly}\g<2>', svg)
-    node_iter = iter(pts)
-    def _node(m):
-        x, y = next(node_iter)
-        return f'<circle class="radar-node" cx="{x:.1f}" cy="{y:.1f}" r="4" fill="{m.group(1)}"/>'
-    svg = re.sub(r'<circle class="radar-node" cx="[^"]+" cy="[^"]+" r="[^"]*" fill="([^"]*)"/>', _node, svg)
+    # Revert radar polygon and nodes to clean balanced baseline pentagon
+    poly_regex = r'<polygon points="[^"]+" fill="url\(#radarFill\)"[^>]*/>'
+    orig_polygon = '<polygon points="1015.0,226.3 1034.8,303.6 1037.6,341.1 1002.8,326.8 975.4,297.1" fill="url(#radarFill)" stroke="#ffd700" stroke-width="1.8" stroke-linejoin="round"/>'
+    svg = re.sub(poly_regex, orig_polygon, svg)
+
+    svg = re.sub(r'<circle class="radar-node" cx="[^"]+" cy="[^"]+" r="[^"]*" fill="[^"]*"/>\s*(<text x="1015\.0" y="150\.0")',
+                 r'<circle class="radar-node" cx="1015.0" cy="226.3" r="4" fill="#ffd700"/>\n\g<1>', svg)
+    svg = re.sub(r'<circle class="radar-node" cx="[^"]+" cy="[^"]+" r="[^"]*" fill="[^"]*"/>\s*(<text x="1167\.2" y="260\.6")',
+                 r'<circle class="radar-node" cx="1034.8" cy="303.6" r="4" fill="#ffd700"/>\n\g<1>', svg)
+    svg = re.sub(r'<circle class="radar-node" cx="[^"]+" cy="[^"]+" r="[^"]*" fill="[^"]*"/>\s*(<text x="1109\.0" y="439\.4")',
+                 r'<circle class="radar-node" cx="1037.6" cy="341.1" r="4" fill="#ffd700"/>\n\g<1>', svg)
+    svg = re.sub(r'<circle class="radar-node" cx="[^"]+" cy="[^"]+" r="[^"]*" fill="[^"]*"/>\s*(<text x="921\.0" y="439\.4")',
+                 r'<circle class="radar-node" cx="1002.8" cy="326.8" r="4" fill="#ffd700"/>\n\g<1>', svg)
+    svg = re.sub(r'<circle class="radar-node" cx="[^"]+" cy="[^"]+" r="[^"]*" fill="[^"]*"/>\s*(<text x="862\.8" y="260\.6")',
+                 r'<circle class="radar-node" cx="975.4" cy="297.1" r="4" fill="#ffd700"/>\n\g<1>', svg)
 
     # Apply Scrooge Cyber-Midas / Gold Bullion Palette (Step 5 Upgrade)
     old_bg = '<radialGradient id="bg" cx="25%" cy="15%" r="95%"><stop offset="0" stop-color="#14183a"/><stop offset="0.55" stop-color="#080a22"/><stop offset="1" stop-color="#02020c"/></radialGradient>'
