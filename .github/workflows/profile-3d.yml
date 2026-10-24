@@ -1,4 +1,4 @@
-name: GitHub-Profile-3D-Contrib
+name: Profile card sync
 
 on:
   schedule:
@@ -22,27 +22,15 @@ concurrency:
 jobs:
   build:
     runs-on: ubuntu-latest
-    name: generate-github-profile-3d-contrib
+    timeout-minutes: 10
+    name: sync-profile-card
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
-      - name: Generate 3D Contribution Graph
-        uses: yoshi389111/github-profile-3d-contrib@7d95e7d4cdc028dd1e1cbd957d65f35efb12ae39 # v0.9.3
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          USERNAME: ${{ github.repository_owner }}
-
-      - name: Patch Multi-Language Breakdown & Relocate to Assets
-        run: |
-          python scripts/patch_3d_languages.py
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          USERNAME: ${{ github.repository_owner }}
-
-      - name: Sync Interactive GitHub Card v2 & README Arsenal
+      - name: Sync profile card & README arsenal
         run: |
           python scripts/sync_github_card.py
         env:
@@ -58,7 +46,6 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git rm -rf --ignore-unmatch profile-3d-contrib || true
           git add assets/ README.md
           if ! git diff --staged --quiet; then
             git commit -m "chore(sync): update 3d contribution graph, interactive card, and arsenal"

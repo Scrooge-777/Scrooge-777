@@ -395,6 +395,19 @@ def generate_matrix_grid_svg():
   </g>
 </g>"""
 
+def build_radar(values):
+    """Polygon + node positions for the contribution-mix radar (centre 1015,310, outer ring r=130).
+    Order: commits, issues, PRs, reviews, repos. Log scale so one big number does not flatten the rest."""
+    cx, cy, rmax = 1015.0, 310.0, 130.0
+    vmax = max(values) or 1
+    pts = []
+    for i, v in enumerate(values):
+        frac = math.log1p(v) / math.log1p(vmax)
+        r = rmax * 0.9 * frac
+        ang = math.radians(-90 + 72 * i)
+        pts.append((cx + r * math.cos(ang), cy + r * math.sin(ang)))
+    return pts
+
 def update_svg(svg_path, stats):
     if not os.path.exists(svg_path):
         print(f"SVG not found at {svg_path}")
@@ -466,20 +479,21 @@ def update_svg(svg_path, stats):
     svg = re.sub(r'(<text[^>]*x="1109\.0"[^>]*y="457\.4"[^>]*class="strong">)\d+(</text>)', rf'\g<1>{p_cnt}\g<2>', svg)
     svg = re.sub(r'(<text[^>]*x="862\.8"[^>]*y="278\.6"[^>]*class="strong">)\d+(</text>)', rf'\g<1>{r_cnt}\g<2>', svg)
 
-    poly_regex = r'<polygon points="[^"]+" fill="url\(#radarFill\)"[^>]*/>'
-    orig_polygon = '<polygon points="1015.0,226.3 1034.8,303.6 1037.6,341.1 1002.8,326.8 975.4,297.1" fill="url(#radarFill)" stroke="#2ea043" stroke-width="1.8" stroke-linejoin="round"/>'
-    svg = re.sub(poly_regex, orig_polygon, svg)
+    # issue / review labels
+    i_cnt = stats.get("issues", 0)
+    v_cnt = stats.get("reviews", 0)
+    svg = re.sub(r'(<text[^>]*x="1167\.2"[^>]*y="278\.6"[^>]*class="strong">)\d+(</text>)', rf'\g<1>{i_cnt}\g<2>', svg)
+    svg = re.sub(r'(<text[^>]*x="921\.0"[^>]*y="457\.4"[^>]*class="strong">)\d+(</text>)', rf'\g<1>{v_cnt}\g<2>', svg)
 
-    svg = re.sub(r'<circle class="radar-node" cx="[^"]+" cy="[^"]+" r="[^"]*" fill="[^"]*"/>\s*(<text x="1015\.0" y="150\.0")',
-                 r'<circle class="radar-node" cx="1015.0" cy="226.3" r="4" fill="#2ea043"/>\n\g<1>', svg)
-    svg = re.sub(r'<circle class="radar-node" cx="[^"]+" cy="[^"]+" r="[^"]*" fill="[^"]*"/>\s*(<text x="1167\.2" y="260\.6")',
-                 r'<circle class="radar-node" cx="1034.8" cy="303.6" r="4" fill="#2ea043"/>\n\g<1>', svg)
-    svg = re.sub(r'<circle class="radar-node" cx="[^"]+" cy="[^"]+" r="[^"]*" fill="[^"]*"/>\s*(<text x="1109\.0" y="439\.4")',
-                 r'<circle class="radar-node" cx="1037.6" cy="341.1" r="4" fill="#2ea043"/>\n\g<1>', svg)
-    svg = re.sub(r'<circle class="radar-node" cx="[^"]+" cy="[^"]+" r="[^"]*" fill="[^"]*"/>\s*(<text x="921\.0" y="439\.4")',
-                 r'<circle class="radar-node" cx="1002.8" cy="326.8" r="4" fill="#2ea043"/>\n\g<1>', svg)
-    svg = re.sub(r'<circle class="radar-node" cx="[^"]+" cy="[^"]+" r="[^"]*" fill="[^"]*"/>\s*(<text x="862\.8" y="260\.6")',
-                 r'<circle class="radar-node" cx="975.4" cy="297.1" r="4" fill="#2ea043"/>\n\g<1>', svg)
+    # radar polygon and nodes from the real numbers
+    pts = build_radar([m_cnt, i_cnt, p_cnt, v_cnt, r_cnt])
+    poly = ' '.join(f'{x:.1f},{y:.1f}' for x, y in pts)
+    svg = re.sub(r'(<polygon points=")[^"]+(" fill="url\(#radarFill\)")', rf'\g<1>{poly}\g<2>', svg)
+    node_iter = iter(pts)
+    def _node(m):
+        x, y = next(node_iter)
+        return f'<circle class="radar-node" cx="{x:.1f}" cy="{y:.1f}" r="4" fill="{m.group(1)}"/>'
+    svg = re.sub(r'<circle class="radar-node" cx="[^"]+" cy="[^"]+" r="[^"]*" fill="([^"]*)"/>', _node, svg)
 
     # Apply Scrooge Cyber-Midas / Gold Bullion Palette (Step 5 Upgrade)
     old_bg = '<radialGradient id="bg" cx="25%" cy="15%" r="95%"><stop offset="0" stop-color="#14183a"/><stop offset="0.55" stop-color="#080a22"/><stop offset="1" stop-color="#02020c"/></radialGradient>'
@@ -512,6 +526,13 @@ def update_svg(svg_path, stats):
     svg = re.sub(r'\.strong\{fill:#[0-9a-fA-F]+\}', '.strong{fill:#ffd700}', svg)
     svg = re.sub(r'(<polygon points="[^"]+" fill="url\(#radarFill\)" stroke=")[^"]+(" stroke-width="1.8" stroke-linejoin="round"/>)', rf'\g<1>#ffd700\g<2>', svg)
     svg = re.sub(r'(<circle class="radar-node" cx="[^"]+" cy="[^"]+" r="4" fill=")[^"]+("/>)', rf'\g<1>#ffd700\g<2>', svg)
+
+    # accessibility: name and describe the image for screen readers
+    if 'role="img"' not in svg[:400]:
+        svg = svg.replace(
+            '<svg xmlns="http://www.w3.org/2000/svg"',
+            '<svg xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="card-title card-desc"', 1)
+        svg = re.sub(r'(<svg[^>]*>)', r'\1\n<title id="card-title">GitHub activity card for Scrooge-777</title>\n<desc id="card-desc">Isometric terrain of the last 12 weeks of contributions, a contribution-mix radar, top languages, and totals for contributions, commits, pull requests, repos, stars, forks and contributions since September 2026.</desc>', svg, count=1)
 
     # 5. Validate XML
     ET.fromstring(svg)
