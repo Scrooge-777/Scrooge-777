@@ -6,22 +6,16 @@ def fetch_stats_and_languages(username, token=None):
         headers['Authorization'] = f'Bearer {token}'
     
     stats = {
-        'contributions': 299,
-        'commits': 232,
-        'prs': 5,
+        'contributions': 0,
+        'commits': 0,
+        'prs': 0,
         'reviews': 0,
         'issues': 0,
-        'repos': 7,
+        'repos': 0,
         'stars': 0,
         'forks': 0,
         'raw_languages': ['C#', 'Rust', 'Python', 'JavaScript', 'TypeScript', 'HTML', 'CSS'],
-        'languages': [
-            ('JavaScript', 356975, '#f1e05a'),
-            ('Python', 320500, '#3572A5'),
-            ('C#', 145000, '#178600'),
-            ('CSS', 63193, '#563d7c'),
-            ('Others', 27839, '#8b949e')
-        ]
+        'languages': None
     }
 
     try:
@@ -54,6 +48,9 @@ def fetch_stats_and_languages(username, token=None):
                     'Dart': '#00B4AB'
                 }
                 for r in repos_data:
+                    # forks and this profile repo's own scripts would skew the totals
+                    if r.get('fork') or r.get('name') == username:
+                        continue
                     lang_url = r.get('languages_url')
                     if lang_url:
                         try:
@@ -525,10 +522,7 @@ def update_svg(svg_path, green_path, stats):
     ET.fromstring(svg)
     with open(svg_path, 'w', encoding='utf-8') as f:
         f.write(svg)
-    profile_card_path = os.path.join(os.path.dirname(svg_path), 'profile_card.svg')
-    with open(profile_card_path, 'w', encoding='utf-8') as f:
-        f.write(svg)
-    print(f"Successfully synced and verified XML: {svg_path} and {profile_card_path}")
+    print(f"Successfully synced and verified XML: {svg_path}")
 
 def main():
     username = os.environ.get('GH_USERNAME') or os.environ.get('GITHUB_ACTOR') or 'Scrooge-777'
@@ -537,7 +531,7 @@ def main():
     token = os.environ.get('GITHUB_TOKEN')
     stats = fetch_stats_and_languages(username, token)
     repo_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-    svg_path = os.path.join(repo_dir, 'assets', 'github_card_v2.svg')
+    svg_path = os.path.join(repo_dir, 'assets', 'profile_card.svg')
     green_path = os.path.join(repo_dir, 'assets', 'profile-night-green.svg')
     readme_path = os.path.join(repo_dir, 'README.md')
 

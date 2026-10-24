@@ -49,6 +49,11 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           USERNAME: ${{ github.repository_owner }}
 
+      - name: Validate scripts and SVG assets
+        run: |
+          python -m py_compile scripts/*.py
+          python -c "import glob, xml.etree.ElementTree as ET; [ET.parse(f) for f in glob.glob('assets/*.svg')]"
+
       - name: Commit & Push
         run: |
           git config user.name "github-actions[bot]"

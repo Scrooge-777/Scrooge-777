@@ -3,9 +3,7 @@
   "version": "1.0.0",
   "description": "Dynamic 3D GitHub profile card serverless endpoint",
   "main": "api/card.js",
-  "scripts": {
-    "start": "node api/card.js"
-  },
+  "scripts": {},
   "keywords": [],
   "author": "Scrooge-777",
   "license": "MIT"

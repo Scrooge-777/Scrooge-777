@@ -4,13 +4,6 @@ def fetch_languages(username, token=None):
     headers = {'User-Agent': 'GitHub-Profile-Sync'}
     if token:
         headers['Authorization'] = f'Bearer {token}'
-    default_langs = [
-        ('JavaScript', 356975, '#f1e05a'),
-        ('Python', 320500, '#3572A5'),
-        ('C#', 145000, '#178600'),
-        ('CSS', 63193, '#563d7c'),
-        ('Others', 27839, '#8b949e')
-    ]
     try:
         # /user/repos needs a user token; Actions' GITHUB_TOKEN gets 403, so use the public listing
         url = f'https://api.github.com/users/{username}/repos?per_page=100'
@@ -31,6 +24,9 @@ def fetch_languages(username, token=None):
                     'Go': '#00ADD8'
                 }
                 for r in repos_data:
+                    # forks and this profile repo's own scripts would skew the totals
+                    if r.get('fork') or r.get('name') == username:
+                        continue
                     lang_url = r.get('languages_url')
                     if lang_url:
                         try:
@@ -52,14 +48,17 @@ def fetch_languages(username, token=None):
                         return top_4 + [('Others', other_bytes, '#8b949e')]
                     return top_4
     except Exception as e:
-        print(f"Language list fetch failed, using defaults: {e}")
-    return default_langs
+        print(f"Language list fetch failed, keeping existing section: {e}")
+    return None
 
 def patch_file(path, username, token=None):
     with open(path, 'r', encoding='utf-8') as f:
         svg = f.read()
 
     langs = fetch_languages(username, token)
+    if not langs:
+        print(f"No language data, left {path} unchanged")
+        return
     total = sum(c for _, c, _ in langs)
     cur_angle = -math.pi / 2
     paths_xml, legend_xml = [], []
