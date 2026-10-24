@@ -3,5 +3,10 @@
   "rewrites": [
     { "source": "/card", "destination": "/api/card" },
     { "source": "/card.svg", "destination": "/api/card" }
-  ]
+  ],
+  "functions": {
+    "api/card.js": {
+      "includeFiles": "assets/**"
+    }
+  }
 }

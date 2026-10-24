@@ -82,9 +82,22 @@ const THEMES = [
   }
 ];
 
+function getSvgContent() {
+  const candidates = [
+    path.join(__dirname, '..', 'assets', 'profile_card.svg'),
+    path.join(process.cwd(), 'assets', 'profile_card.svg'),
+    path.join(__dirname, 'assets', 'profile_card.svg')
+  ];
+  for (const c of candidates) {
+    if (fs.existsSync(c)) {
+      return fs.readFileSync(c, 'utf8');
+    }
+  }
+  throw new Error('profile_card.svg not found in candidates: ' + candidates.join(', '));
+}
+
 function generateCard(selectedThemeName) {
-  const svgPath = path.join(__dirname, '..', 'assets', 'profile_card.svg');
-  let svg = fs.readFileSync(svgPath, 'utf8');
+  let svg = getSvgContent();
 
   let theme = THEMES.find(t => t.name === selectedThemeName);
   if (!theme) {
@@ -138,6 +151,5 @@ module.exports = (req, res) => {
   }
 };
 
-// Export generateCard for local CLI testing
 module.exports.generateCard = generateCard;
 module.exports.THEMES = THEMES;
