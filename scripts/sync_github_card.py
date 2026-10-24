@@ -240,7 +240,13 @@ def generate_languages_svg(languages):
         )
 
     donut_sub = "\n".join(donut_paths)
-    donut_xml = f'<g id="donut-hologram" class="donut-dial">\n{donut_sub}\n</g>'
+    center_metric = f"""  <!-- Donut Center Metric (Step 4 Upgrade) -->
+  <circle cx="{cx:.1f}" cy="{cy:.1f}" r="44" fill="none" stroke="#ffffff" stroke-opacity="0.08" stroke-width="1" stroke-dasharray="3 3"/>
+  <g class="donut-center" text-anchor="middle">
+    <text x="{cx:.1f}" y="{cy - 4:.1f}" font-size="22" font-weight="800" fill="#ffffff">{len(languages)}</text>
+    <text x="{cx:.1f}" y="{cy + 15:.1f}" font-size="10" font-weight="700" fill="#8b949e" letter-spacing="1.5">LANGUAGES</text>
+  </g>"""
+    donut_xml = f'<g id="donut-hologram" class="donut-dial">\n{donut_sub}\n{center_metric}\n</g>'
 
     legend_rows = []
     y_start = 572
@@ -444,54 +450,25 @@ def update_svg(svg_path, green_path, stats):
     svg = re.sub(r'(<rect[^>]*width="110"[^>]*/>\s*<text[^>]*class="strong">)\d+(</text>\s*<text[^>]*>stars</text>)', rf'\g<1>{stats["stars"]}\g<2>', svg)
     svg = re.sub(r'(<rect[^>]*width="110"[^>]*/>\s*<text[^>]*class="strong">)\d+(</text>\s*<text[^>]*>forks</text>)', rf'\g<1>{stats["forks"]}\g<2>', svg)
 
-    # 4. Update Balanced Logarithmic Radar Polygon & Nodes (Step 3 Upgrade)
+    # 4. Update Radar Commit & PR numbers (reverted to original baseline)
     svg = re.sub(r'(<text[^>]*x="1015\.0"[^>]*y="168\.0"[^>]*class="strong">)\d+(</text>)', rf'\g<1>{stats["commits"]}\g<2>', svg)
     svg = re.sub(r'(<text[^>]*x="1109\.0"[^>]*y="457\.4"[^>]*class="strong">)\d+(</text>)', rf'\g<1>{stats["prs"]}\g<2>', svg)
     svg = re.sub(r'(<text[^>]*x="862\.8"[^>]*y="278\.6"[^>]*class="strong">)\d+(</text>)', rf'\g<1>{stats["repos"]}\g<2>', svg)
 
-    cx_rad, cy_rad = 1015.0, 310.0
-    R_max = 130.0
-    r_base = 28.0
-    angles_deg = [-90, -18, 54, 126, 198]
-    radar_values = [
-        stats.get('commits', 0),
-        stats.get('issues', 0),
-        stats.get('prs', 0),
-        stats.get('reviews', 0),
-        stats.get('repos', 0)
-    ]
-    max_val = max(250.0, max(radar_values))
-
-    poly_pts = []
-    node_pts = []
-    for deg, val in zip(angles_deg, radar_values):
-        rad = math.radians(deg)
-        if val > 0:
-            ratio = (math.log(1 + val) / math.log(1 + max_val)) ** 0.62
-            dist = r_base + (R_max - r_base) * ratio
-        else:
-            dist = r_base
-        nx = cx_rad + dist * math.cos(rad)
-        ny = cy_rad + dist * math.sin(rad)
-        poly_pts.append(f"{nx:.1f},{ny:.1f}")
-        node_pts.append((nx, ny))
-
-    poly_str = " ".join(poly_pts)
     poly_regex = r'<polygon points="[^"]+" fill="url\(#radarFill\)"[^>]*/>'
-    new_polygon = f'<polygon points="{poly_str}" fill="url(#radarFill)" stroke="#57da69" stroke-width="2.2" stroke-linejoin="round"/>'
-    svg = re.sub(poly_regex, new_polygon, svg)
+    orig_polygon = '<polygon points="1015.0,226.3 1034.8,303.6 1037.6,341.1 1002.8,326.8 975.4,297.1" fill="url(#radarFill)" stroke="#2ea043" stroke-width="1.8" stroke-linejoin="round"/>'
+    svg = re.sub(poly_regex, orig_polygon, svg)
 
-    # Update node circles to match balanced polygon vertices
     svg = re.sub(r'<circle class="radar-node" cx="[^"]+" cy="[^"]+" r="[^"]*" fill="[^"]*"/>\s*(<text x="1015\.0" y="150\.0")',
-                 rf'<circle class="radar-node" cx="{node_pts[0][0]:.1f}" cy="{node_pts[0][1]:.1f}" r="4.5" fill="#57da69"/>\n\g<1>', svg)
+                 r'<circle class="radar-node" cx="1015.0" cy="226.3" r="4" fill="#2ea043"/>\n\g<1>', svg)
     svg = re.sub(r'<circle class="radar-node" cx="[^"]+" cy="[^"]+" r="[^"]*" fill="[^"]*"/>\s*(<text x="1167\.2" y="260\.6")',
-                 rf'<circle class="radar-node" cx="{node_pts[1][0]:.1f}" cy="{node_pts[1][1]:.1f}" r="4.5" fill="#57da69"/>\n\g<1>', svg)
+                 r'<circle class="radar-node" cx="1034.8" cy="303.6" r="4" fill="#2ea043"/>\n\g<1>', svg)
     svg = re.sub(r'<circle class="radar-node" cx="[^"]+" cy="[^"]+" r="[^"]*" fill="[^"]*"/>\s*(<text x="1109\.0" y="439\.4")',
-                 rf'<circle class="radar-node" cx="{node_pts[2][0]:.1f}" cy="{node_pts[2][1]:.1f}" r="4.5" fill="#57da69"/>\n\g<1>', svg)
+                 r'<circle class="radar-node" cx="1037.6" cy="341.1" r="4" fill="#2ea043"/>\n\g<1>', svg)
     svg = re.sub(r'<circle class="radar-node" cx="[^"]+" cy="[^"]+" r="[^"]*" fill="[^"]*"/>\s*(<text x="921\.0" y="439\.4")',
-                 rf'<circle class="radar-node" cx="{node_pts[3][0]:.1f}" cy="{node_pts[3][1]:.1f}" r="4.5" fill="#57da69"/>\n\g<1>', svg)
+                 r'<circle class="radar-node" cx="1002.8" cy="326.8" r="4" fill="#2ea043"/>\n\g<1>', svg)
     svg = re.sub(r'<circle class="radar-node" cx="[^"]+" cy="[^"]+" r="[^"]*" fill="[^"]*"/>\s*(<text x="862\.8" y="260\.6")',
-                 rf'<circle class="radar-node" cx="{node_pts[4][0]:.1f}" cy="{node_pts[4][1]:.1f}" r="4.5" fill="#57da69"/>\n\g<1>', svg)
+                 r'<circle class="radar-node" cx="975.4" cy="297.1" r="4" fill="#2ea043"/>\n\g<1>', svg)
 
     # 5. Validate XML
     ET.fromstring(svg)
