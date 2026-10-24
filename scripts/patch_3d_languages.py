@@ -105,7 +105,9 @@ def patch_file(path, username, token=None):
         print(f"Markers not found in {path}")
 
 def main():
-    username = os.environ.get('USERNAME', 'Scrooge-777')
+    username = os.environ.get('GH_USERNAME') or os.environ.get('GITHUB_ACTOR') or 'Scrooge-777'
+    if username == os.environ.get('USERNAME') and username != 'Scrooge-777':
+        username = 'Scrooge-777'
     token = os.environ.get('GITHUB_TOKEN')
     repo_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
     target_file = os.path.join(repo_dir, 'profile-3d-contrib', 'profile-night-green.svg')
