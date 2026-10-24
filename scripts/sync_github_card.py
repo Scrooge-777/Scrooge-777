@@ -6,8 +6,8 @@ def fetch_stats_and_languages(username, token=None):
         headers['Authorization'] = f'Bearer {token}'
     
     stats = {
-        'contributions': 297,
-        'commits': 230,
+        'contributions': 299,
+        'commits': 232,
         'prs': 5,
         'reviews': 0,
         'issues': 0,
@@ -486,18 +486,29 @@ def update_svg(svg_path, green_path, stats):
         svg = svg[:langs_start] + langs_xml + svg[kpi_start:]
         print(f"Synced {len(stats['languages'])} top languages into SVG!")
 
-    # 3. Update bottom KPI capsules
-    svg = re.sub(r'(<rect[^>]*width="200"[^>]*/>\s*<text[^>]*class="strong">)\d+(</text>)', rf'\g<1>{stats["contributions"]}\g<2>', svg)
-    svg = re.sub(r'(<rect[^>]*width="150"[^>]*/>\s*<text[^>]*class="strong">)\d+(</text>)', rf'\g<1>{stats["commits"]}\g<2>', svg)
-    svg = re.sub(r'(<rect[^>]*width="170"[^>]*/>\s*<text[^>]*class="strong">)\d+(</text>)', rf'\g<1>{stats["prs"]}\g<2>', svg)
-    svg = re.sub(r'(<rect[^>]*width="120"[^>]*/>\s*<text[^>]*class="strong">)\d+(</text>)', rf'\g<1>{stats["repos"]}\g<2>', svg)
-    svg = re.sub(r'(<rect[^>]*width="110"[^>]*/>\s*<text[^>]*class="strong">)\d+(</text>\s*<text[^>]*>stars</text>)', rf'\g<1>{stats["stars"]}\g<2>', svg)
-    svg = re.sub(r'(<rect[^>]*width="110"[^>]*/>\s*<text[^>]*class="strong">)\d+(</text>\s*<text[^>]*>forks</text>)', rf'\g<1>{stats["forks"]}\g<2>', svg)
+    # 3. Update bottom KPI capsules with non-decrement safeguard (protects private commit totals)
+    def _get_val(p):
+        m = re.search(p, svg)
+        return int(m.group(1)) if m else 0
+
+    c_cnt = max(stats.get("contributions", 0), _get_val(r'<rect[^>]*width="200"[^>]*/>\s*<text[^>]*class="strong">(\d+)</text>'), 299)
+    m_cnt = max(stats.get("commits", 0), _get_val(r'<rect[^>]*width="150"[^>]*/>\s*<text[^>]*class="strong">(\d+)</text>'), 232)
+    p_cnt = max(stats.get("prs", 0), _get_val(r'<rect[^>]*width="170"[^>]*/>\s*<text[^>]*class="strong">(\d+)</text>'), 5)
+    r_cnt = max(stats.get("repos", 0), _get_val(r'<rect[^>]*width="120"[^>]*/>\s*<text[^>]*class="strong">(\d+)</text>'), 7)
+    s_cnt = max(stats.get("stars", 0), _get_val(r'<rect[^>]*width="110"[^>]*/>\s*<text[^>]*class="strong">(\d+)</text>\s*<text[^>]*>stars</text>'))
+    f_cnt = max(stats.get("forks", 0), _get_val(r'<rect[^>]*width="110"[^>]*/>\s*<text[^>]*class="strong">(\d+)</text>\s*<text[^>]*>forks</text>'))
+
+    svg = re.sub(r'(<rect[^>]*width="200"[^>]*/>\s*<text[^>]*class="strong">)\d+(</text>)', rf'\g<1>{c_cnt}\g<2>', svg)
+    svg = re.sub(r'(<rect[^>]*width="150"[^>]*/>\s*<text[^>]*class="strong">)\d+(</text>)', rf'\g<1>{m_cnt}\g<2>', svg)
+    svg = re.sub(r'(<rect[^>]*width="170"[^>]*/>\s*<text[^>]*class="strong">)\d+(</text>)', rf'\g<1>{p_cnt}\g<2>', svg)
+    svg = re.sub(r'(<rect[^>]*width="120"[^>]*/>\s*<text[^>]*class="strong">)\d+(</text>)', rf'\g<1>{r_cnt}\g<2>', svg)
+    svg = re.sub(r'(<rect[^>]*width="110"[^>]*/>\s*<text[^>]*class="strong">)\d+(</text>\s*<text[^>]*>stars</text>)', rf'\g<1>{s_cnt}\g<2>', svg)
+    svg = re.sub(r'(<rect[^>]*width="110"[^>]*/>\s*<text[^>]*class="strong">)\d+(</text>\s*<text[^>]*>forks</text>)', rf'\g<1>{f_cnt}\g<2>', svg)
 
     # 4. Update Radar Commit & PR numbers (reverted to original baseline)
-    svg = re.sub(r'(<text[^>]*x="1015\.0"[^>]*y="168\.0"[^>]*class="strong">)\d+(</text>)', rf'\g<1>{stats["commits"]}\g<2>', svg)
-    svg = re.sub(r'(<text[^>]*x="1109\.0"[^>]*y="457\.4"[^>]*class="strong">)\d+(</text>)', rf'\g<1>{stats["prs"]}\g<2>', svg)
-    svg = re.sub(r'(<text[^>]*x="862\.8"[^>]*y="278\.6"[^>]*class="strong">)\d+(</text>)', rf'\g<1>{stats["repos"]}\g<2>', svg)
+    svg = re.sub(r'(<text[^>]*x="1015\.0"[^>]*y="168\.0"[^>]*class="strong">)\d+(</text>)', rf'\g<1>{m_cnt}\g<2>', svg)
+    svg = re.sub(r'(<text[^>]*x="1109\.0"[^>]*y="457\.4"[^>]*class="strong">)\d+(</text>)', rf'\g<1>{p_cnt}\g<2>', svg)
+    svg = re.sub(r'(<text[^>]*x="862\.8"[^>]*y="278\.6"[^>]*class="strong">)\d+(</text>)', rf'\g<1>{r_cnt}\g<2>', svg)
 
     poly_regex = r'<polygon points="[^"]+" fill="url\(#radarFill\)"[^>]*/>'
     orig_polygon = '<polygon points="1015.0,226.3 1034.8,303.6 1037.6,341.1 1002.8,326.8 975.4,297.1" fill="url(#radarFill)" stroke="#2ea043" stroke-width="1.8" stroke-linejoin="round"/>'
