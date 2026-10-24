@@ -1,5 +1,11 @@
 import os, json, math, re, urllib.request, datetime, xml.etree.ElementTree as ET
 
+WINDOW_WEEKS = 12                       # weeks shown on the terrain
+TRACK_START = datetime.date(2026, 9, 27)  # first day counted by the all-time KPI
+LEVEL_NUM = {'NONE': 0, 'FIRST_QUARTILE': 1, 'SECOND_QUARTILE': 2, 'THIRD_QUARTILE': 3, 'FOURTH_QUARTILE': 4}
+LEVEL_HEIGHT = {0: 2.6, 1: 5.24, 2: 18.85, 3: 34.43, 4: 63.87}
+LEVEL_FLOAT = {0: -7, 1: -7, 2: -10, 3: -12, 4: -14}
+
 def fetch_stats_and_languages(username, token=None):
     headers = {'User-Agent': 'GitHub-Profile-Sync'}
     if token:
@@ -92,6 +98,7 @@ def fetch_stats_and_languages(username, token=None):
                   contributionDays {
                     date
                     contributionCount
+                    contributionLevel
                   }
                 }
               }
@@ -121,6 +128,52 @@ def fetch_stats_and_languages(username, token=None):
             print(f"GraphQL fetch exception: {e}")
 
     return stats
+
+def fetch_alltime(username, token):
+    """Contributions and active days from TRACK_START to today, in <=1 year chunks (API limit)."""
+    if not token:
+        return None
+    query = """
+    query($login: String!, $from: DateTime!, $to: DateTime!) {
+      user(login: $login) {
+        contributionsCollection(from: $from, to: $to) {
+          contributionCalendar {
+            totalContributions
+            weeks { contributionDays { date contributionCount } }
+          }
+        }
+      }
+    }
+    """
+    today = datetime.datetime.now(datetime.timezone.utc).date()
+    total, active = 0, 0
+    start = TRACK_START
+    try:
+        while start <= today:
+            end = min(start + datetime.timedelta(days=364), today)
+            variables = {
+                'login': username,
+                'from': f'{start.isoformat()}T00:00:00Z',
+                'to': f'{end.isoformat()}T23:59:59Z',
+            }
+            req = urllib.request.Request(
+                'https://api.github.com/graphql',
+                data=json.dumps({'query': query, 'variables': variables}).encode('utf-8'),
+                headers={'User-Agent': 'GitHub-Profile-Sync', 'Authorization': f'Bearer {token}', 'Content-Type': 'application/json'}
+            )
+            with urllib.request.urlopen(req, timeout=12) as resp:
+                data = json.loads(resp.read().decode('utf-8'))
+            cal = data['data']['user']['contributionsCollection']['contributionCalendar']
+            for wk in cal['weeks']:
+                for day in wk['contributionDays']:
+                    if start.isoformat() <= day['date'] <= end.isoformat():
+                        total += day['contributionCount']
+                        active += 1 if day['contributionCount'] > 0 else 0
+            start = end + datetime.timedelta(days=1)
+    except Exception as e:
+        print(f"All-time fetch exception: {e}")
+        return None
+    return {'contributions': total, 'active_days': active}
 
 def update_readme_arsenal(readme_path, languages_found):
     if not os.path.exists(readme_path):
@@ -225,123 +278,60 @@ def generate_languages_svg(languages):
     legend_xml = "\n".join(legend_rows)
     return f'Top languages</text>\n{donut_xml}\n{legend_xml}\n'
 
-def build_active_wave_terrain(green_svg, stats=None):
-    first_g = green_svg.find('<g transform="translate(140 154.18)">')
-    last_close = green_svg.find('</g></g><g transform="translate(980, 284.5)">')
-    if first_g == -1 or last_close == -1:
+def build_rolling_terrain(stats):
+    """Isometric terrain for the last WINDOW_WEEKS weeks, straight from the contribution calendar."""
+    weeks = (stats or {}).get('calendar_weeks') or []
+    weeks = weeks[-WINDOW_WEEKS:]
+    if not weeks:
         return None
 
-    raw_grid = green_svg[first_g:last_close + 4]
-    col_pattern = re.compile(r'<g transform="translate\(([^)]+)\)">(.*?)</g>', re.DOTALL)
-    matches = list(col_pattern.finditer(raw_grid))
-    if not matches:
-        return None
-
-    # Inception week: week 49 (late Sept / Oct 1st, 2026 onwards)
-    start_week = 49
-    start_idx = start_week * 7
-    active_matches = matches[start_idx:] if len(matches) > start_idx else matches
-
-    coords = [list(map(float, m.group(1).split())) for m in active_matches]
-    raw_cx = 1090.0
-    raw_cy = 745.52
-
-    target_cx = 390.0
-    target_cy = 280.0
-    scale = 1.6
+    scale, target_cx, target_cy = 1.25, 400.0, 305.0
     wave_period = 3.0
+    n = len(weeks)
+    # grid extents (unscaled); a tile is 36 wide so shift the centre by 18
+    mid_x = ((n - 1) * 20.0 + (0 - 6) * 20.0) / 2 + 18
+    mid_y = ((n - 1 + 6) * 11.547) / 2
 
-    processed_cols = []
-    for i, m in enumerate(active_matches):
-        global_idx = start_idx + i
-        w = global_idx // 7
-        d = global_idx % 7
-        rel_w = w - start_week
+    cells = []
+    for rel_w, wk in enumerate(weeks):
+        for d, day in enumerate(wk.get('contributionDays', [])):
+            cells.append((rel_w, d, day))
+    cells.sort(key=lambda c: (c[0] + c[1], c[0]))  # back to front so near tiles overdraw far ones
 
-        orig_x, orig_y = coords[i]
-        new_x = target_cx + (orig_x - raw_cx) * scale
-        new_y = target_cy + (orig_y - raw_cy) * scale
-
-        content = m.group(2)
-        content = re.sub(r'<animateTransform[^>]*repeatCount="1"[^>]*>.*?</animateTransform>', '', content)
-        content = re.sub(r'<animateTransform[^>]*repeatCount="1"[^>]*/>', '', content)
-        content = content.replace('stroke="none"', '')
-
-        for lvl in range(5):
-            content = content.replace(
-                f'class="cont-top-{lvl}"',
-                f'class="c{lvl}t" stroke="#fff" stroke-opacity="0.06" stroke-width="0.5"'
-            )
-            content = content.replace(f'class="cont-left-{lvl}"', f'class="c{lvl}l"')
-            content = content.replace(f'class="cont-right-{lvl}"', f'class="c{lvl}r"')
-
-        float_h = -14 if "c4t" in content else (-12 if "c3t" in content else (-10 if "c2t" in content else -7))
+    cols = []
+    for rel_w, d, day in cells:
+        lvl = LEVEL_NUM.get(day.get('contributionLevel'), 0)
+        h = LEVEL_HEIGHT[lvl]
+        float_h = LEVEL_FLOAT[lvl]
+        x_u = (rel_w - d) * 20.0
+        floor_y = (rel_w + d) * 11.547
+        new_x = target_cx + (x_u - mid_x) * scale
+        new_y = target_cy + (floor_y - 1.15 * h - mid_y) * scale
         phase = ((rel_w * 0.42) + (d * 0.26)) % wave_period
-
-        wave_anim = (
-            f'<animateTransform attributeName="transform" type="translate" '
-            f'values="0,0; 0,{float_h}; 0,0" dur="{wave_period}s" begin="-{phase:.2f}s" '
-            f'repeatCount="indefinite" additive="sum" calcMode="spline" '
-            f'keySplines="0.45 0 0.55 1; 0.45 0 0.55 1" keyTimes="0; 0.5; 1"/>'
+        cnt = day.get('contributionCount', 0)
+        plural = '' if cnt == 1 else 's'
+        cols.append(
+            f'<g class="iso-col" transform="translate({new_x:.2f} {new_y:.2f}) scale({scale})">'
+            f'<title>{day["date"]}: {cnt} contribution{plural}</title>'
+            f'<rect  x="0" y="0" width="18" height="18" transform="skewY(-30) skewX(40.89) scale(1 1.15)" class="c{lvl}t" stroke="#fff" stroke-opacity="0.06" stroke-width="0.5"></rect>'
+            f'<rect  x="0" y="0" width="18" height="{h}" transform="skewY(30) scale(1 1.15)" class="c{lvl}l"><animate attributeName="height" values="2.6;{h}" dur="3s" repeatCount="1"></animate></rect>'
+            f'<rect  x="0" y="0" width="18" height="{h}" transform="translate(18 10.39) skewY(-30) scale(1 1.15)" class="c{lvl}r"><animate attributeName="height" values="2.6;{h}" dur="3s" repeatCount="1"></animate></rect>'
+            f'<animateTransform attributeName="transform" type="translate" values="0,0; 0,{float_h}; 0,0" dur="{wave_period}s" begin="-{phase:.2f}s" repeatCount="indefinite" additive="sum" calcMode="spline" keySplines="0.45 0 0.55 1; 0.45 0 0.55 1" keyTimes="0; 0.5; 1"/>'
+            f'</g>'
         )
 
-        col_xml = f'<g class="iso-col" transform="translate({new_x:.2f} {new_y:.2f}) scale({scale})">{content}{wave_anim}</g>'
-        processed_cols.append(col_xml)
+    return '<g id="terrain-island" class="terrain-3d">\n' + "\n".join(cols) + '\n</g>'
 
-    # Dynamic synchronization for current date & upcoming days (IST Midnight rollover)
-    now_ist = datetime.datetime.now(datetime.timezone(datetime.timedelta(hours=5, minutes=30)))
-    today_ist = now_ist.date()
-    inception_date = datetime.date(2026, 9, 27)  # Week 49 Day 0
-    total_days_needed = (today_ist - inception_date).days + 1
-
-    # Daily contribution lookup map from GraphQL if available
-    day_counts = {}
-    if stats and stats.get('calendar_weeks'):
-        for wk in stats['calendar_weeks']:
-            for cday in wk.get('contributionDays', []):
-                day_counts[cday['date']] = cday.get('contributionCount', 0)
-
-    if len(processed_cols) < total_days_needed:
-        for day_idx in range(len(processed_cols), total_days_needed):
-            w = start_week + day_idx // 7
-            d = day_idx % 7
-            rel_w = w - start_week
-            col_date = inception_date + datetime.timedelta(days=day_idx)
-            date_str = col_date.strftime('%Y-%m-%d')
-            cnt = day_counts.get(date_str, 0)
-
-            if cnt >= 50:
-                lvl, h, float_h = 4, 63.87, -14
-            elif cnt >= 30:
-                lvl, h, float_h = 3, 34.43, -12
-            elif cnt >= 10:
-                lvl, h, float_h = 2, 18.85, -10
-            elif cnt >= 1:
-                lvl, h, float_h = 1, 5.24, -7
-            else:
-                lvl, h, float_h = 0, 2.6, -7
-
-            orig_x = 1120.0 + rel_w * 20.0 - d * 20.0
-            orig_floor_y = 722.97 + rel_w * 11.547 + d * 11.547
-            orig_y = orig_floor_y - 1.15 * h
-
-            new_x = target_cx + (orig_x - raw_cx) * scale
-            new_y = target_cy + (orig_y - raw_cy) * scale
-            phase = ((rel_w * 0.42) + (d * 0.26)) % wave_period
-
-            col_xml = (
-                f'<g class="iso-col" transform="translate({new_x:.2f} {new_y:.2f}) scale({scale})">'
-                f'<rect  x="0" y="0" width="18" height="18" transform="skewY(-30) skewX(40.89) scale(1 1.15)" class="c{lvl}t" stroke="#fff" stroke-opacity="0.06" stroke-width="0.5"></rect>'
-                f'<rect  x="0" y="0" width="18" height="{h}" transform="skewY(30) scale(1 1.15)" class="c{lvl}l"><animate attributeName="height" values="2.6;{h}" dur="3s" repeatCount="1"></animate></rect>'
-                f'<rect  x="0" y="0" width="18" height="{h}" transform="translate(18 10.39) skewY(-30) scale(1 1.15)" class="c{lvl}r"><animate attributeName="height" values="2.6;{h}" dur="3s" repeatCount="1"></animate></rect>'
-                f'<animateTransform attributeName="transform" type="translate" values="0,0; 0,{float_h}; 0,0" dur="{wave_period}s" begin="-{phase:.2f}s" repeatCount="indefinite" additive="sum" calcMode="spline" keySplines="0.45 0 0.55 1; 0.45 0 0.55 1" keyTimes="0; 0.5; 1"/>'
-                f'</g>'
-            )
-            processed_cols.append(col_xml)
-
-    all_cols_xml = "\n".join(processed_cols)
-    wrapped = f'<g id="terrain-island" class="terrain-3d">\n{all_cols_xml}\n</g>'
-    return wrapped
+def alltime_pill_svg(value, active_days):
+    label = f"since {TRACK_START.strftime('%b %Y')}"
+    label_x = 992 + 18 * len(str(value)) + 8
+    return (
+        '<!-- alltime -->\n'
+        '<rect x="974" y="786" width="214" height="46" rx="14" class="card kpi-pill"/>\n'
+        f'<text x="992" y="818" font-size="26" font-weight="800" class="strong">{value}</text>\n'
+        f'<text x="{label_x}" y="817" font-size="14" class="weak">{label}<title>{value} contributions, {active_days} active days</title></text>\n'
+        '<!-- /alltime -->\n'
+    )
 
 def generate_matrix_grid_svg():
     cx, cy = 390.0, 305.0
@@ -405,7 +395,7 @@ def generate_matrix_grid_svg():
   </g>
 </g>"""
 
-def update_svg(svg_path, green_path, stats):
+def update_svg(svg_path, stats):
     if not os.path.exists(svg_path):
         print(f"SVG not found at {svg_path}")
         return
@@ -425,21 +415,15 @@ def update_svg(svg_path, green_path, stats):
     if start_grid != -1 and end_grid != -1:
         svg = svg[:start_grid] + svg[end_grid:]
 
-    # 1. Sync 3D columns
-    if os.path.exists(green_path):
-        with open(green_path, 'r', encoding='utf-8') as gf:
-            green_svg = gf.read()
-        wrapped_island = build_active_wave_terrain(green_svg, stats)
-        if wrapped_island:
-            v2_start = svg.find('<g id="terrain-island"')
-            if v2_start == -1:
-                v2_start = svg.find('<g class="iso-col"')
-            v2_grid_end = svg.find('<rect x="780" y="96"')
-
-            if v2_start != -1 and v2_grid_end != -1:
-                svg = svg[:v2_start] + wrapped_island + "\n" + svg[v2_grid_end:]
-                svg = re.sub(r'>Last 12 months<', '>Activity since Oct 2026<', svg)
-                print("Synced active 3D wave columns!")
+    # 1. Sync 3D columns (rolling window from the live contribution calendar)
+    wrapped_island = build_rolling_terrain(stats)
+    if wrapped_island:
+        v2_start = svg.find('<g id="terrain-island"')
+        v2_grid_end = svg.find('<rect x="780" y="96"')
+        if v2_start != -1 and v2_grid_end != -1:
+            svg = svg[:v2_start] + wrapped_island + "\n" + svg[v2_grid_end:]
+            svg = re.sub(r'>(Last 12 months|Activity since [^<]*|Last \d+ weeks)<', f'>Last {WINDOW_WEEKS} weeks<', svg)
+            print(f"Synced rolling {WINDOW_WEEKS}-week terrain!")
 
     # 2. Sync Top Languages section
     langs_start = svg.find('Top languages</text>')
@@ -468,6 +452,14 @@ def update_svg(svg_path, green_path, stats):
     svg = re.sub(r'(<rect[^>]*width="120"[^>]*/>\s*<text[^>]*class="strong">)\d+(</text>)', rf'\g<1>{r_cnt}\g<2>', svg)
     svg = re.sub(r'(<rect[^>]*width="110"[^>]*/>\s*<text[^>]*class="strong">)\d+(</text>\s*<text[^>]*>stars</text>)', rf'\g<1>{s_cnt}\g<2>', svg)
     svg = re.sub(r'(<rect[^>]*width="110"[^>]*/>\s*<text[^>]*class="strong">)\d+(</text>\s*<text[^>]*>forks</text>)', rf'\g<1>{f_cnt}\g<2>', svg)
+
+    # 3b. All-time pill (never decreases: private contributions are invisible to the Actions token)
+    prev_all = _get_val(r'<!-- alltime -->\s*<rect[^>]*/>\s*<text[^>]*class="strong">(\d+)</text>')
+    at = stats.get('alltime')
+    if at:
+        at_val = max(at['contributions'], prev_all)
+        svg = re.sub(r'<!-- alltime -->.*?<!-- /alltime -->\n?', '', svg, flags=re.DOTALL)
+        svg = svg.replace('</svg>', alltime_pill_svg(at_val, at['active_days']) + '</svg>')
 
     # 4. Update Radar Commit & PR numbers (reverted to original baseline)
     svg = re.sub(r'(<text[^>]*x="1015\.0"[^>]*y="168\.0"[^>]*class="strong">)\d+(</text>)', rf'\g<1>{m_cnt}\g<2>', svg)
@@ -533,12 +525,12 @@ def main():
         username = 'Scrooge-777'
     token = os.environ.get('GITHUB_TOKEN')
     stats = fetch_stats_and_languages(username, token)
+    stats['alltime'] = fetch_alltime(username, token)
     repo_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
     svg_path = os.path.join(repo_dir, 'assets', 'profile_card.svg')
-    green_path = os.path.join(repo_dir, 'assets', 'profile-night-green.svg')
     readme_path = os.path.join(repo_dir, 'README.md')
 
-    update_svg(svg_path, green_path, stats)
+    update_svg(svg_path, stats)
     update_readme_arsenal(readme_path, stats.get('raw_languages', []))
 
 if __name__ == '__main__':
