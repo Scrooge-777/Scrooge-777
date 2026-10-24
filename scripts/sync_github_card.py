@@ -148,7 +148,8 @@ def fetch_alltime(username, token):
       }
     }
     """
-    today = datetime.datetime.now(datetime.timezone.utc).date()
+    # +1 day so a profile timezone ahead of UTC still gets its current day
+    today = datetime.datetime.now(datetime.timezone.utc).date() + datetime.timedelta(days=1)
     total, active = 0, 0
     start = TRACK_START
     try:
@@ -471,11 +472,10 @@ def update_svg(svg_path, stats):
     svg = re.sub(r'(<rect[^>]*width="110"[^>]*/>\s*<text[^>]*class="strong">)\d+(</text>\s*<text[^>]*>stars</text>)', rf'\g<1>{s_cnt}\g<2>', svg)
     svg = re.sub(r'(<rect[^>]*width="110"[^>]*/>\s*<text[^>]*class="strong">)\d+(</text>\s*<text[^>]*>forks</text>)', rf'\g<1>{f_cnt}\g<2>', svg)
 
-    # 3b. All-time pill (never decreases: private contributions are invisible without a user token)
-    prev_all = _get_val(r'<!-- alltime -->\s*<rect[^>]*/>\s*<text[^>]*class="strong">(\d+)</text>')
+    # 3b. All-time pill, straight from the API; the old pill stays only if the fetch failed
     at = stats.get('alltime')
     if at:
-        at_val = max(at['contributions'], prev_all)
+        at_val = at['contributions']
         svg = re.sub(r'<!-- alltime -->.*?<!-- /alltime -->\n?', '', svg, flags=re.DOTALL)
         svg = svg.replace('</svg>', alltime_pill_svg(at_val, at['active_days']) + '</svg>')
 
