@@ -362,28 +362,29 @@ def generate_matrix_grid_svg():
         (cx + (u_max + v_max) * dx, cy + (v_max - u_max) * dy),
     ]
     for x, y in corners:
-        accents.append(f'<circle cx="{x:.1f}" cy="{y:.1f}" r="3" fill="#57da69" fill-opacity="0.5"/>')
-        accents.append(f'<line x1="{x-6:.1f}" y1="{y:.1f}" x2="{x+6:.1f}" y2="{y:.1f}" stroke="#57da69" stroke-width="1" stroke-opacity="0.6"/>')
-        accents.append(f'<line x1="{x:.1f}" y1="{y-6:.1f}" x2="{x:.1f}" y2="{y+6:.1f}" stroke="#57da69" stroke-width="1" stroke-opacity="0.6"/>')
+        accents.append(f'<circle cx="{x:.1f}" cy="{y:.1f}" r="4" fill="#57da69" fill-opacity="0.8"/>')
+        accents.append(f'<circle cx="{x:.1f}" cy="{y:.1f}" r="8" fill="none" stroke="#57da69" stroke-width="1" stroke-opacity="0.5"/>')
+        accents.append(f'<line x1="{x-8:.1f}" y1="{y:.1f}" x2="{x+8:.1f}" y2="{y:.1f}" stroke="#57da69" stroke-width="1.2" stroke-opacity="0.8"/>')
+        accents.append(f'<line x1="{x:.1f}" y1="{y-8:.1f}" x2="{x:.1f}" y2="{y+8:.1f}" stroke="#57da69" stroke-width="1.2" stroke-opacity="0.8"/>')
 
     accents_xml = "\n    ".join(accents)
 
     return f"""<!-- Isometric Matrix Grid Floor (Step 2 Upgrade) -->
 <g id="iso-matrix-grid" class="matrix-grid">
   <defs>
-    <radialGradient id="matrixGlow" cx="50%" cy="50%" r="50%">
-      <stop offset="0%" stop-color="#57da69" stop-opacity="0.12"/>
-      <stop offset="65%" stop-color="#2ea043" stop-opacity="0.04"/>
+    <radialGradient id="matrixGlow" cx="{cx:.1f}" cy="{cy:.1f}" r="280" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#57da69" stop-opacity="0.25"/>
+      <stop offset="60%" stop-color="#2ea043" stop-opacity="0.08"/>
       <stop offset="100%" stop-color="#0b0e14" stop-opacity="0"/>
     </radialGradient>
-    <linearGradient id="gridFade" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#2ea043" stop-opacity="0.05"/>
-      <stop offset="50%" stop-color="#57da69" stop-opacity="0.30"/>
-      <stop offset="100%" stop-color="#2ea043" stop-opacity="0.05"/>
+    <linearGradient id="gridFade" x1="100" y1="120" x2="680" y2="490" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#2ea043" stop-opacity="0.30"/>
+      <stop offset="50%" stop-color="#57da69" stop-opacity="0.75"/>
+      <stop offset="100%" stop-color="#2ea043" stop-opacity="0.30"/>
     </linearGradient>
   </defs>
   <ellipse cx="{cx:.1f}" cy="{cy:.1f}" rx="290" ry="155" fill="url(#matrixGlow)"/>
-  <g stroke="url(#gridFade)" stroke-width="0.85" stroke-dasharray="2 3" stroke-opacity="0.85">
+  <g stroke="url(#gridFade)" stroke-width="1.2" stroke-opacity="0.85">
     {grid_lines_xml}
   </g>
   <g>
