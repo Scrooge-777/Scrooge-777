@@ -1,0 +1,12 @@
+{
+  "name": "scrooge-profile-card",
+  "version": "1.0.0",
+  "description": "Dynamic 3D GitHub profile card serverless endpoint",
+  "main": "api/card.js",
+  "scripts": {
+    "start": "node api/card.js"
+  },
+  "keywords": [],
+  "author": "Scrooge-777",
+  "license": "MIT"
+}

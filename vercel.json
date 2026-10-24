@@ -1,0 +1,7 @@
+{
+  "version": 2,
+  "rewrites": [
+    { "source": "/card", "destination": "/api/card" },
+    { "source": "/card.svg", "destination": "/api/card" }
+  ]
+}
