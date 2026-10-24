@@ -83,7 +83,7 @@
 <g class="iso-col" transform="translate(438.00 349.98) scale(1.6)"><rect  x="0" y="0" width="18" height="18" transform="skewY(-30) skewX(40.89) scale(1 1.15)" class="c0t" stroke="#fff" stroke-opacity="0.06" stroke-width="0.5"></rect><rect  x="0" y="0" width="18" height="2.6" transform="skewY(30) scale(1 1.15)" class="c0l"></rect><rect  x="0" y="0" width="18" height="2.6" transform="translate(18 10.39) skewY(-30) scale(1 1.15)" class="c0r"></rect><animateTransform attributeName="transform" type="translate" values="0,0; 0,-7; 0,0" dur="3.0s" begin="-2.04s" repeatCount="indefinite" additive="sum" calcMode="spline" keySplines="0.45 0 0.55 1; 0.45 0 0.55 1" keyTimes="0; 0.5; 1"/></g>
 <g class="iso-col" transform="translate(406.00 363.58) scale(1.6)"><rect  x="0" y="0" width="18" height="18" transform="skewY(-30) skewX(40.89) scale(1 1.15)" class="c1t" stroke="#fff" stroke-opacity="0.06" stroke-width="0.5"></rect><rect  x="0" y="0" width="18" height="5.24" transform="skewY(30) scale(1 1.15)" class="c1l"><animate attributeName="height" values="2.6;5.24" dur="3s" repeatCount="1"></animate></rect><rect  x="0" y="0" width="18" height="5.24" transform="translate(18 10.39) skewY(-30) scale(1 1.15)" class="c1r"><animate attributeName="height" values="2.6;5.24" dur="3s" repeatCount="1"></animate></rect><animateTransform attributeName="transform" type="translate" values="0,0; 0,-7; 0,0" dur="3.0s" begin="-2.30s" repeatCount="indefinite" additive="sum" calcMode="spline" keySplines="0.45 0 0.55 1; 0.45 0 0.55 1" keyTimes="0; 0.5; 1"/></g>
 <g class="iso-col" transform="translate(374.00 240.99) scale(1.6)"><rect  x="0" y="0" width="18" height="18" transform="skewY(-30) skewX(40.89) scale(1 1.15)" class="c4t" stroke="#fff" stroke-opacity="0.06" stroke-width="0.5"></rect><rect  x="0" y="0" width="18" height="81.6" transform="skewY(30) scale(1 1.15)" class="c4l"><animate attributeName="height" values="2.6;81.6" dur="3s" repeatCount="1"></animate></rect><rect  x="0" y="0" width="18" height="81.6" transform="translate(18 10.39) skewY(-30) scale(1 1.15)" class="c4r"><animate attributeName="height" values="2.6;81.6" dur="3s" repeatCount="1"></animate></rect><animateTransform attributeName="transform" type="translate" values="0,0; 0,-14; 0,0" dur="3.0s" begin="-2.56s" repeatCount="indefinite" additive="sum" calcMode="spline" keySplines="0.45 0 0.55 1; 0.45 0 0.55 1" keyTimes="0; 0.5; 1"/></g>
-<g class="iso-col" transform="translate(342.00 336.06) scale(1.6)"><rect  x="0" y="0" width="18" height="18" transform="skewY(-30) skewX(40.89) scale(1 1.15)" class="c4t" stroke="#fff" stroke-opacity="0.06" stroke-width="0.5"></rect><rect  x="0" y="0" width="18" height="40.14" transform="skewY(30) scale(1 1.15)" class="c4l"><animate attributeName="height" values="2.6;40.14" dur="3s" repeatCount="1"></animate></rect><rect  x="0" y="0" width="18" height="40.14" transform="translate(18 10.39) skewY(-30) scale(1 1.15)" class="c4r"><animate attributeName="height" values="2.6;40.14" dur="3s" repeatCount="1"></animate></rect><animateTransform attributeName="transform" type="translate" values="0,0; 0,-14; 0,0" dur="3.0s" begin="-2.82s" repeatCount="indefinite" additive="sum" calcMode="spline" keySplines="0.45 0 0.55 1; 0.45 0 0.55 1" keyTimes="0; 0.5; 1"/></g>
+<g class="iso-col" transform="translate(342.00 333.58) scale(1.6)"><rect  x="0" y="0" width="18" height="18" transform="skewY(-30) skewX(40.89) scale(1 1.15)" class="c4t" stroke="#fff" stroke-opacity="0.06" stroke-width="0.5"></rect><rect  x="0" y="0" width="18" height="41.48" transform="skewY(30) scale(1 1.15)" class="c4l"><animate attributeName="height" values="2.6;41.48" dur="3s" repeatCount="1"></animate></rect><rect  x="0" y="0" width="18" height="41.48" transform="translate(18 10.39) skewY(-30) scale(1 1.15)" class="c4r"><animate attributeName="height" values="2.6;41.48" dur="3s" repeatCount="1"></animate></rect><animateTransform attributeName="transform" type="translate" values="0,0; 0,-14; 0,0" dur="3.0s" begin="-2.82s" repeatCount="indefinite" additive="sum" calcMode="spline" keySplines="0.45 0 0.55 1; 0.45 0 0.55 1" keyTimes="0; 0.5; 1"/></g>
 </g>
 <rect x="780" y="96" width="470" height="380" rx="20" class="card" filter="url(#soft)"/>
 <text x="804" y="128" font-size="16" font-weight="700" class="fg">Contribution mix</text>
@@ -97,16 +97,16 @@
 <line x1="1015" y1="310" x2="1091.4" y2="415.2" stroke="#9aa0b8" stroke-opacity="0.25"/>
 <line x1="1015" y1="310" x2="938.6" y2="415.2" stroke="#9aa0b8" stroke-opacity="0.25"/>
 <line x1="1015" y1="310" x2="891.4" y2="269.8" stroke="#9aa0b8" stroke-opacity="0.25"/>
-<polygon points="1015.0,184.0 1041.6,301.3 1056.9,367.7 998.5,332.7 937.6,284.8" fill="url(#radarFill)" stroke="#57da69" stroke-width="2.2" stroke-linejoin="round"/>
-<circle class="radar-node" cx="1015.0" cy="184.0" r="4.5" fill="#57da69"/>
+<polygon points="1015.0,182.2 1041.6,301.3 1059.4,371.1 998.5,332.7 937.6,284.8" fill="url(#radarFill)" stroke="#57da69" stroke-width="2.2" stroke-linejoin="round"/>
+<circle class="radar-node" cx="1015.0" cy="182.2" r="4.5" fill="#57da69"/>
 <text x="1015.0" y="150.0" font-size="16" font-weight="600" text-anchor="middle" class="fg">Commit</text>
-<text x="1015.0" y="168.0" font-size="14" font-weight="700" text-anchor="middle" class="strong">177</text>
+<text x="1015.0" y="168.0" font-size="14" font-weight="700" text-anchor="middle" class="strong">207</text>
 <circle class="radar-node" cx="1041.6" cy="301.3" r="4.5" fill="#57da69"/>
 <text x="1167.2" y="260.6" font-size="16" font-weight="600" text-anchor="start" class="fg">Issue</text>
 <text x="1167.2" y="278.6" font-size="14" font-weight="700" text-anchor="start" class="strong">0</text>
-<circle class="radar-node" cx="1056.9" cy="367.7" r="4.5" fill="#57da69"/>
+<circle class="radar-node" cx="1059.4" cy="371.1" r="4.5" fill="#57da69"/>
 <text x="1109.0" y="439.4" font-size="16" font-weight="600" text-anchor="start" class="fg">PullReq</text>
-<text x="1109.0" y="457.4" font-size="14" font-weight="700" text-anchor="start" class="strong">3</text>
+<text x="1109.0" y="457.4" font-size="14" font-weight="700" text-anchor="start" class="strong">4</text>
 <circle class="radar-node" cx="998.5" cy="332.7" r="4.5" fill="#57da69"/>
 <text x="921.0" y="439.4" font-size="16" font-weight="600" text-anchor="end" class="fg">Review</text>
 <text x="921.0" y="457.4" font-size="14" font-weight="700" text-anchor="end" class="strong">0</text>
@@ -147,13 +147,13 @@
 <rect x="292" y="709" width="132" height="3" rx="1.5" fill="#ffffff" fill-opacity="0.08"/>
 <rect x="292" y="709" width="4" height="3" rx="1.5" fill="#8b949e"/>
 <rect x="30" y="786" width="200" height="46" rx="14" class="card kpi-pill"/>
-<text x="48" y="818" font-size="26" font-weight="800" class="strong">241</text>
+<text x="48" y="818" font-size="26" font-weight="800" class="strong">273</text>
 <text x="104" y="817" font-size="14" class="weak">contributions</text>
 <rect x="244" y="786" width="150" height="46" rx="14" class="card kpi-pill"/>
-<text x="262" y="818" font-size="26" font-weight="800" class="strong">177</text>
+<text x="262" y="818" font-size="26" font-weight="800" class="strong">207</text>
 <text x="318" y="817" font-size="14" class="weak">commits</text>
 <rect x="408" y="786" width="170" height="46" rx="14" class="card kpi-pill"/>
-<text x="426" y="818" font-size="26" font-weight="800" class="strong">3</text>
+<text x="426" y="818" font-size="26" font-weight="800" class="strong">4</text>
 <text x="450" y="817" font-size="14" class="weak">pull requests</text>
 <rect x="592" y="786" width="120" height="46" rx="14" class="card kpi-pill"/>
 <text x="610" y="818" font-size="26" font-weight="800" class="strong">6</text>
