@@ -126,35 +126,10 @@ const THEMES = [
 ];
 
 let cachedSvg = null;
-let lastFetchTime = 0;
 let warmCounter = Math.floor(Math.random() * THEMES.length);
 
 async function getSvgContent() {
-  const now = Date.now();
-  if (cachedSvg && (now - lastFetchTime < 60000)) {
-    return cachedSvg;
-  }
-
-  // 1. Fetch latest raw SVG from GitHub main repo
-  try {
-    const rawUrl = 'https://raw.githubusercontent.com/Scrooge-777/Scrooge-777/main/assets/profile_card.svg';
-    const resp = await fetch(rawUrl, {
-      headers: { 'User-Agent': 'Scrooge-Profile-Worker' },
-      signal: AbortSignal.timeout(3500)
-    });
-    if (resp.ok) {
-      const text = await resp.text();
-      if (text.includes('<svg') && text.includes('</svg>')) {
-        cachedSvg = text;
-        lastFetchTime = now;
-        return text;
-      }
-    }
-  } catch (err) {
-    // Network or timeout, fallback to local file
-  }
-
-  // 2. Fallback to local files
+  // 1. Read local bundled file first (exact build version from repo)
   const candidates = [
     path.join(__dirname, '..', 'assets', 'profile_card.svg'),
     path.join(process.cwd(), 'assets', 'profile_card.svg'),
@@ -162,11 +137,32 @@ async function getSvgContent() {
   ];
   for (const c of candidates) {
     if (fs.existsSync(c)) {
-      cachedSvg = fs.readFileSync(c, 'utf8');
-      lastFetchTime = now;
-      return cachedSvg;
+      return fs.readFileSync(c, 'utf8');
     }
   }
+
+  // 2. Fallback to GitHub raw with cache-busting timestamp
+  if (cachedSvg) {
+    return cachedSvg;
+  }
+
+  try {
+    const rawUrl = `https://raw.githubusercontent.com/Scrooge-777/Scrooge-777/main/assets/profile_card.svg?nocache=${Date.now()}`;
+    const resp = await fetch(rawUrl, {
+      headers: { 'User-Agent': 'Scrooge-Profile-Worker', 'Cache-Control': 'no-cache' },
+      signal: AbortSignal.timeout(3500)
+    });
+    if (resp.ok) {
+      const text = await resp.text();
+      if (text.includes('<svg') && text.includes('</svg>')) {
+        cachedSvg = text;
+        return text;
+      }
+    }
+  } catch (err) {
+    // ignore
+  }
+
   throw new Error('profile_card.svg not found in candidates');
 }
 
