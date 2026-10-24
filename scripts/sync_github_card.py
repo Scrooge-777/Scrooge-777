@@ -89,6 +89,7 @@ def fetch_stats_and_languages(username, token=None):
           user(login: $login) {
             contributionsCollection {
               totalCommitContributions
+              restrictedContributionsCount
               totalPullRequestContributions
               totalIssueContributions
               totalPullRequestReviewContributions
@@ -119,7 +120,9 @@ def fetch_stats_and_languages(username, token=None):
                     c = u.get('contributionsCollection', {})
                     cal = c.get('contributionCalendar', {})
                     stats['contributions'] = cal.get('totalContributions', stats['contributions'])
-                    stats['commits'] = c.get('totalCommitContributions', stats['commits'])
+                    # private activity is reported separately; it is only non-zero with a user token
+                    stats['commits'] = c.get('totalCommitContributions', 0) + c.get('restrictedContributionsCount', 0)
+                    stats['graphql_ok'] = True
                     stats['prs'] = c.get('totalPullRequestContributions', stats['prs'])
                     stats['issues'] = c.get('totalIssueContributions', stats['issues'])
                     stats['reviews'] = c.get('totalPullRequestReviewContributions', stats['reviews'])
@@ -447,18 +450,19 @@ def update_svg(svg_path, stats):
         svg = svg[:langs_start] + langs_xml + svg[kpi_start:]
         print(f"Synced {len(stats['languages'])} top languages into SVG!")
 
-    # 3. Update bottom KPI capsules with non-decrement safeguard (protects private commit totals)
+    # 3. Update bottom KPI capsules. Values come straight from the API so they can go down as well as up;
+    #    the previous SVG value is only kept when the API call failed.
     def _get_val(p):
         m = re.search(p, svg)
         return int(m.group(1)) if m else 0
 
-    c_cnt = max(stats.get("contributions", 0), _get_val(r'<rect[^>]*width="200"[^>]*/>\s*<text[^>]*class="strong">(\d+)</text>'))
-    m_cnt = max(stats.get("commits", 0), _get_val(r'<rect[^>]*width="150"[^>]*/>\s*<text[^>]*class="strong">(\d+)</text>'))
-    p_cnt = max(stats.get("prs", 0), _get_val(r'<rect[^>]*width="170"[^>]*/>\s*<text[^>]*class="strong">(\d+)</text>'))
-    # public repo count straight from the API; falls back to the previous value only if the fetch failed
+    ok = stats.get('graphql_ok', False)
+    c_cnt = stats.get("contributions", 0) if ok else _get_val(r'<rect[^>]*width="200"[^>]*/>\s*<text[^>]*class="strong">(\d+)</text>')
+    m_cnt = stats.get("commits", 0) if ok else _get_val(r'<rect[^>]*width="150"[^>]*/>\s*<text[^>]*class="strong">(\d+)</text>')
+    p_cnt = stats.get("prs", 0) if ok else _get_val(r'<rect[^>]*width="170"[^>]*/>\s*<text[^>]*class="strong">(\d+)</text>')
     r_cnt = stats.get("repos", 0) or _get_val(r'<rect[^>]*width="120"[^>]*/>\s*<text[^>]*class="strong">(\d+)</text>')
-    s_cnt = max(stats.get("stars", 0), _get_val(r'<rect[^>]*width="110"[^>]*/>\s*<text[^>]*class="strong">(\d+)</text>\s*<text[^>]*>stars</text>'))
-    f_cnt = max(stats.get("forks", 0), _get_val(r'<rect[^>]*width="110"[^>]*/>\s*<text[^>]*class="strong">(\d+)</text>\s*<text[^>]*>forks</text>'))
+    s_cnt = stats.get("stars", 0)
+    f_cnt = stats.get("forks", 0)
 
     svg = re.sub(r'(<rect[^>]*width="200"[^>]*/>\s*<text[^>]*class="strong">)\d+(</text>)', rf'\g<1>{c_cnt}\g<2>', svg)
     svg = re.sub(r'(<rect[^>]*width="150"[^>]*/>\s*<text[^>]*class="strong">)\d+(</text>)', rf'\g<1>{m_cnt}\g<2>', svg)
@@ -467,7 +471,7 @@ def update_svg(svg_path, stats):
     svg = re.sub(r'(<rect[^>]*width="110"[^>]*/>\s*<text[^>]*class="strong">)\d+(</text>\s*<text[^>]*>stars</text>)', rf'\g<1>{s_cnt}\g<2>', svg)
     svg = re.sub(r'(<rect[^>]*width="110"[^>]*/>\s*<text[^>]*class="strong">)\d+(</text>\s*<text[^>]*>forks</text>)', rf'\g<1>{f_cnt}\g<2>', svg)
 
-    # 3b. All-time pill (never decreases: private contributions are invisible to the Actions token)
+    # 3b. All-time pill (never decreases: private contributions are invisible without a user token)
     prev_all = _get_val(r'<!-- alltime -->\s*<rect[^>]*/>\s*<text[^>]*class="strong">(\d+)</text>')
     at = stats.get('alltime')
     if at:
