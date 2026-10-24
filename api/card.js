@@ -129,23 +129,7 @@ let cachedSvg = null;
 let warmCounter = Math.floor(Math.random() * THEMES.length);
 
 async function getSvgContent() {
-  // 1. Read local bundled file first (exact build version from repo)
-  const candidates = [
-    path.join(__dirname, '..', 'assets', 'profile_card.svg'),
-    path.join(process.cwd(), 'assets', 'profile_card.svg'),
-    path.join(__dirname, 'assets', 'profile_card.svg')
-  ];
-  for (const c of candidates) {
-    if (fs.existsSync(c)) {
-      return fs.readFileSync(c, 'utf8');
-    }
-  }
-
-  // 2. Fallback to GitHub raw with cache-busting timestamp
-  if (cachedSvg) {
-    return cachedSvg;
-  }
-
+  // 1. Live copy from GitHub first, so the card stays fresh without a Vercel redeploy
   try {
     const rawUrl = `https://raw.githubusercontent.com/Scrooge-777/Scrooge-777/main/assets/profile_card.svg?nocache=${Date.now()}`;
     const resp = await fetch(rawUrl, {
@@ -160,7 +144,24 @@ async function getSvgContent() {
       }
     }
   } catch (err) {
-    // ignore
+    // fall through to cached / bundled copy
+  }
+
+  // 2. Last good live copy on a warm lambda
+  if (cachedSvg) {
+    return cachedSvg;
+  }
+
+  // 3. Bundled file from the deployed build
+  const candidates = [
+    path.join(__dirname, '..', 'assets', 'profile_card.svg'),
+    path.join(process.cwd(), 'assets', 'profile_card.svg'),
+    path.join(__dirname, 'assets', 'profile_card.svg')
+  ];
+  for (const c of candidates) {
+    if (fs.existsSync(c)) {
+      return fs.readFileSync(c, 'utf8');
+    }
   }
 
   throw new Error('profile_card.svg not found in candidates');
