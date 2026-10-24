@@ -404,32 +404,29 @@ def update_svg(svg_path, green_path, stats):
     svg = re.sub(r'(\.hud-marker\{.*?\n|100%\{transform:translate\(388px,108px\)\}\}\n?)', '', svg)
     svg = re.sub(r'<!-- HUD Peak Activity Marker -->\s*<g class="hud-marker".*?</g>\s*</g>\s*', '', svg, flags=re.DOTALL)
 
-    # 1. Sync 3D columns and Isometric Matrix Grid Floor
+    # Revert grid floor if present
+    start_grid = svg.find('<!-- Isometric Matrix Grid Floor')
+    if start_grid == -1:
+        start_grid = svg.find('<g id="iso-matrix-grid"')
+    end_grid = svg.find('<g id="terrain-island"')
+    if start_grid != -1 and end_grid != -1:
+        svg = svg[:start_grid] + svg[end_grid:]
+
+    # 1. Sync 3D columns
     if os.path.exists(green_path):
         with open(green_path, 'r', encoding='utf-8') as gf:
             green_svg = gf.read()
         wrapped_island = build_active_wave_terrain(green_svg)
         if wrapped_island:
-            matrix_grid = generate_matrix_grid_svg()
-
-            comment_grid = svg.find('<!-- Isometric Matrix Grid Floor')
-            if comment_grid != -1:
-                v2_start = comment_grid
-            else:
-                v2_first_grid = svg.find('<g id="iso-matrix-grid"')
-                if v2_first_grid != -1:
-                    v2_start = v2_first_grid
-                else:
-                    v2_start = svg.find('<g id="terrain-island"')
-                    if v2_start == -1:
-                        v2_start = svg.find('<g class="iso-col"')
-            
+            v2_start = svg.find('<g id="terrain-island"')
+            if v2_start == -1:
+                v2_start = svg.find('<g class="iso-col"')
             v2_grid_end = svg.find('<rect x="780" y="96"')
 
             if v2_start != -1 and v2_grid_end != -1:
-                svg = svg[:v2_start] + matrix_grid + "\n" + wrapped_island + "\n" + svg[v2_grid_end:]
+                svg = svg[:v2_start] + wrapped_island + "\n" + svg[v2_grid_end:]
                 svg = re.sub(r'>Last 12 months<', '>Activity since Oct 2026<', svg)
-                print("Synced active 3D wave columns and Isometric Matrix Grid Floor!")
+                print("Synced active 3D wave columns!")
 
     # 2. Sync Top Languages section
     langs_start = svg.find('Top languages</text>')
@@ -447,10 +444,54 @@ def update_svg(svg_path, green_path, stats):
     svg = re.sub(r'(<rect[^>]*width="110"[^>]*/>\s*<text[^>]*class="strong">)\d+(</text>\s*<text[^>]*>stars</text>)', rf'\g<1>{stats["stars"]}\g<2>', svg)
     svg = re.sub(r'(<rect[^>]*width="110"[^>]*/>\s*<text[^>]*class="strong">)\d+(</text>\s*<text[^>]*>forks</text>)', rf'\g<1>{stats["forks"]}\g<2>', svg)
 
-    # 4. Update Radar Commit & PR numbers
+    # 4. Update Balanced Logarithmic Radar Polygon & Nodes (Step 3 Upgrade)
     svg = re.sub(r'(<text[^>]*x="1015\.0"[^>]*y="168\.0"[^>]*class="strong">)\d+(</text>)', rf'\g<1>{stats["commits"]}\g<2>', svg)
     svg = re.sub(r'(<text[^>]*x="1109\.0"[^>]*y="457\.4"[^>]*class="strong">)\d+(</text>)', rf'\g<1>{stats["prs"]}\g<2>', svg)
     svg = re.sub(r'(<text[^>]*x="862\.8"[^>]*y="278\.6"[^>]*class="strong">)\d+(</text>)', rf'\g<1>{stats["repos"]}\g<2>', svg)
+
+    cx_rad, cy_rad = 1015.0, 310.0
+    R_max = 130.0
+    r_base = 28.0
+    angles_deg = [-90, -18, 54, 126, 198]
+    radar_values = [
+        stats.get('commits', 0),
+        stats.get('issues', 0),
+        stats.get('prs', 0),
+        stats.get('reviews', 0),
+        stats.get('repos', 0)
+    ]
+    max_val = max(250.0, max(radar_values))
+
+    poly_pts = []
+    node_pts = []
+    for deg, val in zip(angles_deg, radar_values):
+        rad = math.radians(deg)
+        if val > 0:
+            ratio = (math.log(1 + val) / math.log(1 + max_val)) ** 0.62
+            dist = r_base + (R_max - r_base) * ratio
+        else:
+            dist = r_base
+        nx = cx_rad + dist * math.cos(rad)
+        ny = cy_rad + dist * math.sin(rad)
+        poly_pts.append(f"{nx:.1f},{ny:.1f}")
+        node_pts.append((nx, ny))
+
+    poly_str = " ".join(poly_pts)
+    poly_regex = r'<polygon points="[^"]+" fill="url\(#radarFill\)"[^>]*/>'
+    new_polygon = f'<polygon points="{poly_str}" fill="url(#radarFill)" stroke="#57da69" stroke-width="2.2" stroke-linejoin="round"/>'
+    svg = re.sub(poly_regex, new_polygon, svg)
+
+    # Update node circles to match balanced polygon vertices
+    svg = re.sub(r'<circle class="radar-node" cx="[^"]+" cy="[^"]+" r="[^"]*" fill="[^"]*"/>\s*(<text x="1015\.0" y="150\.0")',
+                 rf'<circle class="radar-node" cx="{node_pts[0][0]:.1f}" cy="{node_pts[0][1]:.1f}" r="4.5" fill="#57da69"/>\n\g<1>', svg)
+    svg = re.sub(r'<circle class="radar-node" cx="[^"]+" cy="[^"]+" r="[^"]*" fill="[^"]*"/>\s*(<text x="1167\.2" y="260\.6")',
+                 rf'<circle class="radar-node" cx="{node_pts[1][0]:.1f}" cy="{node_pts[1][1]:.1f}" r="4.5" fill="#57da69"/>\n\g<1>', svg)
+    svg = re.sub(r'<circle class="radar-node" cx="[^"]+" cy="[^"]+" r="[^"]*" fill="[^"]*"/>\s*(<text x="1109\.0" y="439\.4")',
+                 rf'<circle class="radar-node" cx="{node_pts[2][0]:.1f}" cy="{node_pts[2][1]:.1f}" r="4.5" fill="#57da69"/>\n\g<1>', svg)
+    svg = re.sub(r'<circle class="radar-node" cx="[^"]+" cy="[^"]+" r="[^"]*" fill="[^"]*"/>\s*(<text x="921\.0" y="439\.4")',
+                 rf'<circle class="radar-node" cx="{node_pts[3][0]:.1f}" cy="{node_pts[3][1]:.1f}" r="4.5" fill="#57da69"/>\n\g<1>', svg)
+    svg = re.sub(r'<circle class="radar-node" cx="[^"]+" cy="[^"]+" r="[^"]*" fill="[^"]*"/>\s*(<text x="862\.8" y="260\.6")',
+                 rf'<circle class="radar-node" cx="{node_pts[4][0]:.1f}" cy="{node_pts[4][1]:.1f}" r="4.5" fill="#57da69"/>\n\g<1>', svg)
 
     # 5. Validate XML
     ET.fromstring(svg)
