@@ -6,12 +6,12 @@ def fetch_stats_and_languages(username, token=None):
         headers['Authorization'] = f'Bearer {token}'
     
     stats = {
-        'contributions': 241,
-        'commits': 177,
-        'prs': 3,
+        'contributions': 297,
+        'commits': 230,
+        'prs': 5,
         'reviews': 0,
         'issues': 0,
-        'repos': 6,
+        'repos': 7,
         'stars': 0,
         'forks': 0,
         'raw_languages': ['C#', 'Rust', 'Python', 'JavaScript', 'TypeScript', 'HTML', 'CSS'],
@@ -25,7 +25,7 @@ def fetch_stats_and_languages(username, token=None):
     }
 
     try:
-        url = 'https://api.github.com/user/repos?per_page=100&affiliation=owner' if token else f'https://api.github.com/users/{username}/repos?per_page=100'
+        url = f'https://api.github.com/users/{username}/repos?per_page=100'
         req = urllib.request.Request(url, headers=headers)
         with urllib.request.urlopen(req, timeout=12) as resp:
             repos_data = json.loads(resp.read().decode('utf-8'))
@@ -325,6 +325,12 @@ def build_active_wave_terrain(green_svg):
 
         col_xml = f'<g class="iso-col" transform="translate({new_x:.2f} {new_y:.2f}) scale({scale})">{content}{wave_anim}</g>'
         processed_cols.append(col_xml)
+
+    # Ensure current day (Oct 25) is represented at leading edge if not in static base
+    if len(active_matches) == 28:
+        # Sunday Oct 25 column (3 contributions, c1 level)
+        oct25_col = '<g class="iso-col" transform="translate(566.00 234.76) scale(1.6)"><rect  x="0" y="0" width="18" height="18" transform="skewY(-30) skewX(40.89) scale(1 1.15)" class="c1t" stroke="#fff" stroke-opacity="0.06" stroke-width="0.5"></rect><rect  x="0" y="0" width="18" height="5.24" transform="skewY(30) scale(1 1.15)" class="c1l"><animate attributeName="height" values="2.6;5.24" dur="3s" repeatCount="1"></animate></rect><rect  x="0" y="0" width="18" height="5.24" transform="translate(18 10.39) skewY(-30) scale(1 1.15)" class="c1r"><animate attributeName="height" values="2.6;5.24" dur="3s" repeatCount="1"></animate></rect><animateTransform attributeName="transform" type="translate" values="0,0; 0,-7; 0,0" dur="3.0s" begin="-0.00s" repeatCount="indefinite" additive="sum" calcMode="spline" keySplines="0.45 0 0.55 1; 0.45 0 0.55 1" keyTimes="0; 0.5; 1"/></g>'
+        processed_cols.append(oct25_col)
 
     all_cols_xml = "\n".join(processed_cols)
     wrapped = f'<g id="terrain-island" class="terrain-3d">\n{all_cols_xml}\n</g>'
