@@ -544,7 +544,8 @@ def main():
     username = os.environ.get('GH_USERNAME') or os.environ.get('GITHUB_ACTOR') or 'Scrooge-777'
     if username == os.environ.get('USERNAME') and username != 'Scrooge-777':
         username = 'Scrooge-777'
-    token = os.environ.get('GITHUB_TOKEN')
+    # optional personal token: calendar then follows the profile timezone and includes private activity
+    token = os.environ.get('PROFILE_TOKEN') or os.environ.get('GITHUB_TOKEN')
     stats = fetch_stats_and_languages(username, token)
     stats['alltime'] = fetch_alltime(username, token)
     repo_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))

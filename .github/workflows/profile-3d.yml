@@ -35,6 +35,7 @@ jobs:
           python scripts/sync_github_card.py
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PROFILE_TOKEN: ${{ secrets.PROFILE_TOKEN }}
           USERNAME: ${{ github.repository_owner }}
 
       - name: Validate scripts and SVG assets
