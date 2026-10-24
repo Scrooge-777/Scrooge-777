@@ -330,6 +330,67 @@ def build_active_wave_terrain(green_svg):
     wrapped = f'<g id="terrain-island" class="terrain-3d">\n{all_cols_xml}\n</g>'
     return wrapped
 
+def generate_matrix_grid_svg():
+    cx, cy = 390.0, 305.0
+    dx = 32.0
+    dy = 18.48
+    u_min, u_max = -6, 6
+    v_min, v_max = -5, 5
+
+    lines = []
+    for u in range(u_min, u_max + 1):
+        x1 = cx + (u + v_min) * dx
+        y1 = cy + (v_min - u) * dy
+        x2 = cx + (u + v_max) * dx
+        y2 = cy + (v_max - u) * dy
+        lines.append(f'<line x1="{x1:.1f}" y1="{y1:.1f}" x2="{x2:.1f}" y2="{y2:.1f}"/>')
+
+    for v in range(v_min, v_max + 1):
+        x1 = cx + (u_min + v) * dx
+        y1 = cy + (v - u_min) * dy
+        x2 = cx + (u_max + v) * dx
+        y2 = cy + (v - u_max) * dy
+        lines.append(f'<line x1="{x1:.1f}" y1="{y1:.1f}" x2="{x2:.1f}" y2="{y2:.1f}"/>')
+
+    grid_lines_xml = "\n    ".join(lines)
+
+    accents = []
+    corners = [
+        (cx + (u_min + v_min) * dx, cy + (v_min - u_min) * dy),
+        (cx + (u_max + v_min) * dx, cy + (v_min - u_max) * dy),
+        (cx + (u_min + v_max) * dx, cy + (v_max - u_min) * dy),
+        (cx + (u_max + v_max) * dx, cy + (v_max - u_max) * dy),
+    ]
+    for x, y in corners:
+        accents.append(f'<circle cx="{x:.1f}" cy="{y:.1f}" r="3" fill="#57da69" fill-opacity="0.5"/>')
+        accents.append(f'<line x1="{x-6:.1f}" y1="{y:.1f}" x2="{x+6:.1f}" y2="{y:.1f}" stroke="#57da69" stroke-width="1" stroke-opacity="0.6"/>')
+        accents.append(f'<line x1="{x:.1f}" y1="{y-6:.1f}" x2="{x:.1f}" y2="{y+6:.1f}" stroke="#57da69" stroke-width="1" stroke-opacity="0.6"/>')
+
+    accents_xml = "\n    ".join(accents)
+
+    return f"""<!-- Isometric Matrix Grid Floor (Step 2 Upgrade) -->
+<g id="iso-matrix-grid" class="matrix-grid">
+  <defs>
+    <radialGradient id="matrixGlow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#57da69" stop-opacity="0.12"/>
+      <stop offset="65%" stop-color="#2ea043" stop-opacity="0.04"/>
+      <stop offset="100%" stop-color="#0b0e14" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="gridFade" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#2ea043" stop-opacity="0.05"/>
+      <stop offset="50%" stop-color="#57da69" stop-opacity="0.30"/>
+      <stop offset="100%" stop-color="#2ea043" stop-opacity="0.05"/>
+    </linearGradient>
+  </defs>
+  <ellipse cx="{cx:.1f}" cy="{cy:.1f}" rx="290" ry="155" fill="url(#matrixGlow)"/>
+  <g stroke="url(#gridFade)" stroke-width="0.85" stroke-dasharray="2 3" stroke-opacity="0.85">
+    {grid_lines_xml}
+  </g>
+  <g>
+    {accents_xml}
+  </g>
+</g>"""
+
 def update_svg(svg_path, green_path, stats):
     if not os.path.exists(svg_path):
         print(f"SVG not found at {svg_path}")
@@ -338,43 +399,36 @@ def update_svg(svg_path, green_path, stats):
     with open(svg_path, 'r', encoding='utf-8') as f:
         svg = f.read()
 
-    # 1. Sync 3D columns from profile-night-green.svg if available
+    # Revert HUD marker if present
+    svg = re.sub(r'(\.hud-marker\{.*?\n|100%\{transform:translate\(388px,108px\)\}\}\n?)', '', svg)
+    svg = re.sub(r'<!-- HUD Peak Activity Marker -->\s*<g class="hud-marker".*?</g>\s*</g>\s*', '', svg, flags=re.DOTALL)
+
+    # 1. Sync 3D columns and Isometric Matrix Grid Floor
     if os.path.exists(green_path):
         with open(green_path, 'r', encoding='utf-8') as gf:
             green_svg = gf.read()
         wrapped_island = build_active_wave_terrain(green_svg)
         if wrapped_island:
-            if '.hud-marker' not in svg:
-                hud_style = ".hud-marker{animation:hudFloat 3.5s ease-in-out infinite alternate}@keyframes hudFloat{0%{transform:translate(388px,115px)}100%{transform:translate(388px,108px)}}\n"
-                svg = svg.replace('/* Mouse Interactivity */', hud_style + "/* Mouse Interactivity */")
+            matrix_grid = generate_matrix_grid_svg()
 
-            v2_first_col = svg.find('<g id="terrain-island"')
-            if v2_first_col == -1:
-                v2_first_col = svg.find('<g class="iso-col"')
+            comment_grid = svg.find('<!-- Isometric Matrix Grid Floor')
+            if comment_grid != -1:
+                v2_start = comment_grid
+            else:
+                v2_first_grid = svg.find('<g id="iso-matrix-grid"')
+                if v2_first_grid != -1:
+                    v2_start = v2_first_grid
+                else:
+                    v2_start = svg.find('<g id="terrain-island"')
+                    if v2_start == -1:
+                        v2_start = svg.find('<g class="iso-col"')
+            
             v2_grid_end = svg.find('<rect x="780" y="96"')
 
-            if v2_first_col != -1 and v2_grid_end != -1:
-                hud_marker = """<!-- HUD Peak Activity Marker -->
-<g class="hud-marker" transform="translate(388, 115)">
-  <line x1="0" y1="42" x2="0" y2="105" stroke="#57da69" stroke-width="1.5" stroke-dasharray="3 3" stroke-opacity="0.8"/>
-  <circle cx="0" cy="105" r="4" fill="#57da69" fill-opacity="0.9">
-    <animate attributeName="r" values="3;6;3" dur="2.2s" repeatCount="indefinite"/>
-    <animate attributeName="opacity" values="0.6;1;0.6" dur="2.2s" repeatCount="indefinite"/>
-  </circle>
-  <circle cx="0" cy="105" r="9" fill="none" stroke="#57da69" stroke-width="1" stroke-dasharray="2 2" opacity="0.6">
-    <animate attributeName="r" values="7;13;7" dur="2.2s" repeatCount="indefinite"/>
-    <animate attributeName="opacity" values="0.8;0.2;0.8" dur="2.2s" repeatCount="indefinite"/>
-  </circle>
-  <g transform="translate(-80, 0)">
-    <rect x="0" y="0" width="160" height="42" rx="8" fill="#0d1117" fill-opacity="0.94" stroke="#57da69" stroke-width="1.2" filter="url(#soft)"/>
-    <circle cx="16" cy="15" r="3.5" fill="#57da69"/>
-    <text x="27" y="18" font-size="10" font-weight="700" fill="#57da69" letter-spacing="1">PEAK ACTIVITY</text>
-    <text x="16" y="33" font-size="11" font-weight="600" fill="#ffffff">Oct 24 · 48 Commits</text>
-  </g>
-</g>"""
-                svg = svg[:v2_first_col] + wrapped_island + "\n" + hud_marker + "\n" + svg[v2_grid_end:]
+            if v2_start != -1 and v2_grid_end != -1:
+                svg = svg[:v2_start] + matrix_grid + "\n" + wrapped_island + "\n" + svg[v2_grid_end:]
                 svg = re.sub(r'>Last 12 months<', '>Activity since Oct 2026<', svg)
-                print("Synced active 3D wave columns and HUD peak marker!")
+                print("Synced active 3D wave columns and Isometric Matrix Grid Floor!")
 
     # 2. Sync Top Languages section
     langs_start = svg.find('Top languages</text>')

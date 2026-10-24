@@ -15,7 +15,6 @@
 .c3t{fill:#2dd143}.c3l{fill:#26af38}.c3r{fill:#1f922f}
 .c4t{fill:#57da69}.c4l{fill:#49b658}.c4r{fill:#3d994a}
 
-.hud-marker{animation:hudFloat 3.5s ease-in-out infinite alternate}@keyframes hudFloat{0%{transform:translate(388px,115px)}100%{transform:translate(388px,108px)}}
 /* Mouse Interactivity */
 .iso-col{cursor:pointer;transition:transform 0.22s cubic-bezier(0.34,1.56,0.64,1),filter 0.22s ease}
 .iso-col:hover{transform:scale(1.22) translateY(-8px);filter:drop-shadow(0 0 10px #57da69)}
@@ -56,6 +55,62 @@
 <rect x="128" y="91" width="14" height="14" rx="3" class="c3t"/>
 <rect x="146" y="91" width="14" height="14" rx="3" class="c4t"/>
 <text x="168" y="102" font-size="12" class="weak">More</text>
+<!-- Isometric Matrix Grid Floor (Step 2 Upgrade) -->
+<g id="iso-matrix-grid" class="matrix-grid">
+  <defs>
+    <radialGradient id="matrixGlow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#57da69" stop-opacity="0.12"/>
+      <stop offset="65%" stop-color="#2ea043" stop-opacity="0.04"/>
+      <stop offset="100%" stop-color="#0b0e14" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="gridFade" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#2ea043" stop-opacity="0.05"/>
+      <stop offset="50%" stop-color="#57da69" stop-opacity="0.30"/>
+      <stop offset="100%" stop-color="#2ea043" stop-opacity="0.05"/>
+    </linearGradient>
+  </defs>
+  <ellipse cx="390.0" cy="305.0" rx="290" ry="155" fill="url(#matrixGlow)"/>
+  <g stroke="url(#gridFade)" stroke-width="0.85" stroke-dasharray="2 3" stroke-opacity="0.85">
+    <line x1="38.0" y1="323.5" x2="358.0" y2="508.3"/>
+    <line x1="70.0" y1="305.0" x2="390.0" y2="489.8"/>
+    <line x1="102.0" y1="286.5" x2="422.0" y2="471.3"/>
+    <line x1="134.0" y1="268.0" x2="454.0" y2="452.8"/>
+    <line x1="166.0" y1="249.6" x2="486.0" y2="434.4"/>
+    <line x1="198.0" y1="231.1" x2="518.0" y2="415.9"/>
+    <line x1="230.0" y1="212.6" x2="550.0" y2="397.4"/>
+    <line x1="262.0" y1="194.1" x2="582.0" y2="378.9"/>
+    <line x1="294.0" y1="175.6" x2="614.0" y2="360.4"/>
+    <line x1="326.0" y1="157.2" x2="646.0" y2="342.0"/>
+    <line x1="358.0" y1="138.7" x2="678.0" y2="323.5"/>
+    <line x1="390.0" y1="120.2" x2="710.0" y2="305.0"/>
+    <line x1="422.0" y1="101.7" x2="742.0" y2="286.5"/>
+    <line x1="38.0" y1="323.5" x2="422.0" y2="101.7"/>
+    <line x1="70.0" y1="342.0" x2="454.0" y2="120.2"/>
+    <line x1="102.0" y1="360.4" x2="486.0" y2="138.7"/>
+    <line x1="134.0" y1="378.9" x2="518.0" y2="157.2"/>
+    <line x1="166.0" y1="397.4" x2="550.0" y2="175.6"/>
+    <line x1="198.0" y1="415.9" x2="582.0" y2="194.1"/>
+    <line x1="230.0" y1="434.4" x2="614.0" y2="212.6"/>
+    <line x1="262.0" y1="452.8" x2="646.0" y2="231.1"/>
+    <line x1="294.0" y1="471.3" x2="678.0" y2="249.6"/>
+    <line x1="326.0" y1="489.8" x2="710.0" y2="268.0"/>
+    <line x1="358.0" y1="508.3" x2="742.0" y2="286.5"/>
+  </g>
+  <g>
+    <circle cx="38.0" cy="323.5" r="3" fill="#57da69" fill-opacity="0.5"/>
+    <line x1="32.0" y1="323.5" x2="44.0" y2="323.5" stroke="#57da69" stroke-width="1" stroke-opacity="0.6"/>
+    <line x1="38.0" y1="317.5" x2="38.0" y2="329.5" stroke="#57da69" stroke-width="1" stroke-opacity="0.6"/>
+    <circle cx="422.0" cy="101.7" r="3" fill="#57da69" fill-opacity="0.5"/>
+    <line x1="416.0" y1="101.7" x2="428.0" y2="101.7" stroke="#57da69" stroke-width="1" stroke-opacity="0.6"/>
+    <line x1="422.0" y1="95.7" x2="422.0" y2="107.7" stroke="#57da69" stroke-width="1" stroke-opacity="0.6"/>
+    <circle cx="358.0" cy="508.3" r="3" fill="#57da69" fill-opacity="0.5"/>
+    <line x1="352.0" y1="508.3" x2="364.0" y2="508.3" stroke="#57da69" stroke-width="1" stroke-opacity="0.6"/>
+    <line x1="358.0" y1="502.3" x2="358.0" y2="514.3" stroke="#57da69" stroke-width="1" stroke-opacity="0.6"/>
+    <circle cx="742.0" cy="286.5" r="3" fill="#57da69" fill-opacity="0.5"/>
+    <line x1="736.0" y1="286.5" x2="748.0" y2="286.5" stroke="#57da69" stroke-width="1" stroke-opacity="0.6"/>
+    <line x1="742.0" y1="280.5" x2="742.0" y2="292.5" stroke="#57da69" stroke-width="1" stroke-opacity="0.6"/>
+  </g>
+</g>
 <g id="terrain-island" class="terrain-3d">
 <g class="iso-col" transform="translate(438.00 239.14) scale(1.6)"><rect  x="0" y="0" width="18" height="18" transform="skewY(-30) skewX(40.89) scale(1 1.15)" class="c0t" stroke="#fff" stroke-opacity="0.06" stroke-width="0.5"></rect><rect  x="0" y="0" width="18" height="2.6" transform="skewY(30) scale(1 1.15)" class="c0l"></rect><rect  x="0" y="0" width="18" height="2.6" transform="translate(18 10.39) skewY(-30) scale(1 1.15)" class="c0r"></rect><animateTransform attributeName="transform" type="translate" values="0,0; 0,-7; 0,0" dur="3.0s" begin="-0.00s" repeatCount="indefinite" additive="sum" calcMode="spline" keySplines="0.45 0 0.55 1; 0.45 0 0.55 1" keyTimes="0; 0.5; 1"/></g>
 <g class="iso-col" transform="translate(406.00 257.62) scale(1.6)"><rect  x="0" y="0" width="18" height="18" transform="skewY(-30) skewX(40.89) scale(1 1.15)" class="c0t" stroke="#fff" stroke-opacity="0.06" stroke-width="0.5"></rect><rect  x="0" y="0" width="18" height="2.6" transform="skewY(30) scale(1 1.15)" class="c0l"></rect><rect  x="0" y="0" width="18" height="2.6" transform="translate(18 10.39) skewY(-30) scale(1 1.15)" class="c0r"></rect><animateTransform attributeName="transform" type="translate" values="0,0; 0,-7; 0,0" dur="3.0s" begin="-0.26s" repeatCount="indefinite" additive="sum" calcMode="spline" keySplines="0.45 0 0.55 1; 0.45 0 0.55 1" keyTimes="0; 0.5; 1"/></g>
@@ -85,24 +140,6 @@
 <g class="iso-col" transform="translate(406.00 363.58) scale(1.6)"><rect  x="0" y="0" width="18" height="18" transform="skewY(-30) skewX(40.89) scale(1 1.15)" class="c1t" stroke="#fff" stroke-opacity="0.06" stroke-width="0.5"></rect><rect  x="0" y="0" width="18" height="5.24" transform="skewY(30) scale(1 1.15)" class="c1l"><animate attributeName="height" values="2.6;5.24" dur="3s" repeatCount="1"></animate></rect><rect  x="0" y="0" width="18" height="5.24" transform="translate(18 10.39) skewY(-30) scale(1 1.15)" class="c1r"><animate attributeName="height" values="2.6;5.24" dur="3s" repeatCount="1"></animate></rect><animateTransform attributeName="transform" type="translate" values="0,0; 0,-7; 0,0" dur="3.0s" begin="-2.30s" repeatCount="indefinite" additive="sum" calcMode="spline" keySplines="0.45 0 0.55 1; 0.45 0 0.55 1" keyTimes="0; 0.5; 1"/></g>
 <g class="iso-col" transform="translate(374.00 240.99) scale(1.6)"><rect  x="0" y="0" width="18" height="18" transform="skewY(-30) skewX(40.89) scale(1 1.15)" class="c4t" stroke="#fff" stroke-opacity="0.06" stroke-width="0.5"></rect><rect  x="0" y="0" width="18" height="81.6" transform="skewY(30) scale(1 1.15)" class="c4l"><animate attributeName="height" values="2.6;81.6" dur="3s" repeatCount="1"></animate></rect><rect  x="0" y="0" width="18" height="81.6" transform="translate(18 10.39) skewY(-30) scale(1 1.15)" class="c4r"><animate attributeName="height" values="2.6;81.6" dur="3s" repeatCount="1"></animate></rect><animateTransform attributeName="transform" type="translate" values="0,0; 0,-14; 0,0" dur="3.0s" begin="-2.56s" repeatCount="indefinite" additive="sum" calcMode="spline" keySplines="0.45 0 0.55 1; 0.45 0 0.55 1" keyTimes="0; 0.5; 1"/></g>
 <g class="iso-col" transform="translate(342.00 338.59) scale(1.6)"><rect  x="0" y="0" width="18" height="18" transform="skewY(-30) skewX(40.89) scale(1 1.15)" class="c4t" stroke="#fff" stroke-opacity="0.06" stroke-width="0.5"></rect><rect  x="0" y="0" width="18" height="38.77" transform="skewY(30) scale(1 1.15)" class="c4l"><animate attributeName="height" values="2.6;38.77" dur="3s" repeatCount="1"></animate></rect><rect  x="0" y="0" width="18" height="38.77" transform="translate(18 10.39) skewY(-30) scale(1 1.15)" class="c4r"><animate attributeName="height" values="2.6;38.77" dur="3s" repeatCount="1"></animate></rect><animateTransform attributeName="transform" type="translate" values="0,0; 0,-14; 0,0" dur="3.0s" begin="-2.82s" repeatCount="indefinite" additive="sum" calcMode="spline" keySplines="0.45 0 0.55 1; 0.45 0 0.55 1" keyTimes="0; 0.5; 1"/></g>
-</g>
-<!-- HUD Peak Activity Marker -->
-<g class="hud-marker" transform="translate(388, 115)">
-  <line x1="0" y1="42" x2="0" y2="105" stroke="#57da69" stroke-width="1.5" stroke-dasharray="3 3" stroke-opacity="0.8"/>
-  <circle cx="0" cy="105" r="4" fill="#57da69" fill-opacity="0.9">
-    <animate attributeName="r" values="3;6;3" dur="2.2s" repeatCount="indefinite"/>
-    <animate attributeName="opacity" values="0.6;1;0.6" dur="2.2s" repeatCount="indefinite"/>
-  </circle>
-  <circle cx="0" cy="105" r="9" fill="none" stroke="#57da69" stroke-width="1" stroke-dasharray="2 2" opacity="0.6">
-    <animate attributeName="r" values="7;13;7" dur="2.2s" repeatCount="indefinite"/>
-    <animate attributeName="opacity" values="0.8;0.2;0.8" dur="2.2s" repeatCount="indefinite"/>
-  </circle>
-  <g transform="translate(-80, 0)">
-    <rect x="0" y="0" width="160" height="42" rx="8" fill="#0d1117" fill-opacity="0.94" stroke="#57da69" stroke-width="1.2" filter="url(#soft)"/>
-    <circle cx="16" cy="15" r="3.5" fill="#57da69"/>
-    <text x="27" y="18" font-size="10" font-weight="700" fill="#57da69" letter-spacing="1">PEAK ACTIVITY</text>
-    <text x="16" y="33" font-size="11" font-weight="600" fill="#ffffff">Oct 24 · 48 Commits</text>
-  </g>
 </g>
 <rect x="780" y="96" width="470" height="380" rx="20" class="card" filter="url(#soft)"/>
 <text x="804" y="128" font-size="16" font-weight="700" class="fg">Contribution mix</text>
