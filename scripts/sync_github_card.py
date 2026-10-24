@@ -516,6 +516,8 @@ def update_svg(svg_path, green_path, stats):
     svg = svg.replace(old_classes, new_classes)
 
     svg = svg.replace('filter:drop-shadow(0 0 10px #57da69)', 'filter:drop-shadow(0 0 12px #ffd700)')
+    svg = svg.replace('stroke:#57da69', 'stroke:#ffd700')
+    svg = re.sub(r'\.strong\{fill:#[0-9a-fA-F]+\}', '.strong{fill:#ffd700}', svg)
     svg = re.sub(r'(<polygon points="[^"]+" fill="url\(#radarFill\)" stroke=")[^"]+(" stroke-width="1.8" stroke-linejoin="round"/>)', rf'\g<1>#ffd700\g<2>', svg)
     svg = re.sub(r'(<circle class="radar-node" cx="[^"]+" cy="[^"]+" r="4" fill=")[^"]+("/>)', rf'\g<1>#ffd700\g<2>', svg)
 
