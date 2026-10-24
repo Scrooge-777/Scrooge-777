@@ -101,7 +101,7 @@
 <polygon points="1015.0,226.3 1034.8,303.6 1037.6,341.1 1002.8,326.8 975.4,297.1" fill="url(#radarFill)" stroke="#ffd700" stroke-width="1.8" stroke-linejoin="round"/>
 <circle class="radar-node" cx="1015.0" cy="226.3" r="4" fill="#ffd700"/>
 <text x="1015.0" y="150.0" font-size="16" font-weight="600" text-anchor="middle" class="fg">Commit</text>
-<text x="1015.0" y="168.0" font-size="14" font-weight="700" text-anchor="middle" class="strong">233</text>
+<text x="1015.0" y="168.0" font-size="14" font-weight="700" text-anchor="middle" class="strong">227</text>
 <circle class="radar-node" cx="1034.8" cy="303.6" r="4" fill="#ffd700"/>
 <text x="1167.2" y="260.6" font-size="16" font-weight="600" text-anchor="start" class="fg">Issue</text>
 <text x="1167.2" y="278.6" font-size="14" font-weight="700" text-anchor="start" class="strong">0</text>
@@ -116,10 +116,10 @@
 <text x="862.8" y="278.6" font-size="14" font-weight="700" text-anchor="end" class="strong">5</text>
 <text x="54" y="552" font-size="16" font-weight="700" class="fg">Top languages</text>
 <g id="donut-hologram" class="donut-dial">
-<path d="M150.00,573.00A90,90,0,1,1,136.13,751.92L141.99,714.38A52,52,0,1,0,150.00,611.00Z" class="donut-slice" fill="#f1e05a" stroke="none"><title>JavaScript 479.3 KB</title><animate attributeName="fill-opacity" values="0;1" dur="1.2s" fill="freeze"/></path>
-<path d="M136.13,751.92A90,90,0,0,1,93.31,593.09L117.25,622.61A52,52,0,0,0,141.99,714.38Z" class="donut-slice" fill="#3572A5" stroke="none"><title>Python 335.2 KB</title><animate attributeName="fill-opacity" values="0;1" dur="1.2s" fill="freeze"/></path>
-<path d="M93.31,593.09A90,90,0,0,1,128.51,575.60L137.58,612.50A52,52,0,0,0,117.25,622.61Z" class="donut-slice" fill="#563d7c" stroke="none"><title>CSS 64.0 KB</title><animate attributeName="fill-opacity" values="0;1" dur="1.2s" fill="freeze"/></path>
-<path d="M128.51,575.60A90,90,0,0,1,149.08,573.00L149.47,611.00A52,52,0,0,0,137.58,612.50Z" class="donut-slice" fill="#e34c26" stroke="none"><title>HTML 33.6 KB</title><animate attributeName="fill-opacity" values="0;1" dur="1.2s" fill="freeze"/></path>
+<path d="M150.00,573.00A90,90,0,1,1,136.69,752.01L142.31,714.43A52,52,0,1,0,150.00,611.00Z" class="donut-slice" fill="#f1e05a" stroke="none"><title>JavaScript 479.3 KB</title><animate attributeName="fill-opacity" values="0;1" dur="1.2s" fill="freeze"/></path>
+<path d="M136.69,752.01A90,90,0,0,1,93.40,593.02L117.30,622.57A52,52,0,0,0,142.31,714.43Z" class="donut-slice" fill="#3572A5" stroke="none"><title>Python 337.0 KB</title><animate attributeName="fill-opacity" values="0;1" dur="1.2s" fill="freeze"/></path>
+<path d="M93.40,593.02A90,90,0,0,1,128.55,575.59L137.61,612.50A52,52,0,0,0,117.30,622.57Z" class="donut-slice" fill="#563d7c" stroke="none"><title>CSS 64.0 KB</title><animate attributeName="fill-opacity" values="0;1" dur="1.2s" fill="freeze"/></path>
+<path d="M128.55,575.59A90,90,0,0,1,149.08,573.00L149.47,611.00A52,52,0,0,0,137.61,612.50Z" class="donut-slice" fill="#e34c26" stroke="none"><title>HTML 33.6 KB</title><animate attributeName="fill-opacity" values="0;1" dur="1.2s" fill="freeze"/></path>
 <path d="M149.08,573.00A90,90,0,0,1,150.00,573.00L150.00,611.00A52,52,0,0,0,149.47,611.00Z" class="donut-slice" fill="#8b949e" stroke="none"><title>Others 1.5 KB</title><animate attributeName="fill-opacity" values="0;1" dur="1.2s" fill="freeze"/></path>
 </g>
 <rect x="270" y="572" width="13" height="13" rx="3" fill="#f1e05a"/>
@@ -131,7 +131,7 @@
 <text x="292" y="613" font-size="14" class="fg">Python</text>
 <text x="424" y="613" font-size="14" font-weight="700" text-anchor="end" class="weak">37%</text>
 <rect x="292" y="619" width="132" height="3" rx="1.5" fill="#ffffff" fill-opacity="0.08"/>
-<rect x="292" y="619" width="48" height="3" rx="1.5" fill="#3572A5"/>
+<rect x="292" y="619" width="49" height="3" rx="1.5" fill="#3572A5"/>
 <rect x="270" y="632" width="13" height="13" rx="3" fill="#563d7c"/>
 <text x="292" y="643" font-size="14" class="fg">CSS</text>
 <text x="424" y="643" font-size="14" font-weight="700" text-anchor="end" class="weak">7%</text>
@@ -148,10 +148,10 @@
 <rect x="292" y="709" width="132" height="3" rx="1.5" fill="#ffffff" fill-opacity="0.08"/>
 <rect x="292" y="709" width="2" height="3" rx="1.5" fill="#8b949e"/>
 <rect x="30" y="786" width="200" height="46" rx="14" class="card kpi-pill"/>
-<text x="48" y="818" font-size="26" font-weight="800" class="strong">300</text>
+<text x="48" y="818" font-size="26" font-weight="800" class="strong">294</text>
 <text x="104" y="817" font-size="14" class="weak">contributions</text>
 <rect x="244" y="786" width="150" height="46" rx="14" class="card kpi-pill"/>
-<text x="262" y="818" font-size="26" font-weight="800" class="strong">233</text>
+<text x="262" y="818" font-size="26" font-weight="800" class="strong">227</text>
 <text x="318" y="817" font-size="14" class="weak">commits</text>
 <rect x="408" y="786" width="170" height="46" rx="14" class="card kpi-pill"/>
 <text x="426" y="818" font-size="26" font-weight="800" class="strong">5</text>
