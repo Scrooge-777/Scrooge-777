@@ -457,7 +457,8 @@ def update_svg(svg_path, green_path, stats):
     c_cnt = max(stats.get("contributions", 0), _get_val(r'<rect[^>]*width="200"[^>]*/>\s*<text[^>]*class="strong">(\d+)</text>'))
     m_cnt = max(stats.get("commits", 0), _get_val(r'<rect[^>]*width="150"[^>]*/>\s*<text[^>]*class="strong">(\d+)</text>'))
     p_cnt = max(stats.get("prs", 0), _get_val(r'<rect[^>]*width="170"[^>]*/>\s*<text[^>]*class="strong">(\d+)</text>'))
-    r_cnt = max(stats.get("repos", 0), _get_val(r'<rect[^>]*width="120"[^>]*/>\s*<text[^>]*class="strong">(\d+)</text>'))
+    # public repo count straight from the API; falls back to the previous value only if the fetch failed
+    r_cnt = stats.get("repos", 0) or _get_val(r'<rect[^>]*width="120"[^>]*/>\s*<text[^>]*class="strong">(\d+)</text>')
     s_cnt = max(stats.get("stars", 0), _get_val(r'<rect[^>]*width="110"[^>]*/>\s*<text[^>]*class="strong">(\d+)</text>\s*<text[^>]*>stars</text>'))
     f_cnt = max(stats.get("forks", 0), _get_val(r'<rect[^>]*width="110"[^>]*/>\s*<text[^>]*class="strong">(\d+)</text>\s*<text[^>]*>forks</text>'))
 
