@@ -224,7 +224,7 @@
 <text x="892" y="817" font-size="14" class="weak">forks</text>
 <!-- alltime -->
 <rect x="974" y="786" width="214" height="46" rx="14" class="card kpi-pill"/>
-<text x="992" y="818" font-size="26" font-weight="800" class="strong">293</text>
-<text x="1054" y="817" font-size="14" class="weak">since Sep 2026<title>293 contributions, 20 active days</title></text>
+<text x="992" y="818" font-size="26" font-weight="800" class="strong">316</text>
+<text x="1054" y="817" font-size="14" class="weak">since Sep 2026<title>316 contributions, 21 active days</title></text>
 <!-- /alltime -->
 </svg>
