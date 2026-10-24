@@ -15,6 +15,7 @@
 .c3t{fill:#2dd143}.c3l{fill:#26af38}.c3r{fill:#1f922f}
 .c4t{fill:#57da69}.c4l{fill:#49b658}.c4r{fill:#3d994a}
 
+.hud-marker{animation:hudFloat 3.5s ease-in-out infinite alternate}@keyframes hudFloat{0%{transform:translate(388px,115px)}100%{transform:translate(388px,108px)}}
 /* Mouse Interactivity */
 .iso-col{cursor:pointer;transition:transform 0.22s cubic-bezier(0.34,1.56,0.64,1),filter 0.22s ease}
 .iso-col:hover{transform:scale(1.22) translateY(-8px);filter:drop-shadow(0 0 10px #57da69)}
@@ -85,6 +86,24 @@
 <g class="iso-col" transform="translate(374.00 240.99) scale(1.6)"><rect  x="0" y="0" width="18" height="18" transform="skewY(-30) skewX(40.89) scale(1 1.15)" class="c4t" stroke="#fff" stroke-opacity="0.06" stroke-width="0.5"></rect><rect  x="0" y="0" width="18" height="81.6" transform="skewY(30) scale(1 1.15)" class="c4l"><animate attributeName="height" values="2.6;81.6" dur="3s" repeatCount="1"></animate></rect><rect  x="0" y="0" width="18" height="81.6" transform="translate(18 10.39) skewY(-30) scale(1 1.15)" class="c4r"><animate attributeName="height" values="2.6;81.6" dur="3s" repeatCount="1"></animate></rect><animateTransform attributeName="transform" type="translate" values="0,0; 0,-14; 0,0" dur="3.0s" begin="-2.56s" repeatCount="indefinite" additive="sum" calcMode="spline" keySplines="0.45 0 0.55 1; 0.45 0 0.55 1" keyTimes="0; 0.5; 1"/></g>
 <g class="iso-col" transform="translate(342.00 341.20) scale(1.6)"><rect  x="0" y="0" width="18" height="18" transform="skewY(-30) skewX(40.89) scale(1 1.15)" class="c4t" stroke="#fff" stroke-opacity="0.06" stroke-width="0.5"></rect><rect  x="0" y="0" width="18" height="37.36" transform="skewY(30) scale(1 1.15)" class="c4l"><animate attributeName="height" values="2.6;37.36" dur="3s" repeatCount="1"></animate></rect><rect  x="0" y="0" width="18" height="37.36" transform="translate(18 10.39) skewY(-30) scale(1 1.15)" class="c4r"><animate attributeName="height" values="2.6;37.36" dur="3s" repeatCount="1"></animate></rect><animateTransform attributeName="transform" type="translate" values="0,0; 0,-14; 0,0" dur="3.0s" begin="-2.82s" repeatCount="indefinite" additive="sum" calcMode="spline" keySplines="0.45 0 0.55 1; 0.45 0 0.55 1" keyTimes="0; 0.5; 1"/></g>
 </g>
+<!-- HUD Peak Activity Marker -->
+<g class="hud-marker" transform="translate(388, 115)">
+  <line x1="0" y1="42" x2="0" y2="105" stroke="#57da69" stroke-width="1.5" stroke-dasharray="3 3" stroke-opacity="0.8"/>
+  <circle cx="0" cy="105" r="4" fill="#57da69" fill-opacity="0.9">
+    <animate attributeName="r" values="3;6;3" dur="2.2s" repeatCount="indefinite"/>
+    <animate attributeName="opacity" values="0.6;1;0.6" dur="2.2s" repeatCount="indefinite"/>
+  </circle>
+  <circle cx="0" cy="105" r="9" fill="none" stroke="#57da69" stroke-width="1" stroke-dasharray="2 2" opacity="0.6">
+    <animate attributeName="r" values="7;13;7" dur="2.2s" repeatCount="indefinite"/>
+    <animate attributeName="opacity" values="0.8;0.2;0.8" dur="2.2s" repeatCount="indefinite"/>
+  </circle>
+  <g transform="translate(-80, 0)">
+    <rect x="0" y="0" width="160" height="42" rx="8" fill="#0d1117" fill-opacity="0.94" stroke="#57da69" stroke-width="1.2" filter="url(#soft)"/>
+    <circle cx="16" cy="15" r="3.5" fill="#57da69"/>
+    <text x="27" y="18" font-size="10" font-weight="700" fill="#57da69" letter-spacing="1">PEAK ACTIVITY</text>
+    <text x="16" y="33" font-size="11" font-weight="600" fill="#ffffff">Oct 24 · 48 Commits</text>
+  </g>
+</g>
 <rect x="780" y="96" width="470" height="380" rx="20" class="card" filter="url(#soft)"/>
 <text x="804" y="128" font-size="16" font-weight="700" class="fg">Contribution mix</text>
 <polygon points="1015.0,284.0 1039.7,302.0 1030.3,331.0 999.7,331.0 990.3,302.0" fill="none" stroke="#9aa0b8" stroke-opacity="0.35" stroke-dasharray="4 4"/>
@@ -100,13 +119,13 @@
 <polygon points="1015.0,226.3 1034.8,303.6 1037.6,341.1 1002.8,326.8 975.4,297.1" fill="url(#radarFill)" stroke="#2ea043" stroke-width="1.8" stroke-linejoin="round"/>
 <circle class="radar-node" cx="1015.0" cy="226.3" r="4" fill="#2ea043"/>
 <text x="1015.0" y="150.0" font-size="16" font-weight="600" text-anchor="middle" class="fg">Commit</text>
-<text x="1015.0" y="168.0" font-size="14" font-weight="700" text-anchor="middle" class="strong">204</text>
+<text x="1015.0" y="168.0" font-size="14" font-weight="700" text-anchor="middle" class="strong">177</text>
 <circle class="radar-node" cx="1034.8" cy="303.6" r="4" fill="#2ea043"/>
 <text x="1167.2" y="260.6" font-size="16" font-weight="600" text-anchor="start" class="fg">Issue</text>
 <text x="1167.2" y="278.6" font-size="14" font-weight="700" text-anchor="start" class="strong">0</text>
 <circle class="radar-node" cx="1037.6" cy="341.1" r="4" fill="#2ea043"/>
 <text x="1109.0" y="439.4" font-size="16" font-weight="600" text-anchor="start" class="fg">PullReq</text>
-<text x="1109.0" y="457.4" font-size="14" font-weight="700" text-anchor="start" class="strong">4</text>
+<text x="1109.0" y="457.4" font-size="14" font-weight="700" text-anchor="start" class="strong">3</text>
 <circle class="radar-node" cx="1002.8" cy="326.8" r="4" fill="#2ea043"/>
 <text x="921.0" y="439.4" font-size="16" font-weight="600" text-anchor="end" class="fg">Review</text>
 <text x="921.0" y="457.4" font-size="14" font-weight="700" text-anchor="end" class="strong">0</text>
@@ -147,13 +166,13 @@
 <rect x="292" y="709" width="132" height="3" rx="1.5" fill="#ffffff" fill-opacity="0.08"/>
 <rect x="292" y="709" width="4" height="3" rx="1.5" fill="#8b949e"/>
 <rect x="30" y="786" width="200" height="46" rx="14" class="card kpi-pill"/>
-<text x="48" y="818" font-size="26" font-weight="800" class="strong">270</text>
+<text x="48" y="818" font-size="26" font-weight="800" class="strong">241</text>
 <text x="104" y="817" font-size="14" class="weak">contributions</text>
 <rect x="244" y="786" width="150" height="46" rx="14" class="card kpi-pill"/>
-<text x="262" y="818" font-size="26" font-weight="800" class="strong">204</text>
+<text x="262" y="818" font-size="26" font-weight="800" class="strong">177</text>
 <text x="318" y="817" font-size="14" class="weak">commits</text>
 <rect x="408" y="786" width="170" height="46" rx="14" class="card kpi-pill"/>
-<text x="426" y="818" font-size="26" font-weight="800" class="strong">4</text>
+<text x="426" y="818" font-size="26" font-weight="800" class="strong">3</text>
 <text x="450" y="817" font-size="14" class="weak">pull requests</text>
 <rect x="592" y="786" width="120" height="46" rx="14" class="card kpi-pill"/>
 <text x="610" y="818" font-size="26" font-weight="800" class="strong">6</text>

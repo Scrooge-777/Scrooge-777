@@ -344,15 +344,37 @@ def update_svg(svg_path, green_path, stats):
             green_svg = gf.read()
         wrapped_island = build_active_wave_terrain(green_svg)
         if wrapped_island:
+            if '.hud-marker' not in svg:
+                hud_style = ".hud-marker{animation:hudFloat 3.5s ease-in-out infinite alternate}@keyframes hudFloat{0%{transform:translate(388px,115px)}100%{transform:translate(388px,108px)}}\n"
+                svg = svg.replace('/* Mouse Interactivity */', hud_style + "/* Mouse Interactivity */")
+
             v2_first_col = svg.find('<g id="terrain-island"')
             if v2_first_col == -1:
                 v2_first_col = svg.find('<g class="iso-col"')
             v2_grid_end = svg.find('<rect x="780" y="96"')
 
             if v2_first_col != -1 and v2_grid_end != -1:
-                svg = svg[:v2_first_col] + wrapped_island + "\n" + svg[v2_grid_end:]
+                hud_marker = """<!-- HUD Peak Activity Marker -->
+<g class="hud-marker" transform="translate(388, 115)">
+  <line x1="0" y1="42" x2="0" y2="105" stroke="#57da69" stroke-width="1.5" stroke-dasharray="3 3" stroke-opacity="0.8"/>
+  <circle cx="0" cy="105" r="4" fill="#57da69" fill-opacity="0.9">
+    <animate attributeName="r" values="3;6;3" dur="2.2s" repeatCount="indefinite"/>
+    <animate attributeName="opacity" values="0.6;1;0.6" dur="2.2s" repeatCount="indefinite"/>
+  </circle>
+  <circle cx="0" cy="105" r="9" fill="none" stroke="#57da69" stroke-width="1" stroke-dasharray="2 2" opacity="0.6">
+    <animate attributeName="r" values="7;13;7" dur="2.2s" repeatCount="indefinite"/>
+    <animate attributeName="opacity" values="0.8;0.2;0.8" dur="2.2s" repeatCount="indefinite"/>
+  </circle>
+  <g transform="translate(-80, 0)">
+    <rect x="0" y="0" width="160" height="42" rx="8" fill="#0d1117" fill-opacity="0.94" stroke="#57da69" stroke-width="1.2" filter="url(#soft)"/>
+    <circle cx="16" cy="15" r="3.5" fill="#57da69"/>
+    <text x="27" y="18" font-size="10" font-weight="700" fill="#57da69" letter-spacing="1">PEAK ACTIVITY</text>
+    <text x="16" y="33" font-size="11" font-weight="600" fill="#ffffff">Oct 24 · 48 Commits</text>
+  </g>
+</g>"""
+                svg = svg[:v2_first_col] + wrapped_island + "\n" + hud_marker + "\n" + svg[v2_grid_end:]
                 svg = re.sub(r'>Last 12 months<', '>Activity since Oct 2026<', svg)
-                print("Synced active 3D wave columns!")
+                print("Synced active 3D wave columns and HUD peak marker!")
 
     # 2. Sync Top Languages section
     langs_start = svg.find('Top languages</text>')
@@ -382,7 +404,9 @@ def update_svg(svg_path, green_path, stats):
     print(f"Successfully synced and verified XML: {svg_path}")
 
 def main():
-    username = os.environ.get('USERNAME', 'Scrooge-777')
+    username = os.environ.get('GH_USERNAME') or os.environ.get('GITHUB_ACTOR') or 'Scrooge-777'
+    if username == os.environ.get('USERNAME') and username != 'Scrooge-777':
+        username = 'Scrooge-777'
     token = os.environ.get('GITHUB_TOKEN')
     stats = fetch_stats_and_languages(username, token)
     repo_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
