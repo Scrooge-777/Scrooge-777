@@ -241,12 +241,12 @@ def generate_languages_svg(languages):
 
     donut_sub = "\n".join(donut_paths)
     center_metric = f"""  <!-- Donut Center Metric (Step 4 Upgrade) -->
-  <circle cx="{cx:.1f}" cy="{cy:.1f}" r="44" fill="none" stroke="#ffffff" stroke-opacity="0.08" stroke-width="1" stroke-dasharray="3 3"/>
+  <circle cx="{cx:.1f}" cy="{cy:.1f}" r="45" fill="#0d1117" fill-opacity="0.8" stroke="#57da69" stroke-opacity="0.3" stroke-width="1.2" stroke-dasharray="3 3"/>
   <g class="donut-center" text-anchor="middle">
-    <text x="{cx:.1f}" y="{cy - 4:.1f}" font-size="22" font-weight="800" fill="#ffffff">{len(languages)}</text>
-    <text x="{cx:.1f}" y="{cy + 15:.1f}" font-size="10" font-weight="700" fill="#8b949e" letter-spacing="1.5">LANGUAGES</text>
+    <text x="{cx:.1f}" y="{cy - 3:.1f}" font-size="24" font-weight="800" fill="#ffffff">{len(languages)}</text>
+    <text x="{cx:.1f}" y="{cy + 16:.1f}" font-size="10" font-weight="700" fill="#57da69" letter-spacing="1.5">LANGS</text>
   </g>"""
-    donut_xml = f'<g id="donut-hologram" class="donut-dial">\n{donut_sub}\n{center_metric}\n</g>'
+    donut_xml = f'<g id="donut-hologram" class="donut-dial">\n{donut_sub}\n</g>\n{center_metric}'
 
     legend_rows = []
     y_start = 572
@@ -474,7 +474,10 @@ def update_svg(svg_path, green_path, stats):
     ET.fromstring(svg)
     with open(svg_path, 'w', encoding='utf-8') as f:
         f.write(svg)
-    print(f"Successfully synced and verified XML: {svg_path}")
+    profile_card_path = os.path.join(os.path.dirname(svg_path), 'profile_card.svg')
+    with open(profile_card_path, 'w', encoding='utf-8') as f:
+        f.write(svg)
+    print(f"Successfully synced and verified XML: {svg_path} and {profile_card_path}")
 
 def main():
     username = os.environ.get('GH_USERNAME') or os.environ.get('GITHUB_ACTOR') or 'Scrooge-777'
