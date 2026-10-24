@@ -7,12 +7,13 @@ def fetch_languages(username, token=None):
     default_langs = [
         ('JavaScript', 356975, '#f1e05a'),
         ('Python', 320500, '#3572A5'),
+        ('C#', 145000, '#178600'),
         ('CSS', 63193, '#563d7c'),
-        ('HTML', 26792, '#e34c26'),
-        ('Others', 1047, '#8b949e')
+        ('Others', 27839, '#8b949e')
     ]
     try:
-        req = urllib.request.Request(f'https://api.github.com/users/{username}/repos?per_page=100', headers=headers)
+        url = 'https://api.github.com/user/repos?per_page=100&affiliation=owner' if token else f'https://api.github.com/users/{username}/repos?per_page=100'
+        req = urllib.request.Request(url, headers=headers)
         with urllib.request.urlopen(req, timeout=12) as resp:
             repos_data = json.loads(resp.read().decode('utf-8'))
             if isinstance(repos_data, list):
@@ -20,10 +21,11 @@ def fetch_languages(username, token=None):
                 color_map = {
                     'JavaScript': '#f1e05a',
                     'Python': '#3572A5',
+                    'C#': '#178600',
+                    'Rust': '#dea584',
                     'CSS': '#563d7c',
                     'HTML': '#e34c26',
                     'TypeScript': '#3178c6',
-                    'Rust': '#dea584',
                     'C++': '#f34b7d',
                     'Go': '#00ADD8'
                 }

@@ -11,21 +11,22 @@ def fetch_stats_and_languages(username, token=None):
         'prs': 3,
         'reviews': 0,
         'issues': 0,
-        'repos': 4,
+        'repos': 6,
         'stars': 0,
         'forks': 0,
-        'raw_languages': ['Python', 'JavaScript', 'HTML', 'CSS'],
+        'raw_languages': ['C#', 'Rust', 'Python', 'JavaScript', 'TypeScript', 'HTML', 'CSS'],
         'languages': [
             ('JavaScript', 356975, '#f1e05a'),
             ('Python', 320500, '#3572A5'),
+            ('C#', 145000, '#178600'),
             ('CSS', 63193, '#563d7c'),
-            ('HTML', 26792, '#e34c26'),
-            ('Others', 1047, '#8b949e')
+            ('Others', 27839, '#8b949e')
         ]
     }
 
     try:
-        req = urllib.request.Request(f'https://api.github.com/users/{username}/repos?per_page=100', headers=headers)
+        url = 'https://api.github.com/user/repos?per_page=100&affiliation=owner' if token else f'https://api.github.com/users/{username}/repos?per_page=100'
+        req = urllib.request.Request(url, headers=headers)
         with urllib.request.urlopen(req, timeout=12) as resp:
             repos_data = json.loads(resp.read().decode('utf-8'))
             if isinstance(repos_data, list):
@@ -37,10 +38,11 @@ def fetch_stats_and_languages(username, token=None):
                 color_map = {
                     'JavaScript': '#f1e05a',
                     'Python': '#3572A5',
+                    'C#': '#178600',
+                    'Rust': '#dea584',
                     'CSS': '#563d7c',
                     'HTML': '#e34c26',
                     'TypeScript': '#3178c6',
-                    'Rust': '#dea584',
                     'C++': '#f34b7d',
                     'C': '#555555',
                     'Go': '#00ADD8',
@@ -121,15 +123,15 @@ def update_readme_arsenal(readme_path, languages_found):
         return
 
     icon_map = {
+        'C#': 'cs',
+        'Rust': 'rust',
         'Python': 'python',
         'JavaScript': 'js',
+        'TypeScript': 'ts',
         'HTML': 'html',
         'CSS': 'css',
-        'TypeScript': 'ts',
-        'Rust': 'rust',
         'C': 'c',
         'C++': 'cpp',
-        'C#': 'cs',
         'Go': 'go',
         'Java': 'java',
         'Kotlin': 'kotlin',
@@ -143,16 +145,9 @@ def update_readme_arsenal(readme_path, languages_found):
         'Solidity': 'solidity'
     }
 
-    icons = []
-    for lang in languages_found:
-        icon = icon_map.get(lang)
-        if icon and icon not in icons:
-            icons.append(icon)
-
-    if 'git' not in icons:
-        icons.append('git')
-
-    icons_str = ','.join(icons)
+    # Core languages always pinned
+    core_languages = ['cs', 'rust', 'python', 'js', 'ts', 'html', 'css', 'docker', 'git']
+    icons_str = ','.join(core_languages)
     with open(readme_path, 'r', encoding='utf-8') as f:
         content = f.read()
 
@@ -166,6 +161,46 @@ def update_readme_arsenal(readme_path, languages_found):
         with open(readme_path, 'w', encoding='utf-8') as f:
             f.write(new_content)
         print(f"Updated README.md Core Arsenal to: {icons_str}")
+
+def generate_omen_hud_card(output_path):
+    svg_content = """<svg width="400" height="150" viewBox="0 0 400 150" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="desc-omen">
+  <title id="title-omen">omen-hud</title>
+  <desc id="desc-omen">Siri/Alexa-style voice assistant HUD for Windows (OMEN laptop)</desc>
+  <style>
+    .header { font: 600 18px 'Segoe UI', Ubuntu, -apple-system, Sans-Serif; fill: #7aa2f7; }
+    .description { font: 400 13px 'Segoe UI', Ubuntu, -apple-system, Sans-Serif; fill: #a9b1d6; }
+    .badge { font: 600 11px 'Segoe UI', Ubuntu, -apple-system, Sans-Serif; fill: #7aa2f7; }
+    .lock-text { font: 600 10px 'Segoe UI', Ubuntu, -apple-system, Sans-Serif; fill: #7982a9; }
+  </style>
+
+  <rect x="0.5" y="0.5" rx="6" height="149" width="399" fill="#1a1b26" stroke="#30363d" stroke-width="1"/>
+
+  <!-- Title & Repo Icon -->
+  <g transform="translate(25, 35)">
+    <path fill="#7aa2f7" d="M2 2.5A2.5 2.5 0 014.5 0h8.75a.75.75 0 01.75.75v12.5a.75.75 0 01-.75.75h-2.5a.75.75 0 110-1.5h1.75v-2h-8a1 1 0 00-.714 1.7.75.75 0 01-1.072 1.05A2.495 2.495 0 012 11.5v-9zm10.5-1V9h-8c-.356 0-.694.074-1 .208V2.5a1 1 0 011-1h8zM5 12.25v3.25a.25.25 0 00.4.2l1.45-1.087a.25.25 0 01.3 0L8.6 15.7a.25.25 0 00.4-.2v-3.25a.25.25 0 00-.25-.25h-3.5a.25.25 0 00-.25.25z"/>
+    <text x="25" y="1" class="header">omen-hud</text>
+    <rect x="130" y="-12" width="56" height="18" rx="9" fill="rgba(255,255,255,0.06)" stroke="#414868" stroke-width="0.8"/>
+    <text x="142" y="1" class="lock-text">Private</text>
+  </g>
+
+  <!-- Description -->
+  <g transform="translate(25, 62)">
+    <text class="description" x="0" y="0">
+      <tspan dy="1.2em" x="0">Siri/Alexa-style local voice &amp; text assistant HUD</tspan>
+      <tspan dy="1.35em" x="0">for Windows (OMEN laptop) with on-device LLM.</tspan>
+    </text>
+  </g>
+
+  <!-- Language Badge -->
+  <g transform="translate(25, 125)">
+    <circle cx="6" cy="-4" r="5.5" fill="#178600" />
+    <text class="badge" x="18" y="0">C#</text>
+    <text class="lock-text" x="48" y="0">· WPF · .NET 8</text>
+  </g>
+</svg>"""
+    with open(output_path, 'w', encoding='utf-8') as f:
+        f.write(svg_content)
+    print(f"Generated {output_path}")
 
 def generate_languages_svg(languages):
     total_bytes = sum(b for _, b, _ in languages)
@@ -354,8 +389,10 @@ def main():
     svg_path = os.path.join(repo_dir, 'assets', 'github_card_v2.svg')
     green_path = os.path.join(repo_dir, 'assets', 'profile-night-green.svg')
     readme_path = os.path.join(repo_dir, 'README.md')
+    omen_card_path = os.path.join(repo_dir, 'assets', 'omen_hud_card.svg')
 
     update_svg(svg_path, green_path, stats)
+    generate_omen_hud_card(omen_card_path)
     update_readme_arsenal(readme_path, stats.get('raw_languages', []))
 
 if __name__ == '__main__':
