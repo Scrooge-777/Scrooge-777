@@ -62,9 +62,9 @@ def fetch_stats_and_languages(username, token=None):
                                 l_data = json.loads(l_resp.read().decode('utf-8'))
                                 for l_name, l_bytes in l_data.items():
                                     lang_totals[l_name] = lang_totals.get(l_name, 0) + l_bytes
-                        except Exception:
-                            pass
-                
+                        except Exception as e:
+                            print(f"Language fetch failed for {r.get('name')}: {e}")
+
                 if lang_totals:
                     sorted_langs = sorted(lang_totals.items(), key=lambda x: x[1], reverse=True)
                     stats['raw_languages'] = [name for name, _ in sorted_langs]
@@ -91,6 +91,12 @@ def fetch_stats_and_languages(username, token=None):
               totalPullRequestReviewContributions
               contributionCalendar {
                 totalContributions
+                weeks {
+                  contributionDays {
+                    date
+                    contributionCount
+                  }
+                }
               }
             }
           }
@@ -162,46 +168,6 @@ def update_readme_arsenal(readme_path, languages_found):
         with open(readme_path, 'w', encoding='utf-8') as f:
             f.write(new_content)
         print(f"Updated README.md Core Arsenal to: {icons_str}")
-
-def generate_omen_hud_card(output_path):
-    svg_content = """<svg width="400" height="150" viewBox="0 0 400 150" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="desc-omen">
-  <title id="title-omen">omen-hud</title>
-  <desc id="desc-omen">Siri/Alexa-style voice assistant HUD for Windows (OMEN laptop)</desc>
-  <style>
-    .header { font: 600 18px 'Segoe UI', Ubuntu, -apple-system, Sans-Serif; fill: #7aa2f7; }
-    .description { font: 400 13px 'Segoe UI', Ubuntu, -apple-system, Sans-Serif; fill: #a9b1d6; }
-    .badge { font: 600 11px 'Segoe UI', Ubuntu, -apple-system, Sans-Serif; fill: #7aa2f7; }
-    .lock-text { font: 600 10px 'Segoe UI', Ubuntu, -apple-system, Sans-Serif; fill: #7982a9; }
-  </style>
-
-  <rect x="0.5" y="0.5" rx="6" height="149" width="399" fill="#1a1b26" stroke="#30363d" stroke-width="1"/>
-
-  <!-- Title & Repo Icon -->
-  <g transform="translate(25, 35)">
-    <path fill="#7aa2f7" d="M2 2.5A2.5 2.5 0 014.5 0h8.75a.75.75 0 01.75.75v12.5a.75.75 0 01-.75.75h-2.5a.75.75 0 110-1.5h1.75v-2h-8a1 1 0 00-.714 1.7.75.75 0 01-1.072 1.05A2.495 2.495 0 012 11.5v-9zm10.5-1V9h-8c-.356 0-.694.074-1 .208V2.5a1 1 0 011-1h8zM5 12.25v3.25a.25.25 0 00.4.2l1.45-1.087a.25.25 0 01.3 0L8.6 15.7a.25.25 0 00.4-.2v-3.25a.25.25 0 00-.25-.25h-3.5a.25.25 0 00-.25.25z"/>
-    <text x="25" y="1" class="header">omen-hud</text>
-    <rect x="130" y="-12" width="56" height="18" rx="9" fill="rgba(255,255,255,0.06)" stroke="#414868" stroke-width="0.8"/>
-    <text x="142" y="1" class="lock-text">Private</text>
-  </g>
-
-  <!-- Description -->
-  <g transform="translate(25, 62)">
-    <text class="description" x="0" y="0">
-      <tspan dy="1.2em" x="0">Siri/Alexa-style local voice &amp; text assistant HUD</tspan>
-      <tspan dy="1.35em" x="0">for Windows (OMEN laptop) with on-device LLM.</tspan>
-    </text>
-  </g>
-
-  <!-- Language Badge -->
-  <g transform="translate(25, 125)">
-    <circle cx="6" cy="-4" r="5.5" fill="#178600" />
-    <text class="badge" x="18" y="0">C#</text>
-    <text class="lock-text" x="48" y="0">· WPF · .NET 8</text>
-  </g>
-</svg>"""
-    with open(output_path, 'w', encoding='utf-8') as f:
-        f.write(svg_content)
-    print(f"Generated {output_path}")
 
 def generate_languages_svg(languages):
     total_bytes = sum(b for _, b, _ in languages)
@@ -345,7 +311,7 @@ def build_active_wave_terrain(green_svg, stats=None):
             rel_w = w - start_week
             col_date = inception_date + datetime.timedelta(days=day_idx)
             date_str = col_date.strftime('%Y-%m-%d')
-            cnt = day_counts.get(date_str, 6 if date_str == '2026-10-25' else 0)
+            cnt = day_counts.get(date_str, 0)
 
             if cnt >= 50:
                 lvl, h, float_h = 4, 63.87, -14
@@ -491,10 +457,10 @@ def update_svg(svg_path, green_path, stats):
         m = re.search(p, svg)
         return int(m.group(1)) if m else 0
 
-    c_cnt = max(stats.get("contributions", 0), _get_val(r'<rect[^>]*width="200"[^>]*/>\s*<text[^>]*class="strong">(\d+)</text>'), 299)
-    m_cnt = max(stats.get("commits", 0), _get_val(r'<rect[^>]*width="150"[^>]*/>\s*<text[^>]*class="strong">(\d+)</text>'), 232)
-    p_cnt = max(stats.get("prs", 0), _get_val(r'<rect[^>]*width="170"[^>]*/>\s*<text[^>]*class="strong">(\d+)</text>'), 5)
-    r_cnt = max(stats.get("repos", 0), _get_val(r'<rect[^>]*width="120"[^>]*/>\s*<text[^>]*class="strong">(\d+)</text>'), 7)
+    c_cnt = max(stats.get("contributions", 0), _get_val(r'<rect[^>]*width="200"[^>]*/>\s*<text[^>]*class="strong">(\d+)</text>'))
+    m_cnt = max(stats.get("commits", 0), _get_val(r'<rect[^>]*width="150"[^>]*/>\s*<text[^>]*class="strong">(\d+)</text>'))
+    p_cnt = max(stats.get("prs", 0), _get_val(r'<rect[^>]*width="170"[^>]*/>\s*<text[^>]*class="strong">(\d+)</text>'))
+    r_cnt = max(stats.get("repos", 0), _get_val(r'<rect[^>]*width="120"[^>]*/>\s*<text[^>]*class="strong">(\d+)</text>'))
     s_cnt = max(stats.get("stars", 0), _get_val(r'<rect[^>]*width="110"[^>]*/>\s*<text[^>]*class="strong">(\d+)</text>\s*<text[^>]*>stars</text>'))
     f_cnt = max(stats.get("forks", 0), _get_val(r'<rect[^>]*width="110"[^>]*/>\s*<text[^>]*class="strong">(\d+)</text>\s*<text[^>]*>forks</text>'))
 
@@ -574,10 +540,8 @@ def main():
     svg_path = os.path.join(repo_dir, 'assets', 'github_card_v2.svg')
     green_path = os.path.join(repo_dir, 'assets', 'profile-night-green.svg')
     readme_path = os.path.join(repo_dir, 'README.md')
-    omen_card_path = os.path.join(repo_dir, 'assets', 'omen_hud_card.svg')
 
     update_svg(svg_path, green_path, stats)
-    generate_omen_hud_card(omen_card_path)
     update_readme_arsenal(readme_path, stats.get('raw_languages', []))
 
 if __name__ == '__main__':

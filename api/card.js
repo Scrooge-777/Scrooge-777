@@ -223,7 +223,8 @@ module.exports = async (req, res) => {
 
     res.status(200).send(svg);
   } catch (err) {
-    res.status(500).send(`<svg xmlns="http://www.w3.org/2000/svg"><text y="20">Error: ${err.message}</text></svg>`);
+    res.setHeader('Content-Type', 'image/svg+xml; charset=utf-8');
+    res.status(500).send('<svg xmlns="http://www.w3.org/2000/svg" width="400" height="40"><text y="20" fill="#f43f5e">Card unavailable</text></svg>');
   }
 };
 

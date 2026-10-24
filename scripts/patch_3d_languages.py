@@ -12,7 +12,8 @@ def fetch_languages(username, token=None):
         ('Others', 27839, '#8b949e')
     ]
     try:
-        url = 'https://api.github.com/user/repos?per_page=100&affiliation=owner' if token else f'https://api.github.com/users/{username}/repos?per_page=100'
+        # /user/repos needs a user token; Actions' GITHUB_TOKEN gets 403, so use the public listing
+        url = f'https://api.github.com/users/{username}/repos?per_page=100'
         req = urllib.request.Request(url, headers=headers)
         with urllib.request.urlopen(req, timeout=12) as resp:
             repos_data = json.loads(resp.read().decode('utf-8'))
@@ -38,8 +39,8 @@ def fetch_languages(username, token=None):
                                 l_data = json.loads(l_resp.read().decode('utf-8'))
                                 for l_name, l_bytes in l_data.items():
                                     lang_totals[l_name] = lang_totals.get(l_name, 0) + l_bytes
-                        except Exception:
-                            pass
+                        except Exception as e:
+                            print(f"Language fetch failed for {r.get('name')}: {e}")
                 if lang_totals:
                     sorted_langs = sorted(lang_totals.items(), key=lambda x: x[1], reverse=True)
                     top_4 = [
@@ -50,8 +51,8 @@ def fetch_languages(username, token=None):
                     if other_bytes > 0:
                         return top_4 + [('Others', other_bytes, '#8b949e')]
                     return top_4
-    except Exception:
-        pass
+    except Exception as e:
+        print(f"Language list fetch failed, using defaults: {e}")
     return default_langs
 
 def patch_file(path, username, token=None):
