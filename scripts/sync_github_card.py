@@ -240,13 +240,7 @@ def generate_languages_svg(languages):
         )
 
     donut_sub = "\n".join(donut_paths)
-    center_metric = f"""  <!-- Donut Center Metric (Step 4 Upgrade) -->
-  <circle cx="{cx:.1f}" cy="{cy:.1f}" r="45" fill="#0d1117" fill-opacity="0.8" stroke="#57da69" stroke-opacity="0.3" stroke-width="1.2" stroke-dasharray="3 3"/>
-  <g class="donut-center" text-anchor="middle">
-    <text x="{cx:.1f}" y="{cy - 3:.1f}" font-size="24" font-weight="800" fill="#ffffff">{len(languages)}</text>
-    <text x="{cx:.1f}" y="{cy + 16:.1f}" font-size="10" font-weight="700" fill="#57da69" letter-spacing="1.5">LANGS</text>
-  </g>"""
-    donut_xml = f'<g id="donut-hologram" class="donut-dial">\n{donut_sub}\n</g>\n{center_metric}'
+    donut_xml = f'<g id="donut-hologram" class="donut-dial">\n{donut_sub}\n</g>'
 
     legend_rows = []
     y_start = 572
@@ -469,6 +463,36 @@ def update_svg(svg_path, green_path, stats):
                  r'<circle class="radar-node" cx="1002.8" cy="326.8" r="4" fill="#2ea043"/>\n\g<1>', svg)
     svg = re.sub(r'<circle class="radar-node" cx="[^"]+" cy="[^"]+" r="[^"]*" fill="[^"]*"/>\s*(<text x="862\.8" y="260\.6")',
                  r'<circle class="radar-node" cx="975.4" cy="297.1" r="4" fill="#2ea043"/>\n\g<1>', svg)
+
+    # Apply Scrooge Cyber-Midas / Gold Bullion Palette (Step 5 Upgrade)
+    old_bg = '<radialGradient id="bg" cx="25%" cy="15%" r="95%"><stop offset="0" stop-color="#14183a"/><stop offset="0.55" stop-color="#080a22"/><stop offset="1" stop-color="#02020c"/></radialGradient>'
+    new_bg = '<radialGradient id="bg" cx="25%" cy="15%" r="95%"><stop offset="0" stop-color="#1f180a"/><stop offset="0.55" stop-color="#0d0c08"/><stop offset="1" stop-color="#030302"/></radialGradient>'
+    svg = svg.replace(old_bg, new_bg)
+
+    old_radar_fill = '<linearGradient id="radarFill" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#238636" stop-opacity="0.30"/><stop offset="1" stop-color="#238636" stop-opacity="0.06"/></linearGradient>'
+    new_radar_fill = '<linearGradient id="radarFill" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffd700" stop-opacity="0.32"/><stop offset="1" stop-color="#ffd700" stop-opacity="0.05"/></linearGradient>'
+    svg = svg.replace(old_radar_fill, new_radar_fill)
+
+    old_title = '<linearGradient id="title" x1="0" x2="1"><stop offset="0" stop-color="#57da69"/><stop offset="1" stop-color="#6ec7ff"/></linearGradient>'
+    new_title = '<linearGradient id="title" x1="0" x2="1"><stop offset="0" stop-color="#ffd700"/><stop offset="1" stop-color="#ffea78"/></linearGradient>'
+    svg = svg.replace(old_title, new_title)
+
+    old_classes = """.c0t{fill:#2f3142}.c0l{fill:#272938}.c0r{fill:#202230}
+.c1t{fill:#1b7d28}.c1l{fill:#176921}.c1r{fill:#135820}
+.c2t{fill:#24a736}.c2l{fill:#1e8c2d}.c2r{fill:#197526}
+.c3t{fill:#2dd143}.c3l{fill:#26af38}.c3r{fill:#1f922f}
+.c4t{fill:#57da69}.c4l{fill:#49b658}.c4r{fill:#3d994a}"""
+
+    new_classes = """.c0t{fill:#2a2620}.c0l{fill:#211d17}.c0r{fill:#1a1712}
+.c1t{fill:#7c6224}.c1l{fill:#68521e}.c1r{fill:#544218}
+.c2t{fill:#b8860b}.c2l{fill:#9e7309}.c2r{fill:#825e07}
+.c3t{fill:#e6b800}.c3l{fill:#c49d00}.c3r{fill:#a38200}
+.c4t{fill:#ffd700}.c4l{fill:#e6c200}.c4r{fill:#ccad00}"""
+    svg = svg.replace(old_classes, new_classes)
+
+    svg = svg.replace('filter:drop-shadow(0 0 10px #57da69)', 'filter:drop-shadow(0 0 12px #ffd700)')
+    svg = re.sub(r'(<polygon points="[^"]+" fill="url\(#radarFill\)" stroke=")[^"]+(" stroke-width="1.8" stroke-linejoin="round"/>)', rf'\g<1>#ffd700\g<2>', svg)
+    svg = re.sub(r'(<circle class="radar-node" cx="[^"]+" cy="[^"]+" r="4" fill=")[^"]+("/>)', rf'\g<1>#ffd700\g<2>', svg)
 
     # 5. Validate XML
     ET.fromstring(svg)
