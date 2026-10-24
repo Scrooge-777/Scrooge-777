@@ -494,60 +494,6 @@ def update_svg(svg_path, green_path, stats):
     svg = re.sub(r'(<polygon points="[^"]+" fill="url\(#radarFill\)" stroke=")[^"]+(" stroke-width="1.8" stroke-linejoin="round"/>)', rf'\g<1>#ffd700\g<2>', svg)
     svg = re.sub(r'(<circle class="radar-node" cx="[^"]+" cy="[^"]+" r="4" fill=")[^"]+("/>)', rf'\g<1>#ffd700\g<2>', svg)
 
-    # Add Vibrant Cyber Spectrum Filter (SMIL + CSS Keyframes)
-    hue_filter = """<filter id="vibrantShift" x="-20%" y="-20%" width="140%" height="140%">
-  <feColorMatrix type="hueRotate" values="0">
-    <animate attributeName="values" from="0" to="360" dur="14s" repeatCount="indefinite"/>
-  </feColorMatrix>
-</filter>"""
-    if 'id="vibrantShift"' not in svg:
-        svg = svg.replace('</defs>', hue_filter + '\n</defs>')
-
-    old_levitate = """.terrain-3d { animation: levitate3D 6s ease-in-out infinite alternate; transform-origin: 380px 320px; }
-@keyframes levitate3D {
-  0% { transform: translateY(0px) rotate(0deg); }
-  50% { transform: translateY(-7px) rotate(-0.3deg); }
-  100% { transform: translateY(-13px) rotate(0.2deg); }
-}"""
-
-    new_levitate = """.terrain-3d {
-  animation: levitate3D 6s ease-in-out infinite alternate, cyberSpectrum 14s linear infinite;
-  transform-origin: 380px 320px;
-}
-.radar-spectrum {
-  animation: cyberSpectrum 14s linear infinite;
-  transform-origin: 1015px 310px;
-}
-@keyframes levitate3D {
-  0% { transform: translateY(0px) rotate(0deg); }
-  50% { transform: translateY(-7px) rotate(-0.3deg); }
-  100% { transform: translateY(-13px) rotate(0.2deg); }
-}
-@keyframes cyberSpectrum {
-  0% { filter: hue-rotate(0deg) saturate(1.4); }
-  50% { filter: hue-rotate(180deg) saturate(1.8); }
-  100% { filter: hue-rotate(360deg) saturate(1.4); }
-}"""
-    if '.radar-spectrum' not in svg:
-        svg = svg.replace(old_levitate, new_levitate)
-
-    # Apply filter to terrain island
-    svg = svg.replace('<g id="terrain-island" class="terrain-3d">', '<g id="terrain-island" class="terrain-3d" filter="url(#vibrantShift)">')
-
-    # Wrap radar in radar-spectrum group if not already wrapped
-    if 'class="radar-spectrum"' not in svg:
-        poly_match = re.search(r'(<polygon points="[^"]+" fill="url\(#radarFill\)"[^>]*/>.*?<circle class="radar-node" cx="975\.4" cy="297\.1" r="4" fill="[^"]+"/>)', svg, flags=re.DOTALL)
-        if poly_match:
-            wrapped_radar = f'<g class="radar-spectrum" filter="url(#vibrantShift)">\n{poly_match.group(1)}\n</g>'
-            svg = svg.replace(poly_match.group(1), wrapped_radar)
-
-    # Wrap activity legend swatches in spectrum group
-    legend_target = '<rect x="74" y="91" width="14" height="14" rx="3" class="c0t"/>'
-    legend_end = '<text x="168" y="102" font-size="12" class="weak">More</text>'
-    if 'class="legend-spectrum"' not in svg and legend_target in svg:
-        svg = svg.replace(legend_target, '<g class="radar-spectrum legend-spectrum" filter="url(#vibrantShift)">\n' + legend_target)
-        svg = svg.replace(legend_end, '</g>\n' + legend_end)
-
     # 5. Validate XML
     ET.fromstring(svg)
     with open(svg_path, 'w', encoding='utf-8') as f:
