@@ -2,9 +2,11 @@ name: Profile card sync
 
 on:
   schedule:
+    - cron: "0 */2 * * *"   # Every 2 hours (catches high runner delay & frequent work)
     - cron: "30 18 * * *"   # Midnight IST (12:00 AM)
-    - cron: "0 0,6,12 * * *"  # Every 6 hours UTC (18:00 slot omitted: 18:30 run covers it)
   workflow_dispatch:
+  repository_dispatch:
+    types: [sync-card, post-push]
   push:
     branches:
       - main
