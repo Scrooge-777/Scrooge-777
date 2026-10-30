@@ -129,21 +129,27 @@ let cachedSvg = null;
 let warmCounter = Math.floor(Math.random() * THEMES.length);
 
 async function getSvgContent() {
-  try {
-    const rawUrl = `https://raw.githubusercontent.com/Scrooge-777/Scrooge-777/main/docs/profile_card.svg?nocache=${Date.now()}`;
-    const resp = await fetch(rawUrl, {
-      headers: { 'User-Agent': 'Scrooge-Profile-Worker', 'Cache-Control': 'no-cache' },
-      signal: AbortSignal.timeout(3500)
-    });
-    if (resp.ok) {
-      const text = await resp.text();
-      if (text.includes('<svg') && text.includes('</svg>')) {
-        cachedSvg = text;
-        return text;
+  const remoteUrls = [
+    `https://raw.githubusercontent.com/Scrooge-777/Scrooge-777/main/docs/profile_card.svg?nocache=${Date.now()}`,
+    `https://raw.githubusercontent.com/Scrooge-777/Scrooge-777/main/assets/profile_card.svg?nocache=${Date.now()}`
+  ];
+
+  for (const rawUrl of remoteUrls) {
+    try {
+      const resp = await fetch(rawUrl, {
+        headers: { 'User-Agent': 'Scrooge-Profile-Worker', 'Cache-Control': 'no-cache' },
+        signal: AbortSignal.timeout(3500)
+      });
+      if (resp.ok) {
+        const text = await resp.text();
+        if (text.includes('<svg') && text.includes('</svg>')) {
+          cachedSvg = text;
+          return text;
+        }
       }
+    } catch (err) {
+      // Continue to next candidate URL
     }
-  } catch (err) {
-    // Fall through to cached or local copy
   }
 
   if (cachedSvg) {
@@ -153,7 +159,10 @@ async function getSvgContent() {
   const candidates = [
     path.join(__dirname, '..', 'docs', 'profile_card.svg'),
     path.join(process.cwd(), 'docs', 'profile_card.svg'),
-    path.join(__dirname, 'docs', 'profile_card.svg')
+    path.join(__dirname, 'docs', 'profile_card.svg'),
+    path.join(__dirname, '..', 'assets', 'profile_card.svg'),
+    path.join(process.cwd(), 'assets', 'profile_card.svg'),
+    path.join(__dirname, 'assets', 'profile_card.svg')
   ];
   for (const c of candidates) {
     if (fs.existsSync(c)) {

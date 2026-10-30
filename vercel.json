@@ -39,7 +39,7 @@
   ],
   "functions": {
     "api/card.js": {
-      "includeFiles": "docs/**"
+      "includeFiles": "{docs/**,assets/**}"
     }
   }
 }
