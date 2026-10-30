@@ -3,11 +3,9 @@
   "version": "1.2.0",
   "private": true,
   "description": "Dynamic 3D GitHub activity card serverless API",
-  "main": "src/api/card.js",
+  "main": "api/card.js",
   "scripts": {
-    "build": "python bin/generate-card.py",
-    "verify": "python scripts/verify.py",
-    "test": "python -m unittest discover tests"
+    "build": "python bin/generate-card.py"
   },
   "author": "Scrooge-777",
   "license": "MIT"

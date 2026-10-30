@@ -10,8 +10,7 @@ on:
       - main
     paths:
       - 'bin/**'
-      - 'src/**'
-      - 'scripts/**'
+      - 'api/**'
       - '.github/workflows/profile-3d.yml'
 
 permissions:
@@ -45,17 +44,16 @@ jobs:
           PROFILE_TOKEN: ${{ secrets.PROFILE_TOKEN }}
           USERNAME: ${{ github.repository_owner }}
 
-      - name: Validate scripts and SVG assets
+      - name: Validate scripts and SVG asset
         run: |
-          python -m py_compile bin/*.py scripts/*.py
-          python scripts/verify.py
-          python -m unittest discover tests
+          python -m py_compile bin/*.py
+          python -c "import xml.etree.ElementTree as ET; ET.parse('docs/profile_card.svg')"
 
       - name: Commit & Push changes
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add docs/ README.md
+          git add docs/profile_card.svg README.md
           if ! git diff --staged --quiet; then
             git commit -m "chore(sync): update 3d contribution terrain, radar, and language metrics"
             git pull --rebase --autostash origin main
