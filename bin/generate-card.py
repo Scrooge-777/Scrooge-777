@@ -477,7 +477,7 @@ def main():
     stats = fetch_stats_and_languages(username, token)
     stats['alltime'] = fetch_alltime(username, token)
     repo_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-    svg_path = os.path.join(repo_dir, 'assets', 'profile_card.svg')
+    svg_path = os.path.join(repo_dir, 'docs', 'profile_card.svg')
     readme_path = os.path.join(repo_dir, 'README.md')
 
     update_svg(svg_path, stats)

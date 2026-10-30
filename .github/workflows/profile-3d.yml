@@ -9,6 +9,8 @@ on:
     branches:
       - main
     paths:
+      - 'bin/**'
+      - 'src/**'
       - 'scripts/**'
       - '.github/workflows/profile-3d.yml'
 
@@ -37,7 +39,7 @@ jobs:
 
       - name: Sync profile card & README arsenal
         run: |
-          python scripts/sync_github_card.py
+          python bin/generate-card.py
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           PROFILE_TOKEN: ${{ secrets.PROFILE_TOKEN }}
@@ -45,14 +47,15 @@ jobs:
 
       - name: Validate scripts and SVG assets
         run: |
-          python -m py_compile scripts/*.py
-          python -c "import glob, xml.etree.ElementTree as ET; [ET.parse(f) for f in glob.glob('assets/*.svg')]"
+          python -m py_compile bin/*.py scripts/*.py
+          python scripts/verify.py
+          python -m unittest discover tests
 
       - name: Commit & Push changes
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add assets/ README.md
+          git add docs/ README.md
           if ! git diff --staged --quiet; then
             git commit -m "chore(sync): update 3d contribution terrain, radar, and language metrics"
             git pull --rebase --autostash origin main

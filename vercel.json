@@ -25,13 +25,21 @@
         {
           "key": "X-Frame-Options",
           "value": "DENY"
+        },
+        {
+          "key": "X-XSS-Protection",
+          "value": "1; mode=block"
+        },
+        {
+          "key": "Content-Security-Policy",
+          "value": "default-src 'none'; style-src 'unsafe-inline';"
         }
       ]
     }
   ],
   "functions": {
-    "api/card.js": {
-      "includeFiles": "assets/**"
+    "src/api/card.js": {
+      "includeFiles": "docs/**"
     }
   }
 }

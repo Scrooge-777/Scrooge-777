@@ -1,10 +1,14 @@
 {
   "name": "scrooge-profile-card",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "private": true,
   "description": "Dynamic 3D GitHub activity card serverless API",
-  "main": "api/card.js",
-  "scripts": {},
+  "main": "src/api/card.js",
+  "scripts": {
+    "build": "python bin/generate-card.py",
+    "verify": "python scripts/verify.py",
+    "test": "python -m unittest discover tests"
+  },
   "author": "Scrooge-777",
   "license": "MIT"
 }
