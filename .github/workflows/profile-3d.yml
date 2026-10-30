@@ -2,11 +2,9 @@ name: Profile card sync
 
 on:
   schedule:
-    - cron: "0 */2 * * *"   # Every 2 hours (catches high runner delay & frequent work)
+    - cron: "0 */2 * * *"   # Every 2 hours
     - cron: "30 18 * * *"   # Midnight IST (12:00 AM)
   workflow_dispatch:
-  repository_dispatch:
-    types: [sync-card, post-push]
   push:
     branches:
       - main
@@ -18,19 +16,24 @@ permissions:
   contents: write
 
 concurrency:
-  group: profile-3d
+  group: profile-3d-sync
   cancel-in-progress: false
 
 jobs:
-  build:
+  sync:
     runs-on: ubuntu-latest
     timeout-minutes: 10
-    name: sync-profile-card
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: false
 
       - name: Sync profile card & README arsenal
         run: |
@@ -45,13 +48,13 @@ jobs:
           python -m py_compile scripts/*.py
           python -c "import glob, xml.etree.ElementTree as ET; [ET.parse(f) for f in glob.glob('assets/*.svg')]"
 
-      - name: Commit & Push
+      - name: Commit & Push changes
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add assets/ README.md
           if ! git diff --staged --quiet; then
-            git commit -m "chore(sync): update 3d contribution graph, interactive card, and arsenal"
+            git commit -m "chore(sync): update 3d contribution terrain, radar, and language metrics"
             git pull --rebase --autostash origin main
             git push
           fi

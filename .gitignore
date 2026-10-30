@@ -1,5 +1,57 @@
+# Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
 *$py.class
 
+# Native binaries & build outputs
+*.o
+*.obj
+*.dll
+*.dylib
+*.exe
+*.bin
+*.so
+bin/
+obj/
+dist/
+build/
+target/
+
+# Node.js
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# Vercel & Deployments
 .vercel
+.output/
+
+# Secrets, Environment & Credentials (STRICT)
+.env
+.env.*
+*.env
+*.pem
+*.key
+*.p12
+*.pfx
+*.pkcs12
+*.crt
+id_rsa*
+*.secret
+secrets/
+credentials/
+*.token
+.npmrc
+.pypirc
+
+# Operating System & Editors
+.DS_Store
+Thumbs.db
+Desktop.ini
+.vscode/
+.idea/
+*.swp
+*.swo
+*~

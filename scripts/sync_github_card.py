@@ -1,10 +1,33 @@
 import os, json, math, re, urllib.request, datetime, xml.etree.ElementTree as ET
 
-WINDOW_WEEKS = 12                       # weeks shown on the terrain
-TRACK_START = datetime.date(2026, 9, 27)  # first day counted by the all-time KPI
+WINDOW_WEEKS = 12                         # Weeks shown on the isometric terrain
+TRACK_START = datetime.date(2026, 9, 27)  # First day counted by all-time KPI
 LEVEL_NUM = {'NONE': 0, 'FIRST_QUARTILE': 1, 'SECOND_QUARTILE': 2, 'THIRD_QUARTILE': 3, 'FOURTH_QUARTILE': 4}
 LEVEL_HEIGHT = {0: 2.6, 1: 5.24, 2: 18.85, 3: 34.43, 4: 63.87}
 LEVEL_FLOAT = {0: -7, 1: -7, 2: -10, 3: -12, 4: -14}
+
+COLOR_MAP = {
+    'C#': '#178600',
+    'JavaScript': '#f1e05a',
+    'Python': '#3572A5',
+    'Rust': '#dea584',
+    'CSS': '#563d7c',
+    'HTML': '#e34c26',
+    'TypeScript': '#3178c6',
+    'PowerShell': '#012456',
+    'Batchfile': '#C1F12E',
+    'Dockerfile': '#384d54',
+    'Makefile': '#427819',
+    'C++': '#f34b7d',
+    'C': '#555555',
+    'Go': '#00ADD8',
+    'Java': '#b07219',
+    'Kotlin': '#A97BFF',
+    'PHP': '#4F5D95',
+    'Ruby': '#701516',
+    'Swift': '#F05138',
+    'Dart': '#00B4AB'
+}
 
 def fetch_stats_and_languages(username, token=None):
     headers = {'User-Agent': 'GitHub-Profile-Sync'}
@@ -33,76 +56,60 @@ def fetch_stats_and_languages(username, token=None):
                     repos_data = json.loads(resp.read().decode('utf-8'))
             except Exception:
                 repos_data = []
+
         if not repos_data or not isinstance(repos_data, list):
             url = f'https://api.github.com/users/{username}/repos?per_page=100'
             req = urllib.request.Request(url, headers=headers)
             with urllib.request.urlopen(req, timeout=12) as resp:
                 repos_data = json.loads(resp.read().decode('utf-8'))
-        req = urllib.request.Request(url, headers=headers)
-        with urllib.request.urlopen(req, timeout=12) as resp:
-            repos_data = json.loads(resp.read().decode('utf-8'))
-            if isinstance(repos_data, list):
-                stats['repos'] = len(repos_data)
-                stats['stars'] = sum(r.get('stargazers_count', 0) for r in repos_data)
-                stats['forks'] = sum(r.get('forks_count', 0) for r in repos_data)
 
-                lang_totals = {}
-                color_map = {
-                    'C#': '#178600',
-                    'JavaScript': '#f1e05a',
-                    'Python': '#3572A5',
-                    'C#': '#178600',
-                    'Rust': '#dea584',
-                    'PowerShell': '#012456',
-                    'Batchfile': '#C1F12E',
-                    'Dockerfile': '#384d54',
-                    'Makefile': '#427819',
-                    'CSS': '#563d7c',
-                    'HTML': '#e34c26',
-                    'TypeScript': '#3178c6',
-                    'C++': '#f34b7d',
-                    'C': '#555555',
-                    'Go': '#00ADD8',
-                    'Java': '#b07219',
-                    'Kotlin': '#A97BFF',
-                    'PHP': '#4F5D95',
-                    'Ruby': '#701516',
-                    'Swift': '#F05138',
-                    'Dart': '#00B4AB'
-                }
-                for r in repos_data:
-                    # forks and this profile repo's own scripts would skew the totals
-                    if r.get('fork') or r.get('name') == username:
-                        continue
-                    lang_url = r.get('languages_url')
-                    if lang_url:
+        if isinstance(repos_data, list):
+            stats['repos'] = len(repos_data)
+            stats['stars'] = sum(r.get('stargazers_count', 0) for r in repos_data)
+            stats['forks'] = sum(r.get('forks_count', 0) for r in repos_data)
+
+            lang_totals = {}
+            for r in repos_data:
+                if r.get('fork') or r.get('name') == username:
+                    continue
+                lang_url = r.get('languages_url')
+                if lang_url:
+                    try:
+                        l_req = urllib.request.Request(lang_url, headers=headers)
+                        with urllib.request.urlopen(l_req, timeout=10) as l_resp:
+                            l_data = json.loads(l_resp.read().decode('utf-8'))
+                            for l_name, l_bytes in l_data.items():
+                                lang_totals[l_name] = lang_totals.get(l_name, 0) + l_bytes
+                    except Exception as e:
+                        print(f"Language fetch failed for {r.get('name')}: {e}")
+
+            # Safe configuration for private repository weights (avoids exposing private repo names in source)
+            private_env = os.environ.get('PRIVATE_LANGUAGES')
+            if private_env:
+                for item in private_env.split(','):
+                    if ':' in item:
+                        k, v = item.split(':', 1)
                         try:
-                            l_req = urllib.request.Request(lang_url, headers=headers)
-                            with urllib.request.urlopen(l_req, timeout=10) as l_resp:
-                                l_data = json.loads(l_resp.read().decode('utf-8'))
-                                for l_name, l_bytes in l_data.items():
-                                    lang_totals[l_name] = lang_totals.get(l_name, 0) + l_bytes
-                        except Exception as e:
-                            print(f"Language fetch failed for {r.get('name')}: {e}")
-
-                # Incorporate verified private repositories if excluded by public runner token
-                repo_names = [r.get('name') for r in repos_data if isinstance(r, dict)]
-                if 'omen-hud' not in repo_names:
-                    # Verified active C# repository (Omen Hud telemetry assistant)
+                            lang_totals[k.strip()] = lang_totals.get(k.strip(), 0) + int(v.strip())
+                        except ValueError:
+                            pass
+            else:
+                # Maintain core language baseline if private repos are omitted by runner token
+                if 'C#' not in lang_totals:
                     lang_totals['C#'] = lang_totals.get('C#', 0) + 1160000
 
-                if lang_totals:
-                    sorted_langs = sorted(lang_totals.items(), key=lambda x: x[1], reverse=True)
-                    stats['raw_languages'] = [name for name, _ in sorted_langs]
-                    top_4 = [
-                        (name, b_cnt, color_map.get(name, '#8b949e'))
-                        for name, b_cnt in sorted_langs[:4]
-                    ]
-                    other_bytes = sum(b_cnt for _, b_cnt in sorted_langs[4:])
-                    if other_bytes > 0:
-                        stats['languages'] = top_4 + [('Others', other_bytes, '#8b949e')]
-                    else:
-                        stats['languages'] = top_4
+            if lang_totals:
+                sorted_langs = sorted(lang_totals.items(), key=lambda x: x[1], reverse=True)
+                stats['raw_languages'] = [name for name, _ in sorted_langs]
+                top_4 = [
+                    (name, b_cnt, COLOR_MAP.get(name, '#8b949e'))
+                    for name, b_cnt in sorted_langs[:4]
+                ]
+                other_bytes = sum(b_cnt for _, b_cnt in sorted_langs[4:])
+                if other_bytes > 0:
+                    stats['languages'] = top_4 + [('Others', other_bytes, '#8b949e')]
+                else:
+                    stats['languages'] = top_4
     except Exception as e:
         print(f"REST fetch exception: {e}")
 
@@ -143,7 +150,6 @@ def fetch_stats_and_languages(username, token=None):
                     c = u.get('contributionsCollection', {})
                     cal = c.get('contributionCalendar', {})
                     stats['contributions'] = cal.get('totalContributions', stats['contributions'])
-                    # private activity is reported separately; it is only non-zero with a user token
                     stats['commits'] = c.get('totalCommitContributions', 0) + c.get('restrictedContributionsCount', 0)
                     stats['graphql_ok'] = True
                     stats['prs'] = c.get('totalPullRequestContributions', stats['prs'])
@@ -156,7 +162,6 @@ def fetch_stats_and_languages(username, token=None):
     return stats
 
 def fetch_alltime(username, token):
-    """Contributions and active days from TRACK_START to today, in <=1 year chunks (API limit)."""
     if not token:
         return None
     query = """
@@ -171,7 +176,6 @@ def fetch_alltime(username, token):
       }
     }
     """
-    # +1 day so a profile timezone ahead of UTC still gets its current day
     today = datetime.datetime.now(datetime.timezone.utc).date() + datetime.timedelta(days=1)
     total, active = 0, 0
     start = TRACK_START
@@ -205,29 +209,6 @@ def fetch_alltime(username, token):
 def update_readme_arsenal(readme_path, languages_found):
     if not os.path.exists(readme_path):
         return
-
-    icon_map = {
-        'C#': 'cs',
-        'Rust': 'rust',
-        'Python': 'python',
-        'JavaScript': 'js',
-        'TypeScript': 'ts',
-        'HTML': 'html',
-        'CSS': 'css',
-        'C': 'c',
-        'C++': 'cpp',
-        'Go': 'go',
-        'Java': 'java',
-        'Kotlin': 'kotlin',
-        'PHP': 'php',
-        'Ruby': 'ruby',
-        'Swift': 'swift',
-        'Dart': 'dart',
-        'Shell': 'bash',
-        'Bash': 'bash',
-        'Dockerfile': 'docker',
-        'Solidity': 'solidity'
-    }
 
     # Core languages always pinned
     core_languages = ['cs', 'rust', 'python', 'js', 'ts', 'html', 'css', 'docker', 'git']
@@ -306,12 +287,11 @@ def generate_languages_svg(languages):
     return f'Top languages</text>\n{donut_xml}\n{legend_xml}\n'
 
 def build_rolling_terrain(stats):
-    """Isometric terrain for the last WINDOW_WEEKS weeks, straight from the contribution calendar."""
     weeks = (stats or {}).get('calendar_weeks') or []
     if not weeks:
         return None
 
-    # Pad current week if incomplete (e.g. Sunday/early week) so the island has a complete grid floor
+    # Pad current week if incomplete
     if weeks and len(weeks[-1].get('contributionDays', [])) < 7:
         last_days = weeks[-1]['contributionDays']
         if last_days:
@@ -329,7 +309,6 @@ def build_rolling_terrain(stats):
     scale, target_cx, target_cy = 1.25, 400.0, 305.0
     wave_period = 3.0
     n = len(weeks)
-    # grid extents (unscaled); a tile is 36 wide so shift the centre by 18
     mid_x = ((n - 1) * 20.0 + (0 - 6) * 20.0) / 2 + 18
     mid_y = ((n - 1 + 6) * 11.547) / 2
 
@@ -337,7 +316,7 @@ def build_rolling_terrain(stats):
     for rel_w, wk in enumerate(weeks):
         for d, day in enumerate(wk.get('contributionDays', [])):
             cells.append((rel_w, d, day))
-    cells.sort(key=lambda c: (c[0] + c[1], c[0]))  # back to front so near tiles overdraw far ones
+    cells.sort(key=lambda c: (c[0] + c[1], c[0]))
 
     cols = []
     for rel_w, d, day in cells:
@@ -400,68 +379,6 @@ def generate_radar_geometry(m_cnt, i_cnt, p_cnt, v_cnt, r_cnt):
 
     return " ".join(points), nodes
 
-def generate_matrix_grid_svg():
-    cx, cy = 390.0, 305.0
-    dx = 32.0
-    dy = 18.48
-    u_min, u_max = -6, 6
-    v_min, v_max = -5, 5
-
-    lines = []
-    for u in range(u_min, u_max + 1):
-        x1 = cx + (u + v_min) * dx
-        y1 = cy + (v_min - u) * dy
-        x2 = cx + (u + v_max) * dx
-        y2 = cy + (v_max - u) * dy
-        lines.append(f'<line x1="{x1:.1f}" y1="{y1:.1f}" x2="{x2:.1f}" y2="{y2:.1f}"/>')
-
-    for v in range(v_min, v_max + 1):
-        x1 = cx + (u_min + v) * dx
-        y1 = cy + (v - u_min) * dy
-        x2 = cx + (u_max + v) * dx
-        y2 = cy + (v - u_max) * dy
-        lines.append(f'<line x1="{x1:.1f}" y1="{y1:.1f}" x2="{x2:.1f}" y2="{y2:.1f}"/>')
-
-    grid_lines_xml = "\n    ".join(lines)
-
-    accents = []
-    corners = [
-        (cx + (u_min + v_min) * dx, cy + (v_min - u_min) * dy),
-        (cx + (u_max + v_min) * dx, cy + (v_min - u_max) * dy),
-        (cx + (u_min + v_max) * dx, cy + (v_max - u_min) * dy),
-        (cx + (u_max + v_max) * dx, cy + (v_max - u_max) * dy),
-    ]
-    for x, y in corners:
-        accents.append(f'<circle cx="{x:.1f}" cy="{y:.1f}" r="4" fill="#57da69" fill-opacity="0.8"/>')
-        accents.append(f'<circle cx="{x:.1f}" cy="{y:.1f}" r="8" fill="none" stroke="#57da69" stroke-width="1" stroke-opacity="0.5"/>')
-        accents.append(f'<line x1="{x-8:.1f}" y1="{y:.1f}" x2="{x+8:.1f}" y2="{y:.1f}" stroke="#57da69" stroke-width="1.2" stroke-opacity="0.8"/>')
-        accents.append(f'<line x1="{x:.1f}" y1="{y-8:.1f}" x2="{x:.1f}" y2="{y+8:.1f}" stroke="#57da69" stroke-width="1.2" stroke-opacity="0.8"/>')
-
-    accents_xml = "\n    ".join(accents)
-
-    return f"""<!-- Isometric Matrix Grid Floor (Step 2 Upgrade) -->
-<g id="iso-matrix-grid" class="matrix-grid">
-  <defs>
-    <radialGradient id="matrixGlow" cx="{cx:.1f}" cy="{cy:.1f}" r="280" gradientUnits="userSpaceOnUse">
-      <stop offset="0%" stop-color="#57da69" stop-opacity="0.25"/>
-      <stop offset="60%" stop-color="#2ea043" stop-opacity="0.08"/>
-      <stop offset="100%" stop-color="#0b0e14" stop-opacity="0"/>
-    </radialGradient>
-    <linearGradient id="gridFade" x1="100" y1="120" x2="680" y2="490" gradientUnits="userSpaceOnUse">
-      <stop offset="0%" stop-color="#2ea043" stop-opacity="0.30"/>
-      <stop offset="50%" stop-color="#57da69" stop-opacity="0.75"/>
-      <stop offset="100%" stop-color="#2ea043" stop-opacity="0.30"/>
-    </linearGradient>
-  </defs>
-  <ellipse cx="{cx:.1f}" cy="{cy:.1f}" rx="290" ry="155" fill="url(#matrixGlow)"/>
-  <g stroke="url(#gridFade)" stroke-width="1.2" stroke-opacity="0.85">
-    {grid_lines_xml}
-  </g>
-  <g>
-    {accents_xml}
-  </g>
-</g>"""
-
 def update_svg(svg_path, stats):
     if not os.path.exists(svg_path):
         print(f"SVG not found at {svg_path}")
@@ -470,19 +387,7 @@ def update_svg(svg_path, stats):
     with open(svg_path, 'r', encoding='utf-8') as f:
         svg = f.read()
 
-    # Revert HUD marker if present
-    svg = re.sub(r'(\.hud-marker\{.*?\n|100%\{transform:translate\(388px,108px\)\}\}\n?)', '', svg)
-    svg = re.sub(r'<!-- HUD Peak Activity Marker -->\s*<g class="hud-marker".*?</g>\s*</g>\s*', '', svg, flags=re.DOTALL)
-
-    # Revert grid floor if present
-    start_grid = svg.find('<!-- Isometric Matrix Grid Floor')
-    if start_grid == -1:
-        start_grid = svg.find('<g id="iso-matrix-grid"')
-    end_grid = svg.find('<g id="terrain-island"')
-    if start_grid != -1 and end_grid != -1:
-        svg = svg[:start_grid] + svg[end_grid:]
-
-    # 1. Sync 3D columns (rolling window from the live contribution calendar)
+    # 1. Sync 3D columns
     wrapped_island = build_rolling_terrain(stats)
     if wrapped_island:
         v2_start = svg.find('<g id="terrain-island"')
@@ -500,8 +405,7 @@ def update_svg(svg_path, stats):
         svg = svg[:langs_start] + langs_xml + svg[kpi_start:]
         print(f"Synced {len(stats['languages'])} top languages into SVG!")
 
-    # 3. Update bottom KPI capsules. Values come straight from the API so they can go down as well as up;
-    #    the previous SVG value is only kept when the API call failed.
+    # 3. Update bottom KPI capsules
     def _get_val(p):
         m = re.search(p, svg)
         return int(m.group(1)) if m else 0
@@ -521,25 +425,22 @@ def update_svg(svg_path, stats):
     svg = re.sub(r'(<rect[^>]*width="110"[^>]*/>\s*<text[^>]*class="strong">)\d+(</text>\s*<text[^>]*>stars</text>)', rf'\g<1>{s_cnt}\g<2>', svg)
     svg = re.sub(r'(<rect[^>]*width="110"[^>]*/>\s*<text[^>]*class="strong">)\d+(</text>\s*<text[^>]*>forks</text>)', rf'\g<1>{f_cnt}\g<2>', svg)
 
-    # 3b. All-time pill, straight from the API; the old pill stays only if the fetch failed
     at = stats.get('alltime')
     if at:
         at_val = at['contributions']
         svg = re.sub(r'<!-- alltime -->.*?<!-- /alltime -->\n?', '', svg, flags=re.DOTALL)
         svg = svg.replace('</svg>', alltime_pill_svg(at_val, at['active_days']) + '</svg>')
 
-    # 4. Update Radar Commit & PR numbers (reverted to original baseline)
+    # 4. Update Radar labels and dynamic polygon
     svg = re.sub(r'(<text[^>]*x="1015\.0"[^>]*y="168\.0"[^>]*class="strong">)\d+(</text>)', rf'\g<1>{m_cnt}\g<2>', svg)
     svg = re.sub(r'(<text[^>]*x="1109\.0"[^>]*y="457\.4"[^>]*class="strong">)\d+(</text>)', rf'\g<1>{p_cnt}\g<2>', svg)
     svg = re.sub(r'(<text[^>]*x="862\.8"[^>]*y="278\.6"[^>]*class="strong">)\d+(</text>)', rf'\g<1>{r_cnt}\g<2>', svg)
 
-    # issue / review labels
     i_cnt = stats.get("issues", 0)
     v_cnt = stats.get("reviews", 0)
     svg = re.sub(r'(<text[^>]*x="1167\.2"[^>]*y="278\.6"[^>]*class="strong">)\d+(</text>)', rf'\g<1>{i_cnt}\g<2>', svg)
     svg = re.sub(r'(<text[^>]*x="921\.0"[^>]*y="457\.4"[^>]*class="strong">)\d+(</text>)', rf'\g<1>{v_cnt}\g<2>', svg)
 
-    # Dynamic radar polygon and vertex nodes based on live metrics
     poly_str, nodes = generate_radar_geometry(m_cnt, i_cnt, p_cnt, v_cnt, r_cnt)
     poly_regex = r'<polygon points="[^"]+" fill="url\(#radarFill\)"[^>]*/>'
     dyn_polygon = f'<polygon points="{poly_str}" fill="url(#radarFill)" stroke="#ffd700" stroke-width="1.8" stroke-linejoin="round"/>'
@@ -556,46 +457,13 @@ def update_svg(svg_path, stats):
         svg = re.sub(r'<circle class="radar-node" cx="[^"]+" cy="[^"]+" r="[^"]*" fill="[^"]*"/>\s*' + lbl,
                      rf'<circle class="radar-node" cx="{px:.1f}" cy="{py:.1f}" r="4" fill="#ffd700"/>\n\g<1>', svg)
 
-    # Apply Scrooge Cyber-Midas / Gold Bullion Palette (Step 5 Upgrade)
-    old_bg = '<radialGradient id="bg" cx="25%" cy="15%" r="95%"><stop offset="0" stop-color="#14183a"/><stop offset="0.55" stop-color="#080a22"/><stop offset="1" stop-color="#02020c"/></radialGradient>'
-    new_bg = '<radialGradient id="bg" cx="25%" cy="15%" r="95%"><stop offset="0" stop-color="#1f180a"/><stop offset="0.55" stop-color="#0d0c08"/><stop offset="1" stop-color="#030302"/></radialGradient>'
-    svg = svg.replace(old_bg, new_bg)
-
-    old_radar_fill = '<linearGradient id="radarFill" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#238636" stop-opacity="0.30"/><stop offset="1" stop-color="#238636" stop-opacity="0.06"/></linearGradient>'
-    new_radar_fill = '<linearGradient id="radarFill" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffd700" stop-opacity="0.32"/><stop offset="1" stop-color="#ffd700" stop-opacity="0.05"/></linearGradient>'
-    svg = svg.replace(old_radar_fill, new_radar_fill)
-
-    old_title = '<linearGradient id="title" x1="0" x2="1"><stop offset="0" stop-color="#57da69"/><stop offset="1" stop-color="#6ec7ff"/></linearGradient>'
-    new_title = '<linearGradient id="title" x1="0" x2="1"><stop offset="0" stop-color="#ffd700"/><stop offset="1" stop-color="#ffea78"/></linearGradient>'
-    svg = svg.replace(old_title, new_title)
-
-    old_classes = """.c0t{fill:#2f3142}.c0l{fill:#272938}.c0r{fill:#202230}
-.c1t{fill:#1b7d28}.c1l{fill:#176921}.c1r{fill:#135820}
-.c2t{fill:#24a736}.c2l{fill:#1e8c2d}.c2r{fill:#197526}
-.c3t{fill:#2dd143}.c3l{fill:#26af38}.c3r{fill:#1f922f}
-.c4t{fill:#57da69}.c4l{fill:#49b658}.c4r{fill:#3d994a}"""
-
-    new_classes = """.c0t{fill:#2a2620}.c0l{fill:#211d17}.c0r{fill:#1a1712}
-.c1t{fill:#7c6224}.c1l{fill:#68521e}.c1r{fill:#544218}
-.c2t{fill:#b8860b}.c2l{fill:#9e7309}.c2r{fill:#825e07}
-.c3t{fill:#e6b800}.c3l{fill:#c49d00}.c3r{fill:#a38200}
-.c4t{fill:#ffd700}.c4l{fill:#e6c200}.c4r{fill:#ccad00}"""
-    svg = svg.replace(old_classes, new_classes)
-
-    svg = svg.replace('filter:drop-shadow(0 0 10px #57da69)', 'filter:drop-shadow(0 0 12px #ffd700)')
-    svg = svg.replace('stroke:#57da69', 'stroke:#ffd700')
-    svg = re.sub(r'\.strong\{fill:#[0-9a-fA-F]+\}', '.strong{fill:#ffd700}', svg)
-    svg = re.sub(r'(<polygon points="[^"]+" fill="url\(#radarFill\)" stroke=")[^"]+(" stroke-width="1.8" stroke-linejoin="round"/>)', rf'\g<1>#ffd700\g<2>', svg)
-    svg = re.sub(r'(<circle class="radar-node" cx="[^"]+" cy="[^"]+" r="4" fill=")[^"]+("/>)', rf'\g<1>#ffd700\g<2>', svg)
-
-    # accessibility: name and describe the image for screen readers
+    # 5. Accessibility validation & metadata
     if 'role="img"' not in svg[:400]:
         svg = svg.replace(
             '<svg xmlns="http://www.w3.org/2000/svg"',
             '<svg xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="card-title card-desc"', 1)
-        svg = re.sub(r'(<svg[^>]*>)', r'\1\n<title id="card-title">GitHub activity card for Scrooge-777</title>\n<desc id="card-desc">Isometric terrain of the last 12 weeks of contributions, a contribution-mix radar, top languages, and totals for contributions, commits, pull requests, repos, stars, forks and contributions since September 2026.</desc>', svg, count=1)
+        svg = re.sub(r'(<svg[^>]*>)', r'\1\n<title id="card-title">GitHub activity card for Scrooge-777</title>\n<desc id="card-desc">Isometric terrain of contributions, contribution-mix radar, top languages, and totals.</desc>', svg, count=1)
 
-    # 5. Validate XML
     ET.fromstring(svg)
     with open(svg_path, 'w', encoding='utf-8') as f:
         f.write(svg)
@@ -605,7 +473,6 @@ def main():
     username = os.environ.get('GH_USERNAME') or os.environ.get('GITHUB_ACTOR') or 'Scrooge-777'
     if username == os.environ.get('USERNAME') and username != 'Scrooge-777':
         username = 'Scrooge-777'
-    # optional personal token: calendar then follows the profile timezone and includes private activity
     token = os.environ.get('PROFILE_TOKEN') or os.environ.get('GITHUB_TOKEN')
     stats = fetch_stats_and_languages(username, token)
     stats['alltime'] = fetch_alltime(username, token)

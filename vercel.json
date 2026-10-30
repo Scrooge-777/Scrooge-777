@@ -14,6 +14,21 @@
       "destination": "/api/card"
     }
   ],
+  "headers": [
+    {
+      "source": "/(.*)",
+      "headers": [
+        {
+          "key": "X-Content-Type-Options",
+          "value": "nosniff"
+        },
+        {
+          "key": "X-Frame-Options",
+          "value": "DENY"
+        }
+      ]
+    }
+  ],
   "functions": {
     "api/card.js": {
       "includeFiles": "assets/**"
