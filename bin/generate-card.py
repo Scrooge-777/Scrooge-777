@@ -443,11 +443,18 @@ def update_svg(svg_path, stats):
     svg = re.sub(r'(<text[^>]*x="1167\.2"[^>]*y="278\.6"[^>]*class="strong">)\d+(</text>)', rf'\g<1>{i_cnt}\g<2>', svg)
     svg = re.sub(r'(<text[^>]*x="921\.0"[^>]*y="457\.4"[^>]*class="strong">)\d+(</text>)', rf'\g<1>{v_cnt}\g<2>', svg)
 
-    poly_str, nodes = generate_radar_geometry(m_cnt, i_cnt, p_cnt, v_cnt, r_cnt)
+    # Revert contribution mix radar to classic balanced baseline pentagon
     poly_regex = r'<polygon points="[^"]+" fill="url\(#radarFill\)"[^>]*/>'
-    dyn_polygon = f'<polygon points="{poly_str}" fill="url(#radarFill)" stroke="#ffd700" stroke-width="1.8" stroke-linejoin="round"/>'
-    svg = re.sub(poly_regex, dyn_polygon, svg)
+    classic_polygon = '<polygon points="1015.0,226.3 1034.8,303.6 1037.6,341.1 1002.8,326.8 975.4,297.1" fill="url(#radarFill)" stroke="#ffd700" stroke-width="1.8" stroke-linejoin="round"/>'
+    svg = re.sub(poly_regex, classic_polygon, svg)
 
+    classic_nodes = [
+        (1015.0, 226.3),
+        (1034.8, 303.6),
+        (1037.6, 341.1),
+        (1002.8, 326.8),
+        (975.4, 297.1)
+    ]
     radar_labels = [
         r'(<text x="1015\.0" y="150\.0")',
         r'(<text x="1167\.2" y="260\.6")',
@@ -455,7 +462,7 @@ def update_svg(svg_path, stats):
         r'(<text x="921\.0" y="439\.4")',
         r'(<text x="862\.8" y="260\.6")'
     ]
-    for (px, py), lbl in zip(nodes, radar_labels):
+    for (px, py), lbl in zip(classic_nodes, radar_labels):
         svg = re.sub(r'<circle class="radar-node" cx="[^"]+" cy="[^"]+" r="[^"]*" fill="[^"]*"/>\s*' + lbl,
                      rf'<circle class="radar-node" cx="{px:.1f}" cy="{py:.1f}" r="4" fill="#ffd700"/>\n\g<1>', svg)
 

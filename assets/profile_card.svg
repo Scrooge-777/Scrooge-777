@@ -155,20 +155,20 @@
 <line x1="1015" y1="310" x2="1091.4" y2="415.2" stroke="#9aa0b8" stroke-opacity="0.25"/>
 <line x1="1015" y1="310" x2="938.6" y2="415.2" stroke="#9aa0b8" stroke-opacity="0.25"/>
 <line x1="1015" y1="310" x2="891.4" y2="269.8" stroke="#9aa0b8" stroke-opacity="0.25"/>
-<polygon points="1015.0,190.6 1032.1,304.4 1066.2,380.4 1004.4,324.6 920.8,279.4" fill="url(#radarFill)" stroke="#ffd700" stroke-width="1.8" stroke-linejoin="round"/>
-<circle class="radar-node" cx="1015.0" cy="190.6" r="4" fill="#ffd700"/>
+<polygon points="1015.0,226.3 1034.8,303.6 1037.6,341.1 1002.8,326.8 975.4,297.1" fill="url(#radarFill)" stroke="#ffd700" stroke-width="1.8" stroke-linejoin="round"/>
+<circle class="radar-node" cx="1015.0" cy="226.3" r="4" fill="#ffd700"/>
 <text x="1015.0" y="150.0" font-size="16" font-weight="600" text-anchor="middle" class="fg">Commit</text>
 <text x="1015.0" y="168.0" font-size="14" font-weight="700" text-anchor="middle" class="strong">342</text>
-<circle class="radar-node" cx="1032.1" cy="304.4" r="4" fill="#ffd700"/>
+<circle class="radar-node" cx="1034.8" cy="303.6" r="4" fill="#ffd700"/>
 <text x="1167.2" y="260.6" font-size="16" font-weight="600" text-anchor="start" class="fg">Issue</text>
 <text x="1167.2" y="278.6" font-size="14" font-weight="700" text-anchor="start" class="strong">0</text>
-<circle class="radar-node" cx="1066.2" cy="380.4" r="4" fill="#ffd700"/>
+<circle class="radar-node" cx="1037.6" cy="341.1" r="4" fill="#ffd700"/>
 <text x="1109.0" y="439.4" font-size="16" font-weight="600" text-anchor="start" class="fg">PullReq</text>
 <text x="1109.0" y="457.4" font-size="14" font-weight="700" text-anchor="start" class="strong">6</text>
-<circle class="radar-node" cx="1004.4" cy="324.6" r="4" fill="#ffd700"/>
+<circle class="radar-node" cx="1002.8" cy="326.8" r="4" fill="#ffd700"/>
 <text x="921.0" y="439.4" font-size="16" font-weight="600" text-anchor="end" class="fg">Review</text>
 <text x="921.0" y="457.4" font-size="14" font-weight="700" text-anchor="end" class="strong">0</text>
-<circle class="radar-node" cx="920.8" cy="279.4" r="4" fill="#ffd700"/>
+<circle class="radar-node" cx="975.4" cy="297.1" r="4" fill="#ffd700"/>
 <text x="862.8" y="260.6" font-size="16" font-weight="600" text-anchor="end" class="fg">Repo</text>
 <text x="862.8" y="278.6" font-size="14" font-weight="700" text-anchor="end" class="strong">7</text>
 <text x="54" y="552" font-size="16" font-weight="700" class="fg">Top languages</text>
