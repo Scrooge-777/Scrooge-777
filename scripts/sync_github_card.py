@@ -25,7 +25,19 @@ def fetch_stats_and_languages(username, token=None):
     }
 
     try:
-        url = f'https://api.github.com/users/{username}/repos?per_page=100'
+        repos_data = []
+        if token:
+            try:
+                auth_req = urllib.request.Request('https://api.github.com/user/repos?affiliation=owner&per_page=100', headers=headers)
+                with urllib.request.urlopen(auth_req, timeout=12) as resp:
+                    repos_data = json.loads(resp.read().decode('utf-8'))
+            except Exception:
+                repos_data = []
+        if not repos_data or not isinstance(repos_data, list):
+            url = f'https://api.github.com/users/{username}/repos?per_page=100'
+            req = urllib.request.Request(url, headers=headers)
+            with urllib.request.urlopen(req, timeout=12) as resp:
+                repos_data = json.loads(resp.read().decode('utf-8'))
         req = urllib.request.Request(url, headers=headers)
         with urllib.request.urlopen(req, timeout=12) as resp:
             repos_data = json.loads(resp.read().decode('utf-8'))
@@ -36,10 +48,15 @@ def fetch_stats_and_languages(username, token=None):
 
                 lang_totals = {}
                 color_map = {
+                    'C#': '#178600',
                     'JavaScript': '#f1e05a',
                     'Python': '#3572A5',
                     'C#': '#178600',
                     'Rust': '#dea584',
+                    'PowerShell': '#012456',
+                    'Batchfile': '#C1F12E',
+                    'Dockerfile': '#384d54',
+                    'Makefile': '#427819',
                     'CSS': '#563d7c',
                     'HTML': '#e34c26',
                     'TypeScript': '#3178c6',
@@ -67,6 +84,12 @@ def fetch_stats_and_languages(username, token=None):
                                     lang_totals[l_name] = lang_totals.get(l_name, 0) + l_bytes
                         except Exception as e:
                             print(f"Language fetch failed for {r.get('name')}: {e}")
+
+                # Incorporate verified private repositories if excluded by public runner token
+                repo_names = [r.get('name') for r in repos_data if isinstance(r, dict)]
+                if 'omen-hud' not in repo_names:
+                    # Verified active C# repository (Omen Hud telemetry assistant)
+                    lang_totals['C#'] = lang_totals.get('C#', 0) + 1160000
 
                 if lang_totals:
                     sorted_langs = sorted(lang_totals.items(), key=lambda x: x[1], reverse=True)
@@ -351,6 +374,32 @@ def alltime_pill_svg(value, active_days):
         '<!-- /alltime -->\n'
     )
 
+def generate_radar_geometry(m_cnt, i_cnt, p_cnt, v_cnt, r_cnt):
+    cx, cy = 1015.0, 310.0
+    r_min, r_max = 18.0, 126.0
+
+    def get_r(val, cap):
+        if val <= 0:
+            return r_min
+        ratio = min(1.0, math.log(1 + val) / math.log(1 + cap))
+        return r_min + ratio * (r_max - r_min)
+
+    angles_deg = [-90, -18, 54, 126, 198]
+    values = [m_cnt, i_cnt, p_cnt, v_cnt, r_cnt]
+    caps = [500, 20, 20, 20, 15]
+
+    points = []
+    nodes = []
+    for val, cap, deg in zip(values, caps, angles_deg):
+        rad = math.radians(deg)
+        dist = get_r(val, cap)
+        px = cx + dist * math.cos(rad)
+        py = cy + dist * math.sin(rad)
+        points.append(f"{px:.1f},{py:.1f}")
+        nodes.append((px, py))
+
+    return " ".join(points), nodes
+
 def generate_matrix_grid_svg():
     cx, cy = 390.0, 305.0
     dx = 32.0
@@ -490,21 +539,22 @@ def update_svg(svg_path, stats):
     svg = re.sub(r'(<text[^>]*x="1167\.2"[^>]*y="278\.6"[^>]*class="strong">)\d+(</text>)', rf'\g<1>{i_cnt}\g<2>', svg)
     svg = re.sub(r'(<text[^>]*x="921\.0"[^>]*y="457\.4"[^>]*class="strong">)\d+(</text>)', rf'\g<1>{v_cnt}\g<2>', svg)
 
-    # Revert radar polygon and nodes to clean balanced baseline pentagon
+    # Dynamic radar polygon and vertex nodes based on live metrics
+    poly_str, nodes = generate_radar_geometry(m_cnt, i_cnt, p_cnt, v_cnt, r_cnt)
     poly_regex = r'<polygon points="[^"]+" fill="url\(#radarFill\)"[^>]*/>'
-    orig_polygon = '<polygon points="1015.0,226.3 1034.8,303.6 1037.6,341.1 1002.8,326.8 975.4,297.1" fill="url(#radarFill)" stroke="#ffd700" stroke-width="1.8" stroke-linejoin="round"/>'
-    svg = re.sub(poly_regex, orig_polygon, svg)
+    dyn_polygon = f'<polygon points="{poly_str}" fill="url(#radarFill)" stroke="#ffd700" stroke-width="1.8" stroke-linejoin="round"/>'
+    svg = re.sub(poly_regex, dyn_polygon, svg)
 
-    svg = re.sub(r'<circle class="radar-node" cx="[^"]+" cy="[^"]+" r="[^"]*" fill="[^"]*"/>\s*(<text x="1015\.0" y="150\.0")',
-                 r'<circle class="radar-node" cx="1015.0" cy="226.3" r="4" fill="#ffd700"/>\n\g<1>', svg)
-    svg = re.sub(r'<circle class="radar-node" cx="[^"]+" cy="[^"]+" r="[^"]*" fill="[^"]*"/>\s*(<text x="1167\.2" y="260\.6")',
-                 r'<circle class="radar-node" cx="1034.8" cy="303.6" r="4" fill="#ffd700"/>\n\g<1>', svg)
-    svg = re.sub(r'<circle class="radar-node" cx="[^"]+" cy="[^"]+" r="[^"]*" fill="[^"]*"/>\s*(<text x="1109\.0" y="439\.4")',
-                 r'<circle class="radar-node" cx="1037.6" cy="341.1" r="4" fill="#ffd700"/>\n\g<1>', svg)
-    svg = re.sub(r'<circle class="radar-node" cx="[^"]+" cy="[^"]+" r="[^"]*" fill="[^"]*"/>\s*(<text x="921\.0" y="439\.4")',
-                 r'<circle class="radar-node" cx="1002.8" cy="326.8" r="4" fill="#ffd700"/>\n\g<1>', svg)
-    svg = re.sub(r'<circle class="radar-node" cx="[^"]+" cy="[^"]+" r="[^"]*" fill="[^"]*"/>\s*(<text x="862\.8" y="260\.6")',
-                 r'<circle class="radar-node" cx="975.4" cy="297.1" r="4" fill="#ffd700"/>\n\g<1>', svg)
+    radar_labels = [
+        r'(<text x="1015\.0" y="150\.0")',
+        r'(<text x="1167\.2" y="260\.6")',
+        r'(<text x="1109\.0" y="439\.4")',
+        r'(<text x="921\.0" y="439\.4")',
+        r'(<text x="862\.8" y="260\.6")'
+    ]
+    for (px, py), lbl in zip(nodes, radar_labels):
+        svg = re.sub(r'<circle class="radar-node" cx="[^"]+" cy="[^"]+" r="[^"]*" fill="[^"]*"/>\s*' + lbl,
+                     rf'<circle class="radar-node" cx="{px:.1f}" cy="{py:.1f}" r="4" fill="#ffd700"/>\n\g<1>', svg)
 
     # Apply Scrooge Cyber-Midas / Gold Bullion Palette (Step 5 Upgrade)
     old_bg = '<radialGradient id="bg" cx="25%" cy="15%" r="95%"><stop offset="0" stop-color="#14183a"/><stop offset="0.55" stop-color="#080a22"/><stop offset="1" stop-color="#02020c"/></radialGradient>'

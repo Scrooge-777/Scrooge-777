@@ -155,53 +155,53 @@
 <line x1="1015" y1="310" x2="1091.4" y2="415.2" stroke="#9aa0b8" stroke-opacity="0.25"/>
 <line x1="1015" y1="310" x2="938.6" y2="415.2" stroke="#9aa0b8" stroke-opacity="0.25"/>
 <line x1="1015" y1="310" x2="891.4" y2="269.8" stroke="#9aa0b8" stroke-opacity="0.25"/>
-<polygon points="1015.0,226.3 1034.8,303.6 1037.6,341.1 1002.8,326.8 975.4,297.1" fill="url(#radarFill)" stroke="#ffd700" stroke-width="1.8" stroke-linejoin="round"/>
-<circle class="radar-node" cx="1015.0" cy="226.3" r="4" fill="#ffd700"/>
+<polygon points="1015.0,190.7 1032.1,304.4 1066.2,380.4 1004.4,324.6 931.5,282.9" fill="url(#radarFill)" stroke="#ffd700" stroke-width="1.8" stroke-linejoin="round"/>
+<circle class="radar-node" cx="1015.0" cy="190.7" r="4" fill="#ffd700"/>
 <text x="1015.0" y="150.0" font-size="16" font-weight="600" text-anchor="middle" class="fg">Commit</text>
 <text x="1015.0" y="168.0" font-size="14" font-weight="700" text-anchor="middle" class="strong">339</text>
-<circle class="radar-node" cx="1034.8" cy="303.6" r="4" fill="#ffd700"/>
+<circle class="radar-node" cx="1032.1" cy="304.4" r="4" fill="#ffd700"/>
 <text x="1167.2" y="260.6" font-size="16" font-weight="600" text-anchor="start" class="fg">Issue</text>
 <text x="1167.2" y="278.6" font-size="14" font-weight="700" text-anchor="start" class="strong">0</text>
-<circle class="radar-node" cx="1037.6" cy="341.1" r="4" fill="#ffd700"/>
+<circle class="radar-node" cx="1066.2" cy="380.4" r="4" fill="#ffd700"/>
 <text x="1109.0" y="439.4" font-size="16" font-weight="600" text-anchor="start" class="fg">PullReq</text>
 <text x="1109.0" y="457.4" font-size="14" font-weight="700" text-anchor="start" class="strong">6</text>
-<circle class="radar-node" cx="1002.8" cy="326.8" r="4" fill="#ffd700"/>
+<circle class="radar-node" cx="1004.4" cy="324.6" r="4" fill="#ffd700"/>
 <text x="921.0" y="439.4" font-size="16" font-weight="600" text-anchor="end" class="fg">Review</text>
 <text x="921.0" y="457.4" font-size="14" font-weight="700" text-anchor="end" class="strong">0</text>
-<circle class="radar-node" cx="975.4" cy="297.1" r="4" fill="#ffd700"/>
+<circle class="radar-node" cx="931.5" cy="282.9" r="4" fill="#ffd700"/>
 <text x="862.8" y="260.6" font-size="16" font-weight="600" text-anchor="end" class="fg">Repo</text>
 <text x="862.8" y="278.6" font-size="14" font-weight="700" text-anchor="end" class="strong">5</text>
 <text x="54" y="552" font-size="16" font-weight="700" class="fg">Top languages</text>
 <g id="donut-hologram" class="donut-dial">
-<path d="M150.00,573.00A90,90,0,1,1,129.49,750.63L138.15,713.63A52,52,0,1,0,150.00,611.00Z" class="donut-slice" fill="#f1e05a" stroke="none"><title>JavaScript 491.3 KB</title><animate attributeName="fill-opacity" values="0;1" dur="1.2s" fill="freeze"/></path>
-<path d="M129.49,750.63A90,90,0,0,1,91.12,594.93L115.98,623.67A52,52,0,0,0,138.15,713.63Z" class="donut-slice" fill="#3572A5" stroke="none"><title>Python 320.4 KB</title><animate attributeName="fill-opacity" values="0;1" dur="1.2s" fill="freeze"/></path>
-<path d="M91.12,594.93A90,90,0,0,1,127.46,575.87L136.97,612.66A52,52,0,0,0,115.98,623.67Z" class="donut-slice" fill="#563d7c" stroke="none"><title>CSS 67.0 KB</title><animate attributeName="fill-opacity" values="0;1" dur="1.2s" fill="freeze"/></path>
-<path d="M127.46,575.87A90,90,0,0,1,149.08,573.00L149.47,611.00A52,52,0,0,0,136.97,612.66Z" class="donut-slice" fill="#e34c26" stroke="none"><title>HTML 35.4 KB</title><animate attributeName="fill-opacity" values="0;1" dur="1.2s" fill="freeze"/></path>
-<path d="M149.08,573.00A90,90,0,0,1,150.00,573.00L150.00,611.00A52,52,0,0,0,149.47,611.00Z" class="donut-slice" fill="#8b949e" stroke="none"><title>Others 1.5 KB</title><animate attributeName="fill-opacity" values="0;1" dur="1.2s" fill="freeze"/></path>
+<path d="M150.00,573.00A90,90,0,1,1,120.58,748.06L133.00,712.14A52,52,0,1,0,150.00,611.00Z" class="donut-slice" fill="#178600" stroke="none"><title>C# 1132.8 KB</title><animate attributeName="fill-opacity" values="0;1" dur="1.2s" fill="freeze"/></path>
+<path d="M120.58,748.06A90,90,0,0,1,63.24,639.06L99.87,649.17A52,52,0,0,0,133.00,712.14Z" class="donut-slice" fill="#f1e05a" stroke="none"><title>JavaScript 491.3 KB</title><animate attributeName="fill-opacity" values="0;1" dur="1.2s" fill="freeze"/></path>
+<path d="M63.24,639.06A90,90,0,0,1,121.79,577.53L133.70,613.62A52,52,0,0,0,99.87,649.17Z" class="donut-slice" fill="#3572A5" stroke="none"><title>Python 320.4 KB</title><animate attributeName="fill-opacity" values="0;1" dur="1.2s" fill="freeze"/></path>
+<path d="M121.79,577.53A90,90,0,0,1,139.84,573.58L144.13,611.33A52,52,0,0,0,133.70,613.62Z" class="donut-slice" fill="#563d7c" stroke="none"><title>CSS 67.0 KB</title><animate attributeName="fill-opacity" values="0;1" dur="1.2s" fill="freeze"/></path>
+<path d="M139.84,573.58A90,90,0,0,1,150.00,573.00L150.00,611.00A52,52,0,0,0,144.13,611.33Z" class="donut-slice" fill="#8b949e" stroke="none"><title>Others 36.9 KB</title><animate attributeName="fill-opacity" values="0;1" dur="1.2s" fill="freeze"/></path>
 </g>
-<rect x="270" y="572" width="13" height="13" rx="3" fill="#f1e05a"/>
-<text x="292" y="583" font-size="14" class="fg">JavaScript</text>
-<text x="424" y="583" font-size="14" font-weight="700" text-anchor="end" class="weak">54%</text>
+<rect x="270" y="572" width="13" height="13" rx="3" fill="#178600"/>
+<text x="292" y="583" font-size="14" class="fg">C#</text>
+<text x="424" y="583" font-size="14" font-weight="700" text-anchor="end" class="weak">55%</text>
 <rect x="292" y="589" width="132" height="3" rx="1.5" fill="#ffffff" fill-opacity="0.08"/>
-<rect x="292" y="589" width="71" height="3" rx="1.5" fill="#f1e05a"/>
-<rect x="270" y="602" width="13" height="13" rx="3" fill="#3572A5"/>
-<text x="292" y="613" font-size="14" class="fg">Python</text>
-<text x="424" y="613" font-size="14" font-weight="700" text-anchor="end" class="weak">35%</text>
+<rect x="292" y="589" width="73" height="3" rx="1.5" fill="#178600"/>
+<rect x="270" y="602" width="13" height="13" rx="3" fill="#f1e05a"/>
+<text x="292" y="613" font-size="14" class="fg">JavaScript</text>
+<text x="424" y="613" font-size="14" font-weight="700" text-anchor="end" class="weak">24%</text>
 <rect x="292" y="619" width="132" height="3" rx="1.5" fill="#ffffff" fill-opacity="0.08"/>
-<rect x="292" y="619" width="46" height="3" rx="1.5" fill="#3572A5"/>
-<rect x="270" y="632" width="13" height="13" rx="3" fill="#563d7c"/>
-<text x="292" y="643" font-size="14" class="fg">CSS</text>
-<text x="424" y="643" font-size="14" font-weight="700" text-anchor="end" class="weak">7%</text>
+<rect x="292" y="619" width="32" height="3" rx="1.5" fill="#f1e05a"/>
+<rect x="270" y="632" width="13" height="13" rx="3" fill="#3572A5"/>
+<text x="292" y="643" font-size="14" class="fg">Python</text>
+<text x="424" y="643" font-size="14" font-weight="700" text-anchor="end" class="weak">16%</text>
 <rect x="292" y="649" width="132" height="3" rx="1.5" fill="#ffffff" fill-opacity="0.08"/>
-<rect x="292" y="649" width="10" height="3" rx="1.5" fill="#563d7c"/>
-<rect x="270" y="662" width="13" height="13" rx="3" fill="#e34c26"/>
-<text x="292" y="673" font-size="14" class="fg">HTML</text>
-<text x="424" y="673" font-size="14" font-weight="700" text-anchor="end" class="weak">4%</text>
+<rect x="292" y="649" width="21" height="3" rx="1.5" fill="#3572A5"/>
+<rect x="270" y="662" width="13" height="13" rx="3" fill="#563d7c"/>
+<text x="292" y="673" font-size="14" class="fg">CSS</text>
+<text x="424" y="673" font-size="14" font-weight="700" text-anchor="end" class="weak">3%</text>
 <rect x="292" y="679" width="132" height="3" rx="1.5" fill="#ffffff" fill-opacity="0.08"/>
-<rect x="292" y="679" width="5" height="3" rx="1.5" fill="#e34c26"/>
+<rect x="292" y="679" width="4" height="3" rx="1.5" fill="#563d7c"/>
 <rect x="270" y="692" width="13" height="13" rx="3" fill="#8b949e"/>
 <text x="292" y="703" font-size="14" class="fg">Others</text>
-<text x="424" y="703" font-size="14" font-weight="700" text-anchor="end" class="weak">0.2%</text>
+<text x="424" y="703" font-size="14" font-weight="700" text-anchor="end" class="weak">2%</text>
 <rect x="292" y="709" width="132" height="3" rx="1.5" fill="#ffffff" fill-opacity="0.08"/>
 <rect x="292" y="709" width="2" height="3" rx="1.5" fill="#8b949e"/>
 <rect x="30" y="786" width="200" height="46" rx="14" class="card kpi-pill"/>
