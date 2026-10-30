@@ -38,6 +38,9 @@
     }
   ],
   "functions": {
+    "api/card.js": {
+      "includeFiles": "docs/**"
+    },
     "src/api/card.js": {
       "includeFiles": "docs/**"
     }
