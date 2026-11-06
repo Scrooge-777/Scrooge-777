@@ -9,6 +9,7 @@ on:
     paths:
       - '.github/workflows/koi.yml'
       - 'scripts/koi_scene.mjs'
+      - 'scripts/koi_card_fx.mjs'
       - 'scripts/build_koi_scene.mjs'
       - 'scripts/koi_strip.py'
       - 'koi/**'
