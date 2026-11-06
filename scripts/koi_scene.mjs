@@ -279,7 +279,10 @@ export function scopeCss(css, scope) {
 export function prepareCard(svgText) {
   let inner = svgText.replace(/^[\s\S]*?<svg[^>]*>/, "").replace(/<\/svg>\s*$/, "");
   inner = inner.replace(/<title[\s\S]*?<\/title>|<desc[\s\S]*?<\/desc>/g, "");
-  inner = inner.replace(/<style>([\s\S]*?)<\/style>/, (m, css) => `<style>${scopeCss(css, "svg.cd")}</style>`);
+  inner = inner.replace(/<style>([\s\S]*?)<\/style>/, (m, css) => {
+    const fullCss = css.includes("cycle_c4t") ? css : css + terrainColourKeyframes(24, 12);
+    return `<style>${scopeCss(fullCss, "svg.cd")}</style>`;
+  });
   return inner;
 }
 
@@ -383,6 +386,31 @@ export function colourCycle(hex, stops = 6, seconds = 24) {
   const colours = Array.from({ length: stops + 1 }, (_, i) => hslToHex((h + (360 * (i % stops)) / stops) % 360, sat, l));
   return `<animate attributeName="fill" values="${colours.join(";")}" dur="${seconds}s" repeatCount="indefinite"/>`;
 }
+export function terrainColourKeyframes(seconds = 24, stops = 12) {
+  const baseColors = {
+    c0t: "#2a2620", c0l: "#211d17", c0r: "#1a1712",
+    c1t: "#7c6224", c1l: "#68521e", c1r: "#544218",
+    c2t: "#b8860b", c2l: "#9e7309", c2r: "#825e07",
+    c3t: "#e6b800", c3l: "#c49d00", c3r: "#a38200",
+    c4t: "#ffd700", c4l: "#e6c200", c4r: "#ccad00",
+  };
+  let css = "";
+  for (const [cls, hex] of Object.entries(baseColors)) {
+    css += `.${cls}{fill:${hex};animation:cycle_${cls} ${seconds}s linear infinite;}`;
+  }
+  for (const [cls, hex] of Object.entries(baseColors)) {
+    const [h, sat, l] = hexToHsl(hex);
+    const steps = [];
+    for (let i = 0; i <= stops; i++) {
+      const pct = ((i / stops) * 100).toFixed(1);
+      const curH = (h + (360 * (i % stops)) / stops) % 360;
+      steps.push(`${pct}%{fill:${hslToHex(curH, sat, l)};}`);
+    }
+    css += `@keyframes cycle_${cls}{${steps.join("")}}`;
+  }
+  return css;
+}
+
 
 export function prepareHeader(svgText) {
   let inner = svgText.replace(/^[\s\S]*?<svg[^>]*>/, "").replace(/<\/svg>\s*$/, "");
