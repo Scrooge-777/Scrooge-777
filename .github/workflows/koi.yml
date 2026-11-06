@@ -62,17 +62,28 @@ jobs:
           python -m pip install --quiet "pillow==12.2.0" "numpy==2.4.6"
           python scripts/koi_strip.py "$RUNNER_TEMP/sprites" "$TOTAL" "$RUNNER_TEMP/sprite.json"
 
-      - name: Put the koi into the activity card (new random route)
+      - name: Refresh the header (original capsule-render look, new colour each run)
         run: |
-          cp "$RUNNER_TEMP/sprite.json" assets/koi-sprite.json
-          # assets/profile_card.svg stays the plain card from the Profile card sync workflow;
-          # docs/profile_card.svg is the same card with the roaming koi, which the Vercel
-          # endpoint behind README card.svg fetches and re-colours on every refresh.
-          node scripts/build_koi_scene.mjs --mode card --renew             --sprite assets/koi-sprite.json             --state assets/koi-state.json             --card assets/profile_card.svg             --out docs/profile_card.svg
+          URL='https://capsule-render.vercel.app/api?type=venom&color=auto&height=220&section=header&text=SYSTEM%20MAINFRAME&fontSize=38&fontColor=ffffff&animation=twinkling&fontAlignY=40'
+          if curl -fsS --max-time 30 -o "$RUNNER_TEMP/header.svg" "$URL" && grep -q '<svg' "$RUNNER_TEMP/header.svg" && grep -q 'SYSTEM MAINFRAME' "$RUNNER_TEMP/header.svg" && ! grep -qiE '<script|onload|onerror|javascript:|<foreignObject' "$RUNNER_TEMP/header.svg"; then
+            cp "$RUNNER_TEMP/header.svg" assets/header-venom.svg
+          else
+            echo "header fetch failed; keeping the last good copy"
+          fi
 
-      - name: Commit the card if it changed
+      - name: Build the roaming-koi scene
+        run: >
+          node scripts/build_koi_scene.mjs
+          --mode scene
+          --snapshot "$RUNNER_TEMP/snapshot.json"
+          --sprite "$RUNNER_TEMP/sprite.json"
+          --header assets/header-venom.svg
+          --card docs/profile_card.svg
+          --out assets/scene.svg
+
+      - name: Commit the scene if it changed
         run: |
-          git add assets/koi-sprite.json assets/koi-state.json docs/profile_card.svg
+          git add assets/scene.svg assets/header-venom.svg
           if git diff --cached --quiet; then
             echo "Nothing changed."
             exit 0

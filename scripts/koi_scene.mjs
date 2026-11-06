@@ -280,7 +280,7 @@ export function prepareCard(svgText) {
   let inner = svgText.replace(/^[\s\S]*?<svg[^>]*>/, "").replace(/<\/svg>\s*$/, "");
   inner = inner.replace(/<title[\s\S]*?<\/title>|<desc[\s\S]*?<\/desc>/g, "");
   inner = inner.replace(/<style>([\s\S]*?)<\/style>/, (m, css) => {
-    const fullCss = css.includes("cycle_c4t") ? css : css + terrainColourKeyframes(24, 12);
+    const fullCss = (css.includes("cycle_c4t") ? css : css + terrainColourKeyframes(24, 12)) + accentColourKeyframes(24, 12);
     return `<style>${scopeCss(fullCss, "svg.cd")}</style>`;
   });
   return inner;
@@ -423,6 +423,26 @@ export function terrainColourKeyframes(seconds = 24, stops = 12) {
   return css;
 }
 
+
+// The card's accent colour (numbers, radar outline and dots, title gradient) drifts through the
+// same colour wheel at the same pace as the terrain, so the whole card changes colour together.
+export function accentColourKeyframes(seconds = 24, stops = 12) {
+  const ramp = (hex, prop, name) => {
+    const [h, sat, l] = hexToHsl(hex);
+    const steps = [];
+    for (let i = 0; i <= stops; i++) {
+      steps.push(`${((i / stops) * 100).toFixed(1)}%{${prop}:${hslToHex((h + (360 * (i % stops)) / stops) % 360, sat, l)};}`);
+    }
+    return `@keyframes ${name}{${steps.join("")}}`;
+  };
+  const run = (name) => `animation:${name} ${seconds}s linear infinite;`;
+  return `.strong,.radar-node{${run("acc_fill")}}`
+    + `polygon[stroke]{${run("acc_stroke")}}`
+    + `#radarFill stop,#title stop:first-child{${run("acc_stop")}}`
+    + `#title stop:last-child{${run("acc_stop_light")}}`
+    + ramp("#ffd700", "fill", "acc_fill") + ramp("#ffd700", "stroke", "acc_stroke")
+    + ramp("#ffd700", "stop-color", "acc_stop") + ramp("#ffea78", "stop-color", "acc_stop_light");
+}
 
 export function prepareHeader(svgText) {
   let inner = svgText.replace(/^[\s\S]*?<svg[^>]*>/, "").replace(/<\/svg>\s*$/, "");
