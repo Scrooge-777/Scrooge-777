@@ -22,13 +22,11 @@
   </a>
 </p>
 
-<!-- Living Activity Koi (git-koi) -->
+<!-- Living Activity Koi (git-koi): roams freely, new random route every 5 hours -->
 <p align="center">
-  <a href="koi/">
-    <img src="assets/koi.gif" width="220" alt="Activity Koi" />
-  </a>
+  <img src="assets/koi-roam.svg" width="100%" alt="A koi swimming freely; its size follows total contributions" />
   <br/>
-  <sub><em>Living activity koi: scale patterns encode public streaks, colors reflect repository languages, and daily motion tracks GitHub rhythm. Rendered nightly via <a href="koi/">git-koi</a>.</em></sub>
+  <sub><em>Living activity koi: its size follows total contributions, and it picks a new random route every 5 hours. Rendered with <a href="https://github.com/yalongwastaken/git-koi">git-koi</a> (vendored in <a href="koi/"><code>koi/</code></a>).</em></sub>
 </p>
 
 <br/>

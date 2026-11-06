@@ -139,17 +139,17 @@ function judge(poly, bounds) {
 // near an edge or corner), turns toward it as sharply as a real fish can, and picks
 // another the moment it gets there. The wander is simulated here, then joined back to its
 // start with one smooth connecting curve, so the baked route loops without a jump.
-export function planRoute(rng) {
-  const bounds = { x0: MARGIN.x, y0: MARGIN.top, x1: SCENE.width - MARGIN.x, y1: SCENE.height - MARGIN.bottom };
+export function planRoute(rng, area = { width: SCENE.width, height: SCENE.height, scene: true }) {
+  const bounds = { x0: MARGIN.x, y0: MARGIN.top, x1: area.width - MARGIN.x, y1: area.height - MARGIN.bottom };
   const STEP = 16; // px of travel per simulation step
   const MAX_TURN = STEP * MAX_CURVATURE; // radians per step
   const MIN_LENGTH = 11000, MAX_LENGTH = 24000;
   const randomSpot = () => {
     const roll = rng();
-    if (roll < 0.2) { // inside the 3D terrain
+    if (area.scene && roll < 0.2) { // inside the 3D terrain
       return [TERRAIN.x + rng() * TERRAIN.w, TERRAIN.y + rng() * TERRAIN.h];
     }
-    if (roll < 0.32) { // along the row of stat pills at the bottom
+    if (area.scene && roll < 0.32) { // along the row of stat pills at the bottom
       return [bounds.x0 + rng() * (bounds.x1 - bounds.x0), SCENE.cardY + 800 + rng() * 45];
     }
     if (rng() < 0.3) { // an edge or corner region
@@ -202,7 +202,7 @@ export function planRoute(rng) {
       const ab = dist(a, b), bc = dist(b, c), ca = dist(c, a);
       maxK = Math.max(maxK, (2 * Math.abs((b[0] - a[0]) * (c[1] - a[1]) - (b[1] - a[1]) * (c[0] - a[0]))) / (ab * bc * ca));
     }
-    const overshoot = pts.some((p) => p[0] < -60 || p[0] > SCENE.width + 60 || p[1] < -60 || p[1] > SCENE.height + 60);
+    const overshoot = pts.some((p) => p[0] < -60 || p[0] > area.width + 60 || p[1] < -60 || p[1] > area.height + 60);
     return overshoot ? null : { pts, maxK };
   };
   let best = null;
@@ -240,7 +240,7 @@ export function simulate(route, rng, speedFactor) {
   let t = 0, s = 0;
   const dt = 0.02;
   let nextSample = 0;
-  while (s < L && t < 120) {
+  while (s < L && t < 600) {
     if (t >= nextSample) {
       samples.push({ t, s });
       nextSample += SAMPLE_DT;
@@ -490,4 +490,26 @@ export function buildScene({ seed = 1, behavior = "cruise", speed = 1, fish = 1,
 </svg>`;
 
   return { svg, meta: { routes, bytes: svg.length, fish, speedFactor: factor, swayingBars: grass.swaying } };
+}
+
+// ---------- a fish on its own: a transparent strip that drops into a README ----------
+// Nothing else is drawn, so it changes nothing about the page around it: the koi just roams
+// the whole strip along a random route that is baked in (see the notes at the top).
+export function buildFishStrip({ seed = 1, speed = 1, sprite, koiScale = 0.6, width = 1280, height = 360 }) {
+  const rng = mulberry32(seed >>> 0);
+  const area = { width, height, scene: false };
+  const route = planRoute(rng, area);
+  const sim = simulate(route, rng, speed);
+  const T = sim.duration;
+  const [pivotX, pivotY] = sprite.pivot || [sprite.w / 2, sprite.h / 2];
+  const keyPoints = sim.samples.map((smp) => f3(clamp(smp.s / route.poly.length, 0, 1))).join(";");
+  const keyTimes = sim.samples.map((smp) => f3(clamp(smp.t / T, 0, 1))).join(";");
+  const frameVals = Array.from({ length: sprite.frames }, (_, i) => `${-i * sprite.w} 0`).join(";");
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 ${width} ${height}" width="${width}" height="${height}" role="img" aria-labelledby="koi-t">
+<title id="koi-t">A koi swimming freely; its size follows total contributions</title>
+<defs><path id="route0" d="${pathData(route.segs)}" fill="none"/>
+<g id="koi-sprite"><svg x="0" y="0" width="${sprite.w}" height="${sprite.h}" viewBox="0 0 ${sprite.w} ${sprite.h}" overflow="hidden"><image width="${sprite.w * sprite.frames}" height="${sprite.h}" href="data:image/png;base64,${sprite.b64}" xlink:href="data:image/png;base64,${sprite.b64}"><animateTransform attributeName="transform" type="translate" calcMode="discrete" dur="${f3((sprite.frames * 70) / 1000)}s" repeatCount="indefinite" values="${frameVals}"/></image></svg></g></defs>
+<g class="fish"><animateMotion dur="${f1(T)}s" repeatCount="indefinite" rotate="auto" calcMode="linear" keyPoints="${keyPoints}" keyTimes="${keyTimes}"><mpath href="#route0" xlink:href="#route0"/></animateMotion><g transform="scale(${f3(koiScale)}) translate(${-pivotX} ${-pivotY})"><use href="#koi-sprite" xlink:href="#koi-sprite"/></g></g>
+</svg>`;
+  return { svg, meta: { duration: T, length: route.poly.length, speed: route.poly.length / T, maxCurvature: route.maxK, coverage: route.coverage, cornersHit: route.cornersHit } };
 }
