@@ -1,9 +1,10 @@
-<div align="center" id="readme-top">
-
-  <!-- Top Corner Coding Animation -->
+<div align="right">
   <a href="#readme-top">
-    <img align="right" src="https://user-images.githubusercontent.com/74038190/212749447-bfb7e725-6987-49d9-ae85-2015e3e7cc41.gif" width="130" alt="Coding Vibe" />
+    <img src="assets/coding-vibe.gif" width="115" alt="Coding Vibe" />
   </a>
+</div>
+
+<div align="center" id="readme-top">
 
   <!-- Venom Header (SVG + CSS Keyframe Animation) -->
   <a href="#readme-top">
@@ -17,7 +18,7 @@
 <!-- Living Mainframe Landscape with Autonomous Roaming Activity Koi -->
 <p align="center">
   <a href="koi/">
-    <img alt="Interactive 3D Activity Landscape with Roaming Koi" src="https://scrooge-777.vercel.app/card.svg" width="92%" />
+    <img alt="Interactive 3D Activity Landscape with Roaming Koi" src="docs/profile_card.svg" width="100%" />
   </a>
   <br/>
   <sub><em>Autonomous activity koi roaming freely across the mainframe landscape. Scale patterns encode public streaks, colors reflect repository languages, and daily motion tracks GitHub rhythm. Self-hosted database in <a href="koi/">Scrooge-777/koi</a>.</em></sub>
