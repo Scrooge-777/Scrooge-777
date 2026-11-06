@@ -24,7 +24,7 @@ export const SCENE = { width: 1280, headerHeight: Math.round(HEADER.height * HEA
 // Speed multipliers for the behaviors git-koi picks from activity.
 export const MODES = { cruise: 1.0, dart: 1.5, feeding: 0.9, rest: 0.5, deep: 0.25 };
 
-const BASE_SPEED = 270; // scene px per second (about two body lengths per second)
+const BASE_SPEED = 150; // scene px per second: cruising pace (the surges and darts go above this)
 const MARGIN = { x: 60, top: 60, bottom: 40 };
 const KICK_PERIOD = 0.9; // seconds between tail-beat surges
 const SAMPLE_DT = 0.2; // keyframe spacing along the route
@@ -362,6 +362,28 @@ export function addGrass(terrainSvg, path) {
 // ---------- the scene ----------
 // The header SVG comes from capsule-render. Namespace its ids, classes and keyframes so
 // they cannot clash with the card's, and drop the outer <svg> tag.
+// The header's blob colour: capsule-render picks a random colour for every request, which a
+// README image cannot do per page view, so the blob instead drifts through the colour wheel
+// (starting from the colour the header was fetched with) while the page is open.
+function hexToHsl(hex) {
+  const r = parseInt(hex.slice(1, 3), 16) / 255, g = parseInt(hex.slice(3, 5), 16) / 255, b = parseInt(hex.slice(5, 7), 16) / 255;
+  const max = Math.max(r, g, b), min = Math.min(r, g, b), l = (max + min) / 2, d = max - min;
+  if (d === 0) return [0, 0, l];
+  const sat = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+  const h = max === r ? ((g - b) / d + (g < b ? 6 : 0)) : max === g ? (b - r) / d + 2 : (r - g) / d + 4;
+  return [h * 60, sat, l];
+}
+function hslToHex(h, sat, l) {
+  const a = sat * Math.min(l, 1 - l);
+  const f = (n) => { const k = (n + h / 30) % 12; const c = l - a * Math.max(-1, Math.min(k - 3, 9 - k, 1)); return Math.round(255 * c).toString(16).padStart(2, "0"); };
+  return `#${f(0)}${f(8)}${f(4)}`.toUpperCase();
+}
+export function colourCycle(hex, stops = 6, seconds = 24) {
+  const [h, sat, l] = hexToHsl(hex);
+  const colours = Array.from({ length: stops + 1 }, (_, i) => hslToHex((h + (360 * (i % stops)) / stops) % 360, sat, l));
+  return `<animate attributeName="fill" values="${colours.join(";")}" dur="${seconds}s" repeatCount="indefinite"/>`;
+}
+
 export function prepareHeader(svgText) {
   let inner = svgText.replace(/^[\s\S]*?<svg[^>]*>/, "").replace(/<\/svg>\s*$/, "");
   inner = inner.replace(/\.text\b/g, ".hd-text").replace(/\.desc\b/g, ".hd-desc")
@@ -369,6 +391,7 @@ export function prepareHeader(svgText) {
     .replace(/\btwinkling\b/g, "hd-twinkling").replace(/\bmyPath\b/g, "hd-myPath")
     // percentages would resolve against the whole scene, so pin them to the header's own size
     .replace(/x="50%"/g, `x="${HEADER.width / 2}"`).replace(/y="40%"/g, `y="${HEADER.height * 0.4}"`);
+  inner = inner.replace(/(<path id="hd-myPath" fill="(#[0-9a-fA-F]{6})"[^>]*>)/, (m, open, hex) => `${open}${colourCycle(hex)}`);
   return inner;
 }
 
