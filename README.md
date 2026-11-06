@@ -3,8 +3,6 @@
   <!-- Header + 3D activity card with the roaming koi swimming through them (colours cycle; new random route every 5 hours) -->
   <img src="assets/scene.svg" width="100%" alt="SYSTEM MAINFRAME header and the animated GitHub activity card with a koi swimming freely through it; the 3D contribution bars sway like grass as it passes" />
 
-  <sub><em>The koi's size follows total contributions; it picks a new random route every 5 hours and the 3D bars sway like grass as it swims through. Built with <a href="https://github.com/yalongwastaken/git-koi">git-koi</a> (vendored in <a href="koi/"><code>koi/</code></a>).</em></sub>
-
 </div>
 
 <br/>
