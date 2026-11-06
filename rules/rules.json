@@ -2,7 +2,7 @@
   "family": {
     "milestones": [500, 1000, 2500, 5000, 10000],
     "streakDays": 7,
-    "maxFish": 5,
+    "maxFish": 1,
     "idleDays": 14,
     "growDays": 30,
     "babyStart": 0.55

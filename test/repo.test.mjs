@@ -6,7 +6,7 @@ import fs from "node:fs";
 import { execFileSync } from "node:child_process";
 
 const root = new URL("../", import.meta.url);
-const read = (p) => fs.readFileSync(new URL(p, root), "utf8");
+const read = (p) => fs.readFileSync(new URL(p, root), "utf8").split(String.fromCharCode(13, 10)).join(String.fromCharCode(10)); // line endings do not matter
 const sheet = (name) => read(`rules/${name}`);
 const tracked = () => {
   try {
