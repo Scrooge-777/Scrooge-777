@@ -58,3 +58,4 @@ Desktop.ini
 # Git Koi temporary assets
 koi/*.html
 koi/*.png
+.koi-out/

@@ -1,11 +1,7 @@
-<div align="right">
-  <img src="assets/coding-vibe.gif" width="280" alt="Animated loop of a developer coding at a desk" />
-</div>
-
 <div align="center" id="readme-top">
 
-  <!-- Venom Header (SVG + CSS Keyframe Animation with Dynamic Color Cycling) -->
-  <img src="https://capsule-render.vercel.app/api?type=venom&color=auto&height=220&section=header&text=SYSTEM%20MAINFRAME&fontSize=38&fontColor=ffffff&animation=twinkling&fontAlignY=40" width="100%" alt="SYSTEM MAINFRAME banner" />
+  <!-- Header banner (self-hosted animated SVG) -->
+  <img src="assets/banner.svg" width="100%" alt="SYSTEM MAINFRAME" />
 
 </div>
 
@@ -18,11 +14,9 @@
 
 <!-- Living Activity Koi (git-koi) -->
 <p align="center">
-  <a href="koi/">
-    <img src="assets/koi.gif" width="220" alt="Activity Koi" />
-  </a>
+  <img src="assets/koi.gif" width="360" alt="A pixel-art koi swimming in a pond; its speed and wake reflect recent GitHub activity" />
   <br/>
-  <sub><em>Living activity koi: scale patterns encode public streaks, colors reflect repository languages, and daily motion tracks GitHub rhythm. Rendered nightly via <a href="koi/">git-koi</a>.</em></sub>
+  <sub><em>Living activity koi: scale patterns encode public streaks, colors reflect repository languages, and daily motion tracks GitHub rhythm. Rendered nightly with <a href="https://github.com/yalongwastaken/git-koi">git-koi</a> (vendored in <a href="koi/"><code>koi/</code></a>) plus a pond layer from <a href="scripts/koi_pond.py"><code>scripts/koi_pond.py</code></a>.</em></sub>
 </p>
 
 <br/>
@@ -58,6 +52,6 @@
 <hr/>
 
 <div align="center">
-  <!-- Venom Footer (SVG + CSS Wave Animation with Dynamic Color Cycling) -->
-  <img src="https://capsule-render.vercel.app/api?type=venom&color=auto&height=100&section=footer" width="100%" alt="" />
+  <!-- Footer wave (self-hosted animated SVG) -->
+  <img src="assets/footer.svg" width="100%" alt="" />
 </div>
