@@ -63,6 +63,38 @@ jobs:
           python -m pip install --quiet "pillow==12.2.0" "numpy==2.4.6"
           python scripts/koi_strip.py "$RUNNER_TEMP/sprites" "$TOTAL" "$RUNNER_TEMP/sprite.json"
 
+      - name: Fetch Live Contribution Calendar and Update 3D Card
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh api graphql -f query='
+            query {
+              user(login: "${{ github.repository_owner }}") {
+                contributionsCollection {
+                  totalCommitContributions
+                  totalPullRequestContributions
+                  totalIssueContributions
+                  totalRepositoryContributions
+                  restrictedContributionsCount
+                  contributionCalendar {
+                    totalContributions
+                    weeks {
+                      contributionDays {
+                        date
+                        contributionCount
+                        contributionLevel
+                      }
+                    }
+                  }
+                }
+                repositories(first: 100, ownerAffiliations: OWNER) {
+                  totalCount
+                }
+              }
+            }
+          ' > "$RUNNER_TEMP/calendar.json"
+          cargo run --release --manifest-path card/rust/Cargo.toml -- docs/profile_card.svg docs/profile_card.svg --calendar "$RUNNER_TEMP/calendar.json"
+
       - name: Build the roaming-koi scene
         run: >
           node scripts/build_koi_scene.mjs
@@ -75,7 +107,7 @@ jobs:
 
       - name: Commit the scene if it changed
         run: |
-          git add assets/scene.svg assets/header-venom.svg
+          git add assets/scene.svg assets/header-venom.svg docs/profile_card.svg assets/profile_card.svg
           if git diff --cached --quiet; then
             echo "Nothing changed."
             exit 0

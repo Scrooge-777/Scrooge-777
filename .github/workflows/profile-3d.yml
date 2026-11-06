@@ -78,7 +78,7 @@ jobs:
 
       - name: Build & Run 3D Card Generator (Rust Edition)
         run: |
-          cargo run --release --manifest-path card/rust/Cargo.toml -- --calendar calendar.json
+          cargo run --release --manifest-path card/rust/Cargo.toml -- docs/profile_card.svg docs/profile_card.svg --calendar calendar.json
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           USERNAME: ${{ github.repository_owner }}
@@ -92,4 +92,7 @@ jobs:
             git commit -m "chore(sync): update 3d contribution terrain, radar, and language metrics"
             git pull --rebase --autostash origin main
             git push
+            gh workflow run koi.yml --ref main || true
           fi
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}

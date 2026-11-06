@@ -12,35 +12,40 @@ fn main() {
     println!(">>> Card Generator [Rust Edition] - High Performance Engine");
 
     let args: Vec<String> = std::env::args().collect();
-    let template_path = if args.len() > 1 && !args[1].starts_with("--") {
-        &args[1]
-    } else {
-        "docs/profile_card.svg"
-    };
+    let mut template_path = "docs/profile_card.svg".to_string();
+    let mut output_path = "docs/profile_card.svg".to_string();
+    let mut calendar_arg = "calendar.json".to_string();
 
-    let output_path = if args.len() > 2 && !args[2].starts_with("--") {
-        &args[2]
-    } else {
-        "docs/profile_card.svg"
-    };
+    let mut i = 1;
+    let mut positional = 0;
+    while i < args.len() {
+        if args[i] == "--calendar" && i + 1 < args.len() {
+            calendar_arg = args[i + 1].clone();
+            i += 2;
+        } else if args[i].starts_with("--") {
+            i += 1;
+        } else {
+            if positional == 0 {
+                template_path = args[i].clone();
+            } else if positional == 1 {
+                output_path = args[i].clone();
+            }
+            positional += 1;
+            i += 1;
+        }
+    }
 
-    let calendar_arg = args
-        .windows(2)
-        .find(|w| w[0] == "--calendar")
-        .map(|w| w[1].as_str())
-        .unwrap_or("calendar.json");
-
-    if !Path::new(template_path).exists() {
+    if !Path::new(&template_path).exists() {
         eprintln!("Template SVG not found at: {}", template_path);
         std::process::exit(1);
     }
 
-    let svg_content = fs::read_to_string(template_path).expect("Failed to read template SVG");
+    let svg_content = fs::read_to_string(&template_path).expect("Failed to read template SVG");
 
     // Dynamic extraction from GraphQL calendar.json if present, else fallback
-    let (terrain_xml, c_cnt, m_cnt, p_cnt, r_cnt, s_cnt, f_cnt, at_val) = if Path::new(calendar_arg).exists() {
+    let (terrain_xml, c_cnt, m_cnt, p_cnt, r_cnt, s_cnt, f_cnt, at_val) = if Path::new(&calendar_arg).exists() {
         println!(">>> Reading live GraphQL calendar from: {}", calendar_arg);
-        let raw = fs::read_to_string(calendar_arg).expect("Failed to read calendar JSON");
+        let raw = fs::read_to_string(&calendar_arg).expect("Failed to read calendar JSON");
         let val: serde_json::Value = serde_json::from_str(&raw).expect("Failed to parse calendar JSON");
 
         let contrib_coll = &val["data"]["user"]["contributionsCollection"];
@@ -124,11 +129,13 @@ fn main() {
         at_val,
     );
 
-    fs::write(output_path, &updated_svg).expect("Failed to write output SVG");
+    fs::write(&output_path, &updated_svg).expect("Failed to write output SVG");
 
     // Mirror to assets if docs was target
     if output_path == "docs/profile_card.svg" && Path::new("assets").exists() {
         let _ = fs::write("assets/profile_card.svg", &updated_svg);
+    } else if output_path == "assets/profile_card.svg" && Path::new("docs").exists() {
+        let _ = fs::write("docs/profile_card.svg", &updated_svg);
     }
 
     let elapsed = start_time.elapsed();
