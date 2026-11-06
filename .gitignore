@@ -54,3 +54,7 @@ Desktop.ini
 *.swp
 *.swo
 *~
+
+# Git Koi temporary assets
+koi/*.html
+koi/*.png

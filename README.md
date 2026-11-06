@@ -16,6 +16,15 @@
   </a>
 </p>
 
+<!-- Living Activity Koi (git-koi) -->
+<p align="center">
+  <a href="https://github.com/yalongwastaken/git-koi">
+    <img src="koi/koi.gif" width="256" alt="SREEHARAN's Activity Koi" />
+  </a>
+  <br/>
+  <sub><em>Living activity koi: scale patterns encode public streaks, colors reflect repository languages, and daily motion tracks GitHub rhythm. Rendered nightly via <a href="https://github.com/yalongwastaken/git-koi">git-koi</a>.</em></sub>
+</p>
+
 <br/>
 
 <hr/>
@@ -26,10 +35,11 @@
 
 | Project | What it is | Stack | Status |
 | --- | --- | --- | --- |
-| [tabroost](https://github.com/Scrooge-777/tabroost) | Edge-style workspaces for Brave and Chrome (Manifest V3). One window per project, saved tabs and tab groups, instant switching. | JavaScript, HTML, CSS | Released (v1.2.0) |
+| [aeon](https://github.com/Scrooge-777/aeon) | Capability-based x86_64 microkernel: UEFI 2.10 bootloader, 4-level paging (CR3), APIC timer interrupts, isolated driver servers. | Rust (no_std), Assembly | Active |
+| [syntra](https://github.com/Scrooge-777/syntra) | Deterministic Windows study OS: 9-state state machine, low-level Win32 keyboard hook, active quiz gatekeeper (80% barrier). | C# .NET 8, Win32, SQLite | Active (Milestones 1-5) |
 | [omni](https://github.com/Scrooge-777/omni) | Windows laptop telemetry dashboard: live CPU/GPU/battery/fans/watts, RAM map, internet speed test, benchmarks and safe power tuning. | Python, JavaScript, HTML, CSS | Active |
+| [tabroost](https://github.com/Scrooge-777/tabroost) | Edge-style workspaces for Brave and Chrome (Manifest V3). One window per project, saved tabs and tab groups, instant switching. | JavaScript, HTML, CSS | Released (v1.2.0) |
 | [voxexpress-eval](https://github.com/Scrooge-777/voxexpress-eval) | Automated objective evaluation benchmark for multilingual and expressive speech synthesis. | Python, Docker | Active |
-| [syntra](https://github.com/Scrooge-777/syntra) | AI-powered Windows study environment that creates adaptive learning plans, verifies learning, and minimizes distractions until study goals are completed. | Specs only | Planning (no build yet) |
 
 <br/>
 
