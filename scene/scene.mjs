@@ -1,4 +1,4 @@
-// koi_scene.mjs: build the "roaming koi" profile scene as ONE animated SVG.
+// scene.mjs: build the "roaming koi" profile scene as ONE animated SVG.
 //
 // GitHub renders README images with scripts disabled, so a koi cannot be steered live.
 // This module plans each fish's whole wander in advance (seeded, so every day gets a new
@@ -9,20 +9,17 @@
 //
 // Pure functions, no I/O, so the same file runs in the browser preview and in Node.
 //
-//   buildScene({ seed, behavior, speed, fish, sprite, headerSvg, cardSvg, koiScale })
+//   buildScene({ seed, speed, family, sprite, headerSvg, cardSvg, koiScale })
 //     -> { svg, meta }
 //
 // `sprite` is { w, h, frames, b64, length }: a horizontal PNG strip of the in-place
 // swimming cycle (head to the right) from the git-koi `roam_sprites` example.
-// `fish` is how many koi swim (1 = adult only; extra fish are babies).
+// `family` lists the koi to draw (see family.mjs); without it `fish` copies swim.
 
 // The header is capsule-render's animated "venom" blob (854 x 220), scaled to the card's width.
 export const HEADER = { width: 854, height: 220 };
 const HEADER_SCALE = 1280 / HEADER.width;
 export const SCENE = { width: 1280, headerHeight: Math.round(HEADER.height * HEADER_SCALE), cardY: Math.round(HEADER.height * HEADER_SCALE) + 16, cardHeight: 850, height: Math.round(HEADER.height * HEADER_SCALE) + 16 + 850 };
-
-// Speed multipliers for the behaviors git-koi picks from activity.
-export const MODES = { cruise: 1.0, dart: 1.5, feeding: 0.9, rest: 0.5, deep: 0.25 };
 
 const BASE_SPEED = 150; // scene px per second: cruising pace (the surges and darts go above this)
 const MARGIN = { x: 60, top: 60, bottom: 40 };
@@ -32,6 +29,17 @@ const MAX_CURVATURE = 1 / 110; // tightest turn allowed (1 / radius in px)
 const BABY_SCALE = 0.55;
 // The 3D contribution terrain inside the card (scene px); the koi swims over it and the bars sway.
 const TERRAIN = { x: 170, y: SCENE.cardY + 160, w: 460, h: 280 };
+
+// ---------- the 5-hour route ----------
+export const ROUTE_PERIOD_MS = 5 * 3600 * 1000;
+
+// The seed is the login plus the number of 5-hour periods since 1970, so every run inside one
+// period reproduces the same route and only a new period gives a new one.
+export function routeSeed(login, now = new Date()) {
+  let h = 0;
+  for (const ch of login) h = (Math.imul(h, 31) + ch.charCodeAt(0)) >>> 0;
+  return (h + Math.floor(now.getTime() / ROUTE_PERIOD_MS)) >>> 0;
+}
 
 // ---------- helpers ----------
 export function mulberry32(seed) {
@@ -139,18 +147,18 @@ function judge(poly, bounds) {
 // near an edge or corner), turns toward it as sharply as a real fish can, and picks
 // another the moment it gets there. The wander is simulated here, then joined back to its
 // start with one smooth connecting curve, so the baked route loops without a jump.
-export function planRoute(rng, area = { width: SCENE.width, height: SCENE.height, scene: true }) {
-  const bounds = { x0: MARGIN.x, y0: MARGIN.top, x1: area.width - MARGIN.x, y1: area.height - MARGIN.bottom };
+export function planRoute(rng) {
+  const bounds = { x0: MARGIN.x, y0: MARGIN.top, x1: SCENE.width - MARGIN.x, y1: SCENE.height - MARGIN.bottom };
   const STEP = 16; // px of travel per simulation step
   const MAX_TURN = STEP * MAX_CURVATURE; // radians per step
   const MIN_LENGTH = 11000, MAX_LENGTH = 24000;
   const randomSpot = () => {
     const roll = rng();
-    if (area.scene && roll < 0.2) { // inside the 3D terrain
-      return [TERRAIN.x + rng() * TERRAIN.w, (area.cardY ?? SCENE.cardY) + 160 + rng() * TERRAIN.h];
+    if (roll < 0.2) { // inside the 3D terrain
+      return [TERRAIN.x + rng() * TERRAIN.w, SCENE.cardY + 160 + rng() * TERRAIN.h];
     }
-    if (area.scene && roll < 0.32) { // along the row of stat pills at the bottom
-      return [bounds.x0 + rng() * (bounds.x1 - bounds.x0), (area.cardY ?? SCENE.cardY) + 800 + rng() * 45];
+    if (roll < 0.32) { // along the row of stat pills at the bottom
+      return [bounds.x0 + rng() * (bounds.x1 - bounds.x0), SCENE.cardY + 800 + rng() * 45];
     }
     if (rng() < 0.3) { // an edge or corner region
       const cx = rng() < 0.5 ? bounds.x0 + rng() * 200 : bounds.x1 - rng() * 200;
@@ -202,7 +210,7 @@ export function planRoute(rng, area = { width: SCENE.width, height: SCENE.height
       const ab = dist(a, b), bc = dist(b, c), ca = dist(c, a);
       maxK = Math.max(maxK, (2 * Math.abs((b[0] - a[0]) * (c[1] - a[1]) - (b[1] - a[1]) * (c[0] - a[0]))) / (ab * bc * ca));
     }
-    const overshoot = pts.some((p) => p[0] < -60 || p[0] > area.width + 60 || p[1] < -60 || p[1] > area.height + 60);
+    const overshoot = pts.some((p) => p[0] < -60 || p[0] > SCENE.width + 60 || p[1] < -60 || p[1] > SCENE.height + 60);
     return overshoot ? null : { pts, maxK };
   };
   let best = null;
@@ -276,56 +284,17 @@ export function scopeCss(css, scope) {
   return text.replace(/@@KF(\d+)@@/g, (m, i) => keyframes[Number(i)]);
 }
 
-// One colour for the whole scene: Monochrome Platinum theme, applied to match the integrated vector scene.
-export const PLATINUM = {
-  accent: "#e2e8f0", accentLight: "#ffffff",
-  bg0: "#11151c", bg1: "#0b0e13", bg2: "#030406",
-  c0t: "#1b1f28", c0l: "#151820", c0r: "#101319",
-  c1t: "#394254", c1l: "#2d3443", c1r: "#232934",
-  c2t: "#58657d", c2l: "#465063", c2r: "#363e4d",
-  c3t: "#94a3b8", c3l: "#64748b", c3r: "#475569",
-  c4t: "#e2e8f0", c4l: "#cbd5e1", c4r: "#94a3b8",
-};
-export function applyTheme(svg, t = PLATINUM) {
-  svg = svg.replace(/<radialGradient id="bg"[^>]*>.*?<\/radialGradient>/s, `<radialGradient id="bg" cx="25%" cy="15%" r="95%"><stop offset="0" stop-color="${t.bg0}"/><stop offset="0.55" stop-color="${t.bg1}"/><stop offset="1" stop-color="${t.bg2}"/></radialGradient>`);
-  svg = svg.replace(/<linearGradient id="radarFill"[^>]*>.*?<\/linearGradient>/s, `<linearGradient id="radarFill" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${t.accent}" stop-opacity="0.32"/><stop offset="1" stop-color="${t.accent}" stop-opacity="0.05"/></linearGradient>`);
-  svg = svg.replace(/<linearGradient id="title"[^>]*>.*?<\/linearGradient>/s, `<linearGradient id="title" x1="0" x2="1"><stop offset="0" stop-color="${t.accent}"/><stop offset="1" stop-color="${t.accentLight}"/></linearGradient>`);
-  for (const k of ["c0", "c1", "c2", "c3", "c4"]) for (const side of ["t", "l", "r"]) {
-    svg = svg.replace(new RegExp(`\.${k}${side}\{fill:[^}]+\}`), `.${k}${side}{fill:${t[k + side]}}`);
-  }
-  svg = svg.replace(/filter:drop-shadow\(0 0 12px #[0-9a-fA-F]+\)/g, `filter:drop-shadow(0 0 12px ${t.accent})`);
-  svg = svg.replace(/(<polygon points="[^"]+" fill="url\(#radarFill\)" stroke=")[^"]+(" stroke-width="1.8" stroke-linejoin="round"\/>)/g, `$1${t.accent}$2`);
-  svg = svg.replace(/(<circle class="radar-node" cx="[^"]+" cy="[^"]+" r="4" fill=")[^"]+("\/>)/g, `$1${t.accent}$2`);
-  svg = svg.replace(/\.strong\{fill:#[0-9a-fA-F]+\}/g, `.strong{fill:${t.accent}}`);
-  // the pie chart keeps its original language colours so the slices stay easy to tell apart
-  return svg.replace(/stroke:#(?:57da69|ffd700)/gi, `stroke:${t.accent}`);
-}
-
 export function prepareCard(svgText) {
-  svgText = applyTheme(svgText);
   let inner = svgText.replace(/^[\s\S]*?<svg[^>]*>/, "").replace(/<\/svg>\s*$/, "");
   inner = inner.replace(/<title[\s\S]*?<\/title>|<desc[\s\S]*?<\/desc>/g, "");
   inner = inner.replace(/<style>([\s\S]*?)<\/style>/, (m, css) => {
-    const fullCss = css;
-    return `<style>${scopeCss(fullCss, "svg.cd")}</style>`;
+    return `<style>${scopeCss(css, "svg.cd")}</style>`;
   });
   return inner;
 }
 
 
 // ---------- the 3D terrain: pull it out of the card so the koi can swim over it ----------
-export function locateTerrain(cardInner) {
-  const start = cardInner.indexOf('<g id="terrain-island"');
-  if (start < 0) return null;
-  const re = /<g\b|<\/g>/g;
-  re.lastIndex = start;
-  let depth = 0, m;
-  while ((m = re.exec(cardInner))) {
-    if (m[0] === "</g>") { depth--; if (depth === 0) return { start, end: m.index + 4 }; } else depth++;
-  }
-  return null;
-}
-
 export function splitTerrain(cardInner) {
   const start = cardInner.indexOf('<g id="terrain-island"');
   if (start < 0) return { terrain: "", rest: cardInner };
@@ -403,72 +372,8 @@ export function addGrass(terrainSvg, path, cardY = SCENE.cardY) {
 // ---------- the scene ----------
 // The header SVG comes from capsule-render. Namespace its ids, classes and keyframes so
 // they cannot clash with the card's, and drop the outer <svg> tag.
-// The header's blob colour: capsule-render picks a random colour for every request, which a
-// README image cannot do per page view, so the blob instead drifts through the colour wheel
-// (starting from the colour the header was fetched with) while the page is open.
-function hexToHsl(hex) {
-  const r = parseInt(hex.slice(1, 3), 16) / 255, g = parseInt(hex.slice(3, 5), 16) / 255, b = parseInt(hex.slice(5, 7), 16) / 255;
-  const max = Math.max(r, g, b), min = Math.min(r, g, b), l = (max + min) / 2, d = max - min;
-  if (d === 0) return [0, 0, l];
-  const sat = l > 0.5 ? d / (2 - max - min) : d / (max + min);
-  const h = max === r ? ((g - b) / d + (g < b ? 6 : 0)) : max === g ? (b - r) / d + 2 : (r - g) / d + 4;
-  return [h * 60, sat, l];
-}
-function hslToHex(h, sat, l) {
-  const a = sat * Math.min(l, 1 - l);
-  const f = (n) => { const k = (n + h / 30) % 12; const c = l - a * Math.max(-1, Math.min(k - 3, 9 - k, 1)); return Math.round(255 * c).toString(16).padStart(2, "0"); };
-  return `#${f(0)}${f(8)}${f(4)}`.toUpperCase();
-}
-export function colourCycle(hex, stops = 6, seconds = 24) {
-  const [h, sat, l] = hexToHsl(hex);
-  const colours = Array.from({ length: stops + 1 }, (_, i) => hslToHex((h + (360 * (i % stops)) / stops) % 360, sat, l));
-  return `<animate attributeName="fill" values="${colours.join(";")}" dur="${seconds}s" repeatCount="indefinite"/>`;
-}
-export function terrainColourKeyframes(seconds = 24, stops = 12) {
-  const baseColors = {
-    c0t: "#2a2620", c0l: "#211d17", c0r: "#1a1712",
-    c1t: "#7c6224", c1l: "#68521e", c1r: "#544218",
-    c2t: "#b8860b", c2l: "#9e7309", c2r: "#825e07",
-    c3t: "#e6b800", c3l: "#c49d00", c3r: "#a38200",
-    c4t: "#ffd700", c4l: "#e6c200", c4r: "#ccad00",
-  };
-  let css = "";
-  for (const [cls, hex] of Object.entries(baseColors)) {
-    css += `.${cls}{fill:${hex};animation:cycle_${cls} ${seconds}s linear infinite;}`;
-  }
-  for (const [cls, hex] of Object.entries(baseColors)) {
-    const [h, sat, l] = hexToHsl(hex);
-    const steps = [];
-    for (let i = 0; i <= stops; i++) {
-      const pct = ((i / stops) * 100).toFixed(1);
-      const curH = (h + (360 * (i % stops)) / stops) % 360;
-      steps.push(`${pct}%{fill:${hslToHex(curH, sat, l)};}`);
-    }
-    css += `@keyframes cycle_${cls}{${steps.join("")}}`;
-  }
-  return css;
-}
-
-
-// The card's accent colour (numbers, radar outline and dots, title gradient) drifts through the
-// same colour wheel at the same pace as the terrain, so the whole card changes colour together.
-export function accentColourKeyframes(seconds = 24, stops = 12) {
-  const ramp = (hex, prop, name) => {
-    const [h, sat, l] = hexToHsl(hex);
-    const steps = [];
-    for (let i = 0; i <= stops; i++) {
-      steps.push(`${((i / stops) * 100).toFixed(1)}%{${prop}:${hslToHex((h + (360 * (i % stops)) / stops) % 360, sat, l)};}`);
-    }
-    return `@keyframes ${name}{${steps.join("")}}`;
-  };
-  const run = (name) => `animation:${name} ${seconds}s linear infinite;`;
-  return `.strong,.radar-node{${run("acc_fill")}}`
-    + `polygon[stroke]{${run("acc_stroke")}}`
-    + `#radarFill stop,#title stop:first-child{${run("acc_stop")}}`
-    + `#title stop:last-child{${run("acc_stop_light")}}`
-    + ramp("#ffd700", "fill", "acc_fill") + ramp("#ffd700", "stroke", "acc_stroke")
-    + ramp("#ffd700", "stop-color", "acc_stop") + ramp("#ffea78", "stop-color", "acc_stop_light");
-}
+// The header's colours: a dim slate blob behind a light title, so the title reads everywhere.
+const HEADER_COLOURS = { blob: "#394254", text: "#e2e8f0" };
 
 export function prepareHeader(svgText) {
   let inner = svgText.replace(/^[\s\S]*?<svg[^>]*>/, "").replace(/<\/svg>\s*$/, "");
@@ -477,16 +382,16 @@ export function prepareHeader(svgText) {
     .replace(/\btwinkling\b/g, "hd-twinkling").replace(/\bmyPath\b/g, "hd-myPath")
     // percentages would resolve against the whole scene, so pin them to the header's own size
     .replace(/x="50%"/g, `x="${HEADER.width / 2}"`).replace(/y="40%"/g, `y="${HEADER.height * 0.4}"`);
-  inner = inner.replace(/(<path id="hd-myPath" fill="(#[0-9a-fA-F]{6})"[^>]*>)/, (m, open) => open.replace(/fill="#[0-9a-fA-F]{6}"/, `fill="${PLATINUM.c1t}"`)); // a dim slate blob, so the light title reads everywhere
-  inner = inner.replace(/fill:#ffffff;/gi, `fill:${PLATINUM.accent};`);
+  inner = inner.replace(/(<path id="hd-myPath" fill="(#[0-9a-fA-F]{6})"[^>]*>)/, (m, open) => open.replace(/fill="#[0-9a-fA-F]{6}"/, `fill="${HEADER_COLOURS.blob}"`)); // a dim slate blob, so the light title reads everywhere
+  inner = inner.replace(/fill:#ffffff;/gi, `fill:${HEADER_COLOURS.text};`);
   return inner;
 }
 
-export function buildScene({ seed = 1, behavior = "cruise", speed = 1, fish = 1, family = null, sprite, headerSvg, cardSvg, koiScale = 0.6 }) {
-  // family: the fish to draw (see koi_family.mjs); otherwise `fish` copies, the first full size
+export function buildScene({ seed = 1, speed = 1, fish = 1, family = null, sprite, headerSvg, cardSvg, koiScale = 0.6 }) {
+  // family: the fish to draw (see family.mjs); otherwise `fish` copies, the first full size
   const crew = family ?? Array.from({ length: fish }, (_, i) => ({ growth: i === 0 ? 1 : BABY_SCALE, age: Infinity }));
   const bannerInner = prepareHeader(headerSvg);
-  const factor = (MODES[behavior] ?? 1) * speed;
+  const factor = speed;
   const fw = sprite.w, fh = sprite.h, frames = sprite.frames;
   // The route is followed by a point on the fish's body axis just behind the nose, so
   // the head leads and the body and fins trail along the direction of travel.
@@ -555,54 +460,3 @@ export function buildScene({ seed = 1, behavior = "cruise", speed = 1, fish = 1,
   return { svg, meta: { routes, bytes: svg.length, fish: crew.length, speedFactor: factor, swayingBars: grass.swaying } };
 }
 
-// ---------- a fish on its own: a transparent strip that drops into a README ----------
-// Nothing else is drawn, so it changes nothing about the page around it: the koi just roams
-// the whole strip along a random route that is baked in (see the notes at the top).
-export function buildFishStrip({ seed = 1, speed = 1, sprite, koiScale = 0.6, width = 1280, height = 360 }) {
-  const rng = mulberry32(seed >>> 0);
-  const area = { width, height, scene: false };
-  const route = planRoute(rng, area);
-  const sim = simulate(route, rng, speed);
-  const T = sim.duration;
-  const [pivotX, pivotY] = sprite.pivot || [sprite.w / 2, sprite.h / 2];
-  const keyPoints = sim.samples.map((smp) => f3(clamp(smp.s / route.poly.length, 0, 1))).join(";");
-  const keyTimes = sim.samples.map((smp) => f3(clamp(smp.t / T, 0, 1))).join(";");
-  const frameVals = Array.from({ length: sprite.frames }, (_, i) => `${-i * sprite.w} 0`).join(";");
-  const svg = `<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 ${width} ${height}" width="${width}" height="${height}" role="img" aria-labelledby="koi-t">
-<title id="koi-t">A koi swimming freely; its size follows total contributions</title>
-<defs><path id="route0" d="${pathData(route.segs)}" fill="none"/>
-<g id="koi-sprite"><svg x="0" y="0" width="${sprite.w}" height="${sprite.h}" viewBox="0 0 ${sprite.w} ${sprite.h}" overflow="hidden"><image width="${sprite.w * sprite.frames}" height="${sprite.h}" href="data:image/png;base64,${sprite.b64}" xlink:href="data:image/png;base64,${sprite.b64}"><animateTransform attributeName="transform" type="translate" calcMode="discrete" dur="${f3((sprite.frames * 70) / 1000)}s" repeatCount="indefinite" values="${frameVals}"/></image></svg></g></defs>
-<g class="fish"><animateMotion dur="${f1(T)}s" repeatCount="indefinite" rotate="auto" calcMode="linear" keyPoints="${keyPoints}" keyTimes="${keyTimes}"><mpath href="#route0" xlink:href="#route0"/></animateMotion><g transform="scale(${f3(koiScale)}) translate(${-pivotX} ${-pivotY})"><use href="#koi-sprite" xlink:href="#koi-sprite"/></g></g>
-</svg>`;
-  return { svg, meta: { duration: T, length: route.poly.length, speed: route.poly.length / T, maxCurvature: route.maxK, coverage: route.coverage, cornersHit: route.cornersHit } };
-}
-
-// ---------- the koi inside the activity card itself ----------
-// The Vercel endpoint behind the README's card (card.svg) fetches docs/profile_card.svg from
-// this repo on every request and re-colours it with a fresh theme, so a fish placed in that
-// file roams the card while the colours still change on every refresh and the endpoint stays
-// exactly as it is. The koi goes right after the 3D terrain: over the bars (which sway like
-// grass as it passes) and under the radar, the donut, the stat pills and every label.
-export function buildCardWithKoi({ seed = 1, speed = 1, sprite, cardSvg, koiScale = 0.6 }) {
-  const loc = locateTerrain(cardSvg);
-  if (!loc) throw new Error("koi: the card has no 3D terrain group to swim over");
-  const area = { width: 1280, height: 850, scene: true, cardY: 0 };
-  const rng = mulberry32(seed >>> 0);
-  const route = planRoute(rng, area);
-  const sim = simulate(route, rng, speed);
-  const T = sim.duration;
-  const [pivotX, pivotY] = sprite.pivot || [sprite.w / 2, sprite.h / 2];
-  const keyPoints = sim.samples.map((smp) => f3(clamp(smp.s / route.poly.length, 0, 1))).join(";");
-  const keyTimes = sim.samples.map((smp) => f3(clamp(smp.t / T, 0, 1))).join(";");
-  const frameVals = Array.from({ length: sprite.frames }, (_, i) => `${-i * sprite.w} 0`).join(";");
-  const terrain = addGrass(cardSvg.slice(loc.start, loc.end), { route, sim }, 0);
-  const layer = `<defs><path id="route0" d="${pathData(route.segs)}" fill="none"/>`
-    + `<g id="koi-sprite"><svg x="0" y="0" width="${sprite.w}" height="${sprite.h}" viewBox="0 0 ${sprite.w} ${sprite.h}" overflow="hidden">`
-    + `<image width="${sprite.w * sprite.frames}" height="${sprite.h}" href="data:image/png;base64,${sprite.b64}" xlink:href="data:image/png;base64,${sprite.b64}">`
-    + `<animateTransform attributeName="transform" type="translate" calcMode="discrete" dur="${f3((sprite.frames * 70) / 1000)}s" repeatCount="indefinite" values="${frameVals}"/></image></svg></g></defs>`
-    + `<g id="koi"><g class="fish"><animateMotion dur="${f1(T)}s" repeatCount="indefinite" rotate="auto" calcMode="linear" keyPoints="${keyPoints}" keyTimes="${keyTimes}"><mpath href="#route0" xlink:href="#route0"/></animateMotion>`
-    + `<g transform="scale(${f3(koiScale)}) translate(${-pivotX} ${-pivotY})"><use href="#koi-sprite" xlink:href="#koi-sprite"/></g></g></g>`;
-  let svg = cardSvg.slice(0, loc.start) + terrain.svg + layer + cardSvg.slice(loc.end);
-  if (!/<svg[^>]*xmlns:xlink=/.test(svg)) svg = svg.replace("<svg ", '<svg xmlns:xlink="http://www.w3.org/1999/xlink" ');
-  return { svg, meta: { duration: T, length: route.poly.length, speed: route.poly.length / T, maxCurvature: route.maxK, coverage: route.coverage, cornersHit: route.cornersHit, swayingBars: terrain.swaying } };
-}

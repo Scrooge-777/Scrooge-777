@@ -1,7 +1,7 @@
 <div align="center" id="readme-top">
 
-  <!-- Header + 3D activity card with the roaming koi swimming through them (colours cycle; new random route every 5 hours) -->
-  <img src="assets/scene.svg" width="100%" alt="ΚΡΑΤΟΣ (Kratos, power) header and the animated GitHub activity card with a koi swimming freely through it; the 3D contribution bars sway like grass as it passes" />
+  <!-- Header + live 3D activity card with a family of koi swimming through them; rebuilt by .github/workflows/profile.yml (see DEVELOPMENT.md) -->
+  <img src="assets/scene.svg" width="100%" alt="ΠΛΟΥΤΟΣ (Ploutos, wealth): my live GitHub activity card with a family of koi swimming through it" />
 
 </div>
 

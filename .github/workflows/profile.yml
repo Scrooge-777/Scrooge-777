@@ -1,0 +1,115 @@
+name: Profile
+
+# One pipeline for the picture at the top of the README (assets/scene.svg):
+#   live GitHub data -> activity card -> koi family -> scene -> commit.
+# It fails loudly if the data looks wrong, and then the last good picture simply stays online.
+
+on:
+  schedule:
+    - cron: "0 */2 * * *"    # every 2 hours
+    - cron: "30 18 * * *"    # and at midnight IST
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/profile.yml"
+      - "card/**"
+      - "scene/**"
+      - "koi/**"
+      - "test/**"
+      - "package.json"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: profile
+  cancel-in-progress: false
+
+env:
+  # Contribution days are counted in this time zone. Without it GitHub counts in UTC, and
+  # an evening in India would be missing from the card until the next UTC day.
+  PROFILE_TZ: Asia/Kolkata
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v7
+      - name: Unit tests (card data, card layout, koi family, scene)
+        run: node --test test/*.test.mjs
+      - name: Koi engine tests
+        run: cargo test --manifest-path koi/Cargo.toml --quiet
+
+  build:
+    needs: test
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+
+      - name: Cache the koi build
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            koi/target
+          key: ${{ runner.os }}-koi-${{ hashFiles('koi/Cargo.lock', 'koi/src/**', 'koi/examples/**') }}
+          restore-keys: |
+            ${{ runner.os }}-koi-
+
+      - name: Build the vendored git-koi engine
+        run: cargo build --release --manifest-path koi/Cargo.toml --bins --examples
+
+      - name: Fetch live data and draw the activity card
+        env:
+          # PROFILE_TOKEN is a personal token that can also see private contributions;
+          # the default token only sees public ones.
+          PROFILE_TOKEN: ${{ secrets.PROFILE_TOKEN }}
+          GITHUB_TOKEN: ${{ github.token }}
+        run: |
+          if [ -z "$PROFILE_TOKEN" ]; then echo "::warning::PROFILE_TOKEN is not set: private contributions are not counted"; fi
+          node card/build.mjs --login "${{ github.repository_owner }}" --out build/card.svg --profile-out build/profile.json
+
+      - name: Collect the account snapshot for the koi
+        env:
+          GH_TOKEN: ${{ secrets.PROFILE_TOKEN || github.token }}
+        run: koi/target/release/git-koi collect "${{ github.repository_owner }}" --output build/snapshot.json
+
+      - name: Render the koi at today's size
+        run: |
+          TOTAL=$(node -e 'console.log(JSON.parse(require("fs").readFileSync("build/profile.json","utf8")).totals.contributions)')
+          echo "total contributions: $TOTAL"
+          koi/target/release/examples/roam_sprites build/snapshot.json build/sprites asagi "$TOTAL"
+          python -m pip install --quiet "pillow==12.2.0" "numpy==2.4.6"
+          python scene/strip.py build/sprites "$TOTAL" build/sprite.json
+
+      - name: Build the scene
+        run: >
+          node scene/build.mjs
+          --profile build/profile.json
+          --card build/card.svg
+          --sprite build/sprite.json
+          --header scene/header.svg
+          --out assets/scene.svg
+
+      - name: Commit the picture if it changed
+        run: |
+          git add assets/scene.svg
+          if git diff --cached --quiet; then
+            echo "Nothing changed."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit --quiet --message "profile: refresh live card and koi"
+          git pull --rebase --autostash origin main
+          git push --quiet

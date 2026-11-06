@@ -8,7 +8,7 @@
 //     every further 14 days; the parent always stays
 //   - a baby starts at 55% of full size and grows to full size over 30 days
 //
-// days: [{ date: "YYYY-MM-DD", contribution_count }] in date order; now: a Date.
+// days: [{ date: "YYYY-MM-DD", count }] in date order; now: a Date.
 export const FAMILY = {
   milestones: [500, 1000, 2500, 5000, 10000],
   streakDays: 7,
@@ -27,14 +27,14 @@ export function planFamily(days, now = new Date(), rules = FAMILY) {
   const reached = new Set();
   let streak = 0;
   for (const d of days) {
-    total += d.contribution_count;
+    total += d.count;
     for (const m of rules.milestones) {
       if (total >= m && !reached.has(m)) {
         reached.add(m);
         born.push({ kind: "milestone", reason: `${m.toLocaleString("en-US")} contributions`, born: at(d.date) });
       }
     }
-    if (d.contribution_count > 0) {
+    if (d.count > 0) {
       streak++;
       if (streak % rules.streakDays === 0) born.push({ kind: "streak", reason: `${streak}-day streak`, born: at(d.date) });
     } else {
@@ -44,7 +44,7 @@ export function planFamily(days, now = new Date(), rules = FAMILY) {
   born.sort((a, b) => a.born - b.born);
 
   let kept = born.slice(Math.max(0, born.length - (rules.maxFish - 1))); // the oldest retire first
-  const last = days.filter((d) => d.contribution_count > 0).map((d) => at(d.date)).pop();
+  const last = days.filter((d) => d.count > 0).map((d) => at(d.date)).pop();
   const idle = last === undefined ? Infinity : Math.max(0, Math.floor((now.getTime() - last) / DAY));
   const faded = Math.min(kept.length, Math.floor(idle / rules.idleDays));
   if (faded > 0) kept = kept.slice(0, kept.length - faded); // the newest fade first

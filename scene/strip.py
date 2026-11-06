@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Pack the 8 in-place swimming frames of one koi size into a cropped horizontal strip.
 
-Usage: koi_strip.py SPRITE_DIR TOTAL OUT.json
+Usage: strip.py SPRITE_DIR TOTAL OUT.json
 
 SPRITE_DIR holds roam_<TOTAL>_<0..7>.png from the git-koi `roam_sprites` example. The
 JSON has the strip (base64 PNG), its frame size, the fish length and a pivot: a point on
@@ -54,7 +54,7 @@ def main(argv):
     }
     with open(out_path, "w", encoding="utf-8") as handle:
         json.dump(result, handle)
-    print(f"koi_strip: {w}x{h} frames={FRAMES} length={int(length)} -> {out_path}")
+    print(f"strip: {w}x{h} frames={FRAMES} length={int(length)} -> {out_path}")
     return 0
 
 
