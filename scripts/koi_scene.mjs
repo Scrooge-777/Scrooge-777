@@ -298,7 +298,10 @@ export function applyTheme(svg, t = PLATINUM) {
   svg = svg.replace(/(<polygon points="[^"]+" fill="url\(#radarFill\)" stroke=")[^"]+(" stroke-width="1.8" stroke-linejoin="round"\/>)/g, `$1${t.accent}$2`);
   svg = svg.replace(/(<circle class="radar-node" cx="[^"]+" cy="[^"]+" r="4" fill=")[^"]+("\/>)/g, `$1${t.accent}$2`);
   svg = svg.replace(/\.strong\{fill:#[0-9a-fA-F]+\}/g, `.strong{fill:${t.accent}}`);
-  return svg.replace(/stroke:#(?:57da69|ffd700)/gi, `stroke:${t.accent}`);
+  svg = svg.replace(/stroke:#(?:57da69|ffd700)/gi, `stroke:${t.accent}`);
+  // the language colours become platinum shades too, so the card is a single colour
+  const lang = { "#178600": t.c4t, "#DEA584": t.c4l, "#F1E05A": t.c3t, "#3572A5": t.c3l, "#8B949E": t.c3r };
+  return svg.replace(/#(?:178600|DEA584|F1E05A|3572A5|8B949E)/gi, (m) => lang[m.toUpperCase()]);
 }
 
 export function prepareCard(svgText) {
