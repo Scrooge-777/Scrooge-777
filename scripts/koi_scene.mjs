@@ -276,11 +276,37 @@ export function scopeCss(css, scope) {
   return text.replace(/@@KF(\d+)@@/g, (m, i) => keyframes[Number(i)]);
 }
 
+// One colour for the whole scene: the "Monochrome Platinum" theme of the Vercel card endpoint
+// (api/card.js), applied with the same replacements that endpoint makes.
+export const PLATINUM = {
+  accent: "#e2e8f0", accentLight: "#ffffff",
+  bg0: "#11151c", bg1: "#0b0e13", bg2: "#030406",
+  c0t: "#1b1f28", c0l: "#151820", c0r: "#101319",
+  c1t: "#394254", c1l: "#2d3443", c1r: "#232934",
+  c2t: "#58657d", c2l: "#465063", c2r: "#363e4d",
+  c3t: "#94a3b8", c3l: "#64748b", c3r: "#475569",
+  c4t: "#e2e8f0", c4l: "#cbd5e1", c4r: "#94a3b8",
+};
+export function applyTheme(svg, t = PLATINUM) {
+  svg = svg.replace(/<radialGradient id="bg"[^>]*>.*?<\/radialGradient>/s, `<radialGradient id="bg" cx="25%" cy="15%" r="95%"><stop offset="0" stop-color="${t.bg0}"/><stop offset="0.55" stop-color="${t.bg1}"/><stop offset="1" stop-color="${t.bg2}"/></radialGradient>`);
+  svg = svg.replace(/<linearGradient id="radarFill"[^>]*>.*?<\/linearGradient>/s, `<linearGradient id="radarFill" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${t.accent}" stop-opacity="0.32"/><stop offset="1" stop-color="${t.accent}" stop-opacity="0.05"/></linearGradient>`);
+  svg = svg.replace(/<linearGradient id="title"[^>]*>.*?<\/linearGradient>/s, `<linearGradient id="title" x1="0" x2="1"><stop offset="0" stop-color="${t.accent}"/><stop offset="1" stop-color="${t.accentLight}"/></linearGradient>`);
+  for (const k of ["c0", "c1", "c2", "c3", "c4"]) for (const side of ["t", "l", "r"]) {
+    svg = svg.replace(new RegExp(`\.${k}${side}\{fill:[^}]+\}`), `.${k}${side}{fill:${t[k + side]}}`);
+  }
+  svg = svg.replace(/filter:drop-shadow\(0 0 12px #[0-9a-fA-F]+\)/g, `filter:drop-shadow(0 0 12px ${t.accent})`);
+  svg = svg.replace(/(<polygon points="[^"]+" fill="url\(#radarFill\)" stroke=")[^"]+(" stroke-width="1.8" stroke-linejoin="round"\/>)/g, `$1${t.accent}$2`);
+  svg = svg.replace(/(<circle class="radar-node" cx="[^"]+" cy="[^"]+" r="4" fill=")[^"]+("\/>)/g, `$1${t.accent}$2`);
+  svg = svg.replace(/\.strong\{fill:#[0-9a-fA-F]+\}/g, `.strong{fill:${t.accent}}`);
+  return svg.replace(/stroke:#(?:57da69|ffd700)/gi, `stroke:${t.accent}`);
+}
+
 export function prepareCard(svgText) {
+  svgText = applyTheme(svgText);
   let inner = svgText.replace(/^[\s\S]*?<svg[^>]*>/, "").replace(/<\/svg>\s*$/, "");
   inner = inner.replace(/<title[\s\S]*?<\/title>|<desc[\s\S]*?<\/desc>/g, "");
   inner = inner.replace(/<style>([\s\S]*?)<\/style>/, (m, css) => {
-    const fullCss = (css.includes("cycle_c4t") ? css : css + terrainColourKeyframes(24, 12)) + accentColourKeyframes(24, 12);
+    const fullCss = css;
     return `<style>${scopeCss(fullCss, "svg.cd")}</style>`;
   });
   return inner;
@@ -451,7 +477,7 @@ export function prepareHeader(svgText) {
     .replace(/\btwinkling\b/g, "hd-twinkling").replace(/\bmyPath\b/g, "hd-myPath")
     // percentages would resolve against the whole scene, so pin them to the header's own size
     .replace(/x="50%"/g, `x="${HEADER.width / 2}"`).replace(/y="40%"/g, `y="${HEADER.height * 0.4}"`);
-  inner = inner.replace(/(<path id="hd-myPath" fill="(#[0-9a-fA-F]{6})"[^>]*>)/, (m, open, hex) => `${open}${colourCycle(hex)}`);
+  inner = inner.replace(/(<path id="hd-myPath" fill="(#[0-9a-fA-F]{6})"[^>]*>)/, (m, open) => open.replace(/fill="#[0-9a-fA-F]{6}"/, `fill="${PLATINUM.accent}"`));
   return inner;
 }
 
