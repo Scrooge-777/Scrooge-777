@@ -55,24 +55,25 @@ export function buildTerrain(weeks) {
 }
 
 // ---------- radar ----------
-const RADAR = { cx: 1015, cy: 310, rMin: 18, rMax: 126, labelR: 160 };
+const RADAR = { cx: 1015, cy: 310, rMin: 20.8, rMax: 126, labelR: 160, perLog: 10 };
 const AXES = [
-  { key: "commits", label: "Commit", deg: -90, cap: 500, anchor: "middle" },
-  { key: "issues", label: "Issue", deg: -18, cap: 20, anchor: "start" },
-  { key: "pullRequests", label: "PullReq", deg: 54, cap: 20, anchor: "start" },
-  { key: "reviews", label: "Review", deg: 126, cap: 20, anchor: "end" },
-  { key: "repos", label: "Repo", deg: 198, cap: 15, anchor: "end" },
+  { key: "commits", label: "Commit", deg: -90, anchor: "middle" },
+  { key: "issues", label: "Issue", deg: -18, anchor: "start" },
+  { key: "pullRequests", label: "PullReq", deg: 54, anchor: "start" },
+  { key: "reviews", label: "Review", deg: 126, anchor: "end" },
+  { key: "repos", label: "Repo", deg: 198, anchor: "end" },
 ];
 
-export function radarRadius(value, cap) {
+// The classic contribution-mix shape: nothing sits on the inner ring (20.8) and a spoke grows by 10
+// for every factor of e in the count, so 560 commits reach about 84 and 7 repos about 42.
+export function radarRadius(value) {
   if (value <= 0) return RADAR.rMin;
-  const ratio = Math.min(1, Math.log(1 + value) / Math.log(1 + cap));
-  return RADAR.rMin + ratio * (RADAR.rMax - RADAR.rMin);
+  return Math.min(RADAR.rMax, RADAR.rMin + RADAR.perLog * Math.log(1 + value));
 }
 
 export function buildRadar(totals) {
   const pts = AXES.map((a) => {
-    const r = radarRadius(totals[a.key], a.cap);
+    const r = radarRadius(totals[a.key]);
     const rad = (a.deg * Math.PI) / 180;
     return [RADAR.cx + r * Math.cos(rad), RADAR.cy + r * Math.sin(rad)];
   });

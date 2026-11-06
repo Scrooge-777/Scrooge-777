@@ -24,14 +24,17 @@ test("the terrain has one bar per day of the last 12 weeks, partial weeks placed
   assert.equal(buildTerrain(partial).match(/class="iso-col"/g).length, partial.slice(-WINDOW_WEEKS).flat().length);
 });
 
-test("the radar follows the numbers: more means a longer spoke, 0 stays on the inner ring", () => {
-  assert.equal(radarRadius(0, 20), 18);
-  assert.ok(radarRadius(5, 20) < radarRadius(10, 20));
-  assert.equal(radarRadius(1000, 20), 126);
+test("the radar keeps its classic shape: 0 on the inner ring, slow growth, never past the outer ring", () => {
+  assert.equal(radarRadius(0), 20.8);
+  assert.ok(radarRadius(5) < radarRadius(10));
+  assert.ok(Math.abs(radarRadius(561) - 84) < 1, "560 commits reach about 84");
+  assert.ok(Math.abs(radarRadius(7) - 41.6) < 0.1, "7 repos reach about 42");
+  assert.equal(radarRadius(1e12), 126);
   const low = buildRadar({ commits: 10, issues: 0, pullRequests: 0, reviews: 0, repos: 1 });
   const high = buildRadar({ commits: 500, issues: 20, pullRequests: 20, reviews: 20, repos: 15 });
   assert.notEqual(low, high);
   assert.match(high, />500<\/text>/);
+  assert.ok(!/NaN/.test(low + high));
 });
 
 test("the row of totals never overlaps and stays inside the card, however big the numbers", () => {
