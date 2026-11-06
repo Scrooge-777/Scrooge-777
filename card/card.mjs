@@ -7,15 +7,17 @@
 //
 // Pure functions: the same profile always gives the same SVG.
 
+import { RULES } from "../rules/index.mjs";
+
 const ACCENT = "#e2e8f0"; // the template's accent colour (Monochrome Platinum)
 
 const esc = (s) => String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
 const f = (n, d = 2) => Number(n).toFixed(d);
 
 // ---------- 3D terrain ----------
-export const WINDOW_WEEKS = 12;
+export const WINDOW_WEEKS = RULES.card.terrainWeeks;
 const LEVELS = { FIRST_QUARTILE: 1, SECOND_QUARTILE: 2, THIRD_QUARTILE: 3, FOURTH_QUARTILE: 4 };
-const LEVEL_HEIGHT = [2.6, 5.24, 18.85, 34.43, 63.87];
+export const LEVEL_HEIGHT = [2.6, 5.24, 18.85, 34.43, 63.87];
 const LEVEL_FLOAT = [-7, -7, -10, -12, -14];
 
 // One column per cell of a weeks-by-weekdays grid; a partial week is placed by weekday.
@@ -55,7 +57,7 @@ export function buildTerrain(weeks) {
 }
 
 // ---------- radar ----------
-const RADAR = { cx: 1015, cy: 310, rMin: 20.8, rMax: 126, labelR: 160, perLog: 10 };
+const RADAR = { cx: 1015, cy: 310, rMin: RULES.radar.innerRing, rMax: RULES.radar.outerRing, labelR: 160, perLog: RULES.radar.pixelsPerLog };
 const AXES = [
   { key: "commits", label: "Commit", deg: -90, anchor: "middle" },
   { key: "issues", label: "Issue", deg: -18, anchor: "start" },
@@ -129,7 +131,7 @@ export function sinceLabel(date) {
 
 // Big totals are shortened so the row of pills always fits: 12345 -> "12.3k".
 export function compact(n) {
-  if (n < 10000) return String(n);
+  if (n < RULES.card.shortenFrom) return String(n);
   if (n < 1000000) return `${(n / 1000).toFixed(1).replace(/\.0$/, "")}k`;
   return `${(n / 1000000).toFixed(1).replace(/\.0$/, "")}M`;
 }

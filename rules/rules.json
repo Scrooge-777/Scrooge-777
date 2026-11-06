@@ -1,0 +1,40 @@
+{
+  "family": {
+    "milestones": [500, 1000, 2500, 5000, 10000],
+    "streakDays": 7,
+    "maxFish": 5,
+    "idleDays": 14,
+    "growDays": 30,
+    "babyStart": 0.55
+  },
+  "life": {
+    "stagger": [0, 1, -1, 2, -2],
+    "schedule": {
+      "adult": [
+        { "from": 23, "to": 6, "state": "sleep" },
+        { "from": 6, "to": 9, "state": "calm" },
+        { "from": 9, "to": 18, "state": "active" },
+        { "from": 18, "to": 23, "state": "calm" }
+      ],
+      "young": [
+        { "from": 21, "to": 7, "state": "sleep" },
+        { "from": 7, "to": 9, "state": "calm" },
+        { "from": 9, "to": 13, "state": "active" },
+        { "from": 13, "to": 15, "state": "sleep" },
+        { "from": 15, "to": 18, "state": "active" },
+        { "from": 18, "to": 21, "state": "calm" }
+      ]
+    },
+    "hunger": { "slowerAfterDays": 3, "slowestAfterDays": 7 },
+    "states": {
+      "active": { "speed": 1, "tail": 1, "opacity": 1, "darts": true },
+      "calm": { "speed": 0.6, "tail": 1.6, "opacity": 1, "darts": false },
+      "rest": { "speed": 0.35, "tail": 2.5, "opacity": 1, "darts": false },
+      "sleep": { "speed": 6, "tail": 6, "opacity": 0.7, "darts": false }
+    },
+    "nest": { "radiusX": 38, "radiusY": 10 }
+  },
+  "route": { "periodHours": 5, "cruiseSpeed": 150 },
+  "radar": { "innerRing": 20.8, "outerRing": 126, "pixelsPerLog": 10 },
+  "card": { "terrainWeeks": 12, "languagesShown": 4, "shortenFrom": 10000 }
+}

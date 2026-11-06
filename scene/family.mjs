@@ -9,14 +9,9 @@
 //   - a baby starts at 55% of full size and grows to full size over 30 days
 //
 // days: [{ date: "YYYY-MM-DD", count }] in date order; now: a Date.
-export const FAMILY = {
-  milestones: [500, 1000, 2500, 5000, 10000],
-  streakDays: 7,
-  maxFish: 5,
-  idleDays: 14,
-  growDays: 30,
-  babyStart: 0.55,
-};
+import { RULES } from "../rules/index.mjs";
+
+export const FAMILY = RULES.family; // numbers: rules/rules.json, in words: rules/koi-family.md
 
 const DAY = 86400000;
 const at = (date) => Date.parse(`${date}T00:00:00Z`);

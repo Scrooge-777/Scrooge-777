@@ -16,12 +16,14 @@
 // swimming cycle (head to the right) from the git-koi `roam_sprites` example.
 // `family` lists the koi to draw (see family.mjs); without it `fish` copies swim.
 
+import { RULES } from "../rules/index.mjs";
+
 // The header is capsule-render's animated "venom" blob (854 x 220), scaled to the card's width.
 export const HEADER = { width: 854, height: 220 };
 const HEADER_SCALE = 1280 / HEADER.width;
 export const SCENE = { width: 1280, headerHeight: Math.round(HEADER.height * HEADER_SCALE), cardY: Math.round(HEADER.height * HEADER_SCALE) + 16, cardHeight: 850, height: Math.round(HEADER.height * HEADER_SCALE) + 16 + 850 };
 
-const BASE_SPEED = 150; // scene px per second: cruising pace (the surges and darts go above this)
+const BASE_SPEED = RULES.route.cruiseSpeed; // scene px per second: cruising pace (the surges and darts go above this)
 const MARGIN = { x: 60, top: 60, bottom: 40 };
 const KICK_PERIOD = 0.9; // seconds between tail-beat surges
 const SAMPLE_DT = 0.2; // keyframe spacing along the route
@@ -31,7 +33,7 @@ const BABY_SCALE = 0.55;
 const TERRAIN = { x: 170, y: SCENE.cardY + 160, w: 460, h: 280 };
 
 // ---------- the 5-hour route ----------
-export const ROUTE_PERIOD_MS = 5 * 3600 * 1000;
+export const ROUTE_PERIOD_MS = RULES.route.periodHours * 3600 * 1000;
 
 // The seed is the login plus the number of 5-hour periods since 1970, so every run inside one
 // period reproduces the same route and only a new period gives a new one.
@@ -238,12 +240,42 @@ function pathData(segs) {
   return d + "Z";
 }
 
+// ---------- a sleeping fish: a slow drift in a small oval among the bars ----------
+const NESTS = [[250, 390], [335, 425], [425, 415], [505, 390], [300, 335]]; // card coordinates, on the terrain floor
+
+export function planNest(index, rng) {
+  const [nx, ny] = NESTS[index % NESTS.length];
+  const cx = nx, cy = SCENE.cardY + ny;
+  const { radiusX, radiusY } = RULES.life.nest;
+  const tilt = (rng() - 0.5) * 0.6;
+  const pts = Array.from({ length: 6 }, (_, i) => {
+    const a = (i / 6) * 2 * Math.PI;
+    const x = radiusX * Math.cos(a), y = radiusY * Math.sin(a);
+    return [cx + x * Math.cos(tilt) - y * Math.sin(tilt), cy + x * Math.sin(tilt) + y * Math.cos(tilt)];
+  });
+  const segs = closedBeziers(pts);
+  return { pts, segs, poly: samplePolyline(segs, 40), maxK: 0, coverage: 0, cornersHit: 0 };
+}
+
+// Constant slow speed, no tail-beat surges.
+export function drift(route, pixelsPerSecond) {
+  const L = route.poly.length;
+  const duration = L / pixelsPerSecond;
+  const samples = [];
+  for (let t = 0; t < duration; t += SAMPLE_DT) samples.push({ t, s: t * pixelsPerSecond });
+  samples.push({ t: duration, s: L });
+  return { samples, duration, darts: 0 };
+}
+
 // ---------- speed profile: tail-beat surges, smooth darts ----------
-export function simulate(route, rng, speedFactor) {
+export function simulate(route, rng, speedFactor, { darts: withDarts = true } = {}) {
   const L = route.poly.length;
   const darts = [];
   const dartCount = 2 + Math.floor(rng() * 3);
-  for (let i = 0; i < dartCount; i++) darts.push({ s: rng() * L, len: 300 + rng() * 260 });
+  for (let i = 0; i < dartCount; i++) {
+    const d = { s: rng() * L, len: 300 + rng() * 260 }; // drawn either way, so a route never depends on the fish's mood
+    if (withDarts) darts.push(d);
+  }
   const samples = [];
   let t = 0, s = 0;
   const dt = 0.02;
@@ -403,20 +435,25 @@ export function buildScene({ seed = 1, speed = 1, fish = 1, family = null, sprit
   const paths = [];
   const defs = [];
   const fishSvg = [];
+  const tails = new Set(); // one sprite per tail-beat speed in use
   for (let i = 0; i < crew.length; i++) {
     const rng = mulberry32((seed + i * 7919) >>> 0);
-    const route = planRoute(rng);
-    const sim = simulate(route, rng, factor * (i === 0 ? 1 : 1.12));
+    const life = crew[i].life || { state: "active", ...RULES.life.states.active };
+    const asleep = life.state === "sleep";
+    const route = asleep ? planNest(i, rng) : planRoute(rng);
+    const sim = asleep ? drift(route, life.speed) : simulate(route, rng, factor * life.speed * (i === 0 ? 1 : 1.12), { darts: life.darts });
     const T = sim.duration;
-    paths.push({ route, sim });
+    if (!asleep) paths.push({ route, sim }); // bars lean away from swimmers, not from a sleeper
     const keyPoints = sim.samples.map((smp) => f3(clamp(smp.s / route.poly.length, 0, 1))).join(";");
     const keyTimes = sim.samples.map((smp) => f3(clamp(smp.t / T, 0, 1))).join(";");
     const scale = koiScale * crew[i].growth;
+    const tail = life.tail;
+    tails.add(tail);
     const pop = crew[i].age < 2 ? `<animate attributeName="opacity" values="0;1" dur="2.5s" fill="freeze"/>` : ""; // a newborn fades in
     defs.push(`<path id="route${i}" d="${pathData(route.segs)}" fill="none"/>`);
     fishSvg.push(
       `<g class="fish">${pop}<animateMotion dur="${f1(T)}s" repeatCount="indefinite" rotate="auto" calcMode="linear" keyPoints="${keyPoints}" keyTimes="${keyTimes}"><mpath href="#route${i}" xlink:href="#route${i}"/></animateMotion>`
-      + `<g transform="scale(${f3(scale)}) translate(${-pivotX} ${-pivotY})"><use href="#koi-sprite" xlink:href="#koi-sprite"/></g></g>`,
+      + `<g opacity="${life.opacity}" transform="scale(${f3(scale)}) translate(${-pivotX} ${-pivotY})"><use href="#koi-sprite-${tail}" xlink:href="#koi-sprite-${tail}"/></g></g>`,
     );
     routes.push({
       id: i,
@@ -429,12 +466,13 @@ export function buildScene({ seed = 1, speed = 1, fish = 1, family = null, sprit
       routeD: pathData(route.segs),
       waypoints: route.pts,
       darts: sim.darts,
+      state: life.state,
     });
   }
 
-  const sprites = `<g id="koi-sprite"><svg x="0" y="0" width="${fw}" height="${fh}" viewBox="0 0 ${fw} ${fh}" overflow="hidden">`
+  const sprites = [...tails].map((tail) => `<g id="koi-sprite-${tail}"><svg x="0" y="0" width="${fw}" height="${fh}" viewBox="0 0 ${fw} ${fh}" overflow="hidden">`
     + `<image width="${fw * frames}" height="${fh}" href="data:image/png;base64,${sprite.b64}" xlink:href="data:image/png;base64,${sprite.b64}">`
-    + `<animateTransform attributeName="transform" type="translate" calcMode="discrete" dur="${flipDur}s" repeatCount="indefinite" values="${frameVals}"/></image></svg></g>`;
+    + `<animateTransform attributeName="transform" type="translate" calcMode="discrete" dur="${f3(flipDur * tail)}s" repeatCount="indefinite" values="${frameVals}"/></image></svg></g>`).join("");
 
   const k = HEADER_SCALE;
   // Layer order: header background < 3D terrain < koi < header text < rest of the card. The koi

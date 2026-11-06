@@ -12,9 +12,12 @@ card/                      the activity card
   profile.mjs              asks GitHub for the data and refuses bad data
   card.mjs                 draws the terrain, radar, languages and totals
   build.mjs                command line: data -> card
+rules/                     the rulebook, in plain words (start with rules/README.md)
+  rules.json               the numbers the code follows; edit here to change behaviour
 scene/                     the header, the koi and the final picture
   header.svg               the title (edit the text here)
-  family.mjs               which koi exist (milestones, streak babies, 5 at most, fade when idle)
+  family.mjs               which koi exist
+  life.mjs                 how each koi lives: sleep, calm, active, hunger
   scene.mjs                routes, swimming, bars that sway, assembling the picture
   build.mjs                command line: card + data -> assets/scene.svg
   strip.py                 packs the koi frames into one image
@@ -30,21 +33,17 @@ test/                      unit tests: node --test test/*.test.mjs
    the run; the card never falls back to old numbers.
 2. It writes `build/card.svg` and `build/profile.json` (both git-ignored).
 3. `git-koi` draws the koi at today's size (`TOTAL` = contributions in the last year).
-4. `scene/build.mjs` plans the family from the daily counts, plans one route per fish and bakes
-   everything into `assets/scene.svg`. The route changes every 5 hours (the seed is the number of
+4. `scene/build.mjs` plans the family from the daily counts, works out each fish's state for the
+   current hour (sleep, calm, active), plans one route per fish and bakes everything into
+   `assets/scene.svg`. The route changes every 5 hours (the seed is the number of
    5-hour periods since 1970); the data refreshes every run.
 5. The workflow commits `assets/scene.svg` only if it changed.
 
-## Rules for the koi
+## Rules
 
-- The parent always swims; its size follows total contributions.
-- A new fish at 500, 1,000, 2,500, 5,000 and 10,000 contributions.
-- A baby for every full 7 days of daily contributions in a row.
-- At most 5 fish at once; the oldest baby retires first.
-- A baby starts at 55% size and is full size after 30 days.
-- After 14 days with no contributions the newest fish fades; another every further 14 days.
-
-Change them in `scene/family.mjs` (`FAMILY`).
+How the fish, the card and the colours behave is written in plain words in `rules/`, one sheet per
+topic, with the numbers in `rules/rules.json`. Change a number there and the next run follows it.
+`test/rules.test.mjs` fails if a sheet and the code say different things.
 
 ## Secrets
 

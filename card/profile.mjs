@@ -7,6 +7,8 @@
 // Days are bucketed in YOUR time zone (PROFILE_TZ, default Asia/Kolkata). Without the Time-Zone
 // header GitHub buckets in UTC, which is why a Kolkata evening could be missing from the card.
 
+import { RULES } from "../rules/index.mjs";
+
 export const QUERY = `
 query ($login: String!) {
   user(login: $login) {
@@ -106,8 +108,8 @@ export function normalizeProfile(json, { login = "", now = new Date(), timeZone 
     }
   }
   const ranked = [...bytes.values()].sort((a, b) => b.bytes - a.bytes);
-  const languages = ranked.slice(0, 4);
-  const rest = ranked.slice(4).reduce((a, l) => a + l.bytes, 0);
+  const languages = ranked.slice(0, RULES.card.languagesShown);
+  const rest = ranked.slice(RULES.card.languagesShown).reduce((a, l) => a + l.bytes, 0);
   if (rest > 0) languages.push({ name: "Others", color: "#8b949e", bytes: rest });
 
   const active = days.filter((d) => d.count > 0);
