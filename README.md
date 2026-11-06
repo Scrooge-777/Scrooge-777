@@ -6,28 +6,12 @@
 
 <div align="center" id="readme-top">
 
-  <!-- Venom Header (SVG + CSS Keyframe Animation with Dynamic Color Cycling) -->
-  <a href="#readme-top">
-    <img src="https://capsule-render.vercel.app/api?type=venom&color=auto&height=220&section=header&text=SYSTEM%20MAINFRAME&fontSize=38&fontColor=ffffff&animation=twinkling&fontAlignY=40" width="100%" alt="Header Banner" />
-  </a>
+  <!-- Header + 3D activity card with the roaming koi swimming through them (colours cycle; new random route every 5 hours) -->
+  <img src="assets/scene.svg" width="100%" alt="SYSTEM MAINFRAME header and the animated GitHub activity card with a koi swimming freely through it; the 3D contribution bars sway like grass as it passes" />
+
+  <sub><em>The koi's size follows total contributions; it picks a new random route every 5 hours and the 3D bars sway like grass as it swims through. Built with <a href="https://github.com/yalongwastaken/git-koi">git-koi</a> (vendored in <a href="koi/"><code>koi/</code></a>).</em></sub>
 
 </div>
-
-<br/>
-
-<!-- 3D Activity Landscape (Dynamic Vercel Serverless Rotation - changes theme on every refresh) -->
-<p align="center">
-  <a href="https://scrooge-777.vercel.app/card.svg">
-    <img alt="Interactive 3D Activity Landscape" src="https://scrooge-777.vercel.app/card.svg" width="100%" />
-  </a>
-</p>
-
-<!-- Living Activity Koi (git-koi): roams freely, new random route every 5 hours -->
-<p align="center">
-  <img src="assets/koi-roam.svg" width="100%" alt="A koi swimming freely; its size follows total contributions" />
-  <br/>
-  <sub><em>Living activity koi: its size follows total contributions, and it picks a new random route every 5 hours. Rendered with <a href="https://github.com/yalongwastaken/git-koi">git-koi</a> (vendored in <a href="koi/"><code>koi/</code></a>).</em></sub>
-</p>
 
 <br/>
 
