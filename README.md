@@ -41,13 +41,16 @@
 
 <hr/>
 
-<!-- Minimal Core Arsenal -->
+<!-- Dynamic Core Arsenal with Floating Wave Motion -->
 <h2 align="center">Core Arsenal</h2>
-<br/>
 
 <p align="center">
-  <a href="#readme-top">
-    <img src="https://skillicons.dev/icons?i=cs,rust,python,js,ts,html,css,docker,git&theme=dark" alt="Core Arsenal" />
+  <img src="https://readme-typing-svg.demolab.com?font=Fira+Code&weight=600&size=16&duration=3000&pause=1000&color=38BDF8&center=true&vCenter=true&width=650&height=36&lines=Low-Level+Systems+%26+Microkernel+Architecture;Rust+%2B+C%23+%2B+C%2B%2B+%2B+Python+%2B+Assembly;Deterministic+Study+OS+%26+Hardware+Telemetry" alt="Core Specializations" />
+</p>
+
+<p align="center">
+  <a href="assets/core_arsenal.svg">
+    <img src="assets/core_arsenal.svg" alt="Dynamic Core Arsenal" width="100%" />
   </a>
 </p>
 
