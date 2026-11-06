@@ -26,7 +26,7 @@ cargo run --release --manifest-path card/rust/Cargo.toml
 
 ## Performance & Invariants
 
-- **Execution Overhead**: Standalone native binary with zero Python or pip runtime dependencies.
-- **In-Memory Render Latency**: ~12.6 ms.
-- **Safety**: Pure memory-safe Rust with static type checks and guaranteed XML structural validity.
-- **Continuous Deployment**: Automated via GitHub Actions in `.github/workflows/profile-3d.yml`.
+- **Execution Overhead**: Standalone native binary with no Python or pip runtime dependencies.
+- **Safety**: Pure memory-safe Rust with static type checks.
+- **Data**: totals, language bytes and the radar shape are currently fixed baseline values in `rust/src/main.rs`; the crate does not call the GitHub API yet.
+- **Continuous Deployment**: Regenerated every 2 hours and at midnight IST by `.github/workflows/profile-3d.yml`.

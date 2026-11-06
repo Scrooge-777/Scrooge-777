@@ -14,7 +14,7 @@ on:
       - '.github/workflows/profile-3d.yml'
 
 permissions:
-  contents: write
+  contents: read
 
 concurrency:
   group: profile-3d-sync
@@ -24,6 +24,8 @@ jobs:
   sync:
     runs-on: ubuntu-latest
     timeout-minutes: 10
+    permissions:
+      contents: write
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -49,14 +51,13 @@ jobs:
           cargo run --release --manifest-path card/rust/Cargo.toml
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          PROFILE_TOKEN: ${{ secrets.PROFILE_TOKEN }}
           USERNAME: ${{ github.repository_owner }}
 
       - name: Commit & Push changes
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add docs/profile_card.svg assets/profile_card.svg README.md
+          git add docs/profile_card.svg assets/profile_card.svg
           if ! git diff --staged --quiet; then
             git commit -m "chore(sync): update 3d contribution terrain, radar, and language metrics"
             git pull --rebase --autostash origin main
