@@ -1,6 +1,6 @@
 <div align="right">
   <a href="#readme-top">
-    <img src="assets/coding-vibe.gif" width="115" alt="Coding Vibe" />
+    <img src="assets/coding-vibe.gif" width="220" alt="Coding Vibe" />
   </a>
 </div>
 
