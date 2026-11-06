@@ -1,9 +1,6 @@
 name: Profile card sync
 
 on:
-  schedule:
-    - cron: "0 */2 * * *"   # Every 2 hours
-    - cron: "30 18 * * *"   # Midnight IST (12:00 AM)
   workflow_dispatch:
   push:
     branches:
@@ -25,6 +22,7 @@ jobs:
     timeout-minutes: 10
     permissions:
       contents: write
+      actions: write
     steps:
       - name: Checkout repository
         uses: actions/checkout@v7
@@ -47,7 +45,7 @@ jobs:
 
       - name: Fetch Live GitHub Contribution Calendar
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ secrets.PROFILE_TOKEN || secrets.GITHUB_TOKEN }}
         run: |
           gh api graphql -f query='
             query {
@@ -80,7 +78,7 @@ jobs:
         run: |
           cargo run --release --manifest-path card/rust/Cargo.toml -- docs/profile_card.svg docs/profile_card.svg --calendar calendar.json
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.PROFILE_TOKEN || secrets.GITHUB_TOKEN }}
           USERNAME: ${{ github.repository_owner }}
 
       - name: Commit & Push changes
@@ -95,4 +93,4 @@ jobs:
             gh workflow run koi.yml --ref main || true
           fi
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ secrets.PROFILE_TOKEN || secrets.GITHUB_TOKEN }}
