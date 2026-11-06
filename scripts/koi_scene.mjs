@@ -276,8 +276,7 @@ export function scopeCss(css, scope) {
   return text.replace(/@@KF(\d+)@@/g, (m, i) => keyframes[Number(i)]);
 }
 
-// One colour for the whole scene: the "Monochrome Platinum" theme of the Vercel card endpoint
-// (api/card.js), applied with the same replacements that endpoint makes.
+// One colour for the whole scene: Monochrome Platinum theme, applied to match the integrated vector scene.
 export const PLATINUM = {
   accent: "#e2e8f0", accentLight: "#ffffff",
   bg0: "#11151c", bg1: "#0b0e13", bg2: "#030406",

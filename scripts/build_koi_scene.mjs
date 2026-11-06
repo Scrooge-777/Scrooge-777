@@ -3,9 +3,8 @@
 //   fish mode (default): assets/koi-roam.svg, a transparent strip with only the koi in it. It
 //     changes nothing about the rest of the README.
 //   scene mode: assets/scene.svg, the header and activity card with the koi swimming under them.
-//   card mode: the koi swims inside the activity card itself (docs/profile_card.svg), which the
-//     Vercel endpoint behind the README's card.svg serves with a fresh colour theme on every
-//     refresh. The route comes from a saved seed, so every rebuild of the card in the next five
+//   card mode: the koi swims inside the activity card itself (docs/profile_card.svg).
+//     The route comes from a saved seed, so every rebuild of the card in the next five
 //     hours keeps the same route; --renew picks a new one.
 //
 // node scripts/build_koi_scene.mjs --snapshot S.json --sprite SPRITE.json --out assets/koi-roam.svg

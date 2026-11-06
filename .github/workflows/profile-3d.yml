@@ -10,7 +10,6 @@ on:
       - main
     paths:
       - 'card/rust/**'
-      - 'card/themes/**'
       - '.github/workflows/profile-3d.yml'
 
 permissions:
