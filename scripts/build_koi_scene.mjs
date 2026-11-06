@@ -14,6 +14,7 @@
 //   [--seed N] [--speed X]
 import fs from "node:fs";
 import { buildCardWithKoi, buildFishStrip, buildScene } from "./koi_scene.mjs";
+import { planFamily } from "./koi_family.mjs";
 
 const args = Object.fromEntries(
   process.argv.slice(2).reduce((acc, token, i, all) => (token.startsWith("--") ? [...acc, [token.slice(2), all[i + 1]]] : acc), []),
@@ -41,12 +42,13 @@ if (args.seed) {
 if (mode === "card" && args.state && !kept) fs.writeFileSync(args.state, JSON.stringify({ seed, built: new Date().toISOString() }) + String.fromCharCode(10));
 const speed = Number(args.speed || 1);
 
+const family = planFamily(snapshot.contribution_history?.days ?? [], new Date());
 let result;
 if (mode === "card") {
   result = buildCardWithKoi({ seed, speed, sprite, cardSvg: fs.readFileSync(args.card, "utf8") });
 } else if (mode === "scene") {
   result = buildScene({
-    seed, speed, sprite,
+    seed, speed, sprite, family: family.fish,
     headerSvg: fs.readFileSync(args.header, "utf8"),
     cardSvg: fs.readFileSync(args.card, "utf8"),
   });
@@ -60,4 +62,5 @@ if (!svg.includes("<animateMotion") || svg.length < 5000) {
 }
 fs.writeFileSync(args.out, svg);
 const r = meta.routes ? meta.routes[0] : meta;
+if (mode === "scene") console.log(`family: ${family.fish.map((f) => f.kind + (f.reason && f.kind !== "parent" ? " (" + f.reason + ", " + Math.round(f.age) + "d)" : "")).join(", ")}; idle ${family.idle}d, faded ${family.faded}, retired ${family.retired}`);
 console.log(`build_koi_scene (${mode}): seed ${seed}, ${(svg.length / 1024).toFixed(0)} KB, loop ${r.duration.toFixed(0)} s, ${Math.round(r.speed)} px/s -> ${args.out}`);

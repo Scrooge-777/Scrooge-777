@@ -297,10 +297,8 @@ export function applyTheme(svg, t = PLATINUM) {
   svg = svg.replace(/(<polygon points="[^"]+" fill="url\(#radarFill\)" stroke=")[^"]+(" stroke-width="1.8" stroke-linejoin="round"\/>)/g, `$1${t.accent}$2`);
   svg = svg.replace(/(<circle class="radar-node" cx="[^"]+" cy="[^"]+" r="4" fill=")[^"]+("\/>)/g, `$1${t.accent}$2`);
   svg = svg.replace(/\.strong\{fill:#[0-9a-fA-F]+\}/g, `.strong{fill:${t.accent}}`);
-  svg = svg.replace(/stroke:#(?:57da69|ffd700)/gi, `stroke:${t.accent}`);
-  // the language colours become platinum shades too, so the card is a single colour
-  const lang = { "#178600": t.c4t, "#DEA584": t.c4l, "#F1E05A": t.c3t, "#3572A5": t.c3l, "#8B949E": t.c3r };
-  return svg.replace(/#(?:178600|DEA584|F1E05A|3572A5|8B949E)/gi, (m) => lang[m.toUpperCase()]);
+  // the pie chart keeps its original language colours so the slices stay easy to tell apart
+  return svg.replace(/stroke:#(?:57da69|ffd700)/gi, `stroke:${t.accent}`);
 }
 
 export function prepareCard(svgText) {
@@ -483,7 +481,9 @@ export function prepareHeader(svgText) {
   return inner;
 }
 
-export function buildScene({ seed = 1, behavior = "cruise", speed = 1, fish = 1, sprite, headerSvg, cardSvg, koiScale = 0.6 }) {
+export function buildScene({ seed = 1, behavior = "cruise", speed = 1, fish = 1, family = null, sprite, headerSvg, cardSvg, koiScale = 0.6 }) {
+  // family: the fish to draw (see koi_family.mjs); otherwise `fish` copies, the first full size
+  const crew = family ?? Array.from({ length: fish }, (_, i) => ({ growth: i === 0 ? 1 : BABY_SCALE, age: Infinity }));
   const bannerInner = prepareHeader(headerSvg);
   const factor = (MODES[behavior] ?? 1) * speed;
   const fw = sprite.w, fh = sprite.h, frames = sprite.frames;
@@ -497,7 +497,7 @@ export function buildScene({ seed = 1, behavior = "cruise", speed = 1, fish = 1,
   const paths = [];
   const defs = [];
   const fishSvg = [];
-  for (let i = 0; i < fish; i++) {
+  for (let i = 0; i < crew.length; i++) {
     const rng = mulberry32((seed + i * 7919) >>> 0);
     const route = planRoute(rng);
     const sim = simulate(route, rng, factor * (i === 0 ? 1 : 1.12));
@@ -505,10 +505,11 @@ export function buildScene({ seed = 1, behavior = "cruise", speed = 1, fish = 1,
     paths.push({ route, sim });
     const keyPoints = sim.samples.map((smp) => f3(clamp(smp.s / route.poly.length, 0, 1))).join(";");
     const keyTimes = sim.samples.map((smp) => f3(clamp(smp.t / T, 0, 1))).join(";");
-    const scale = koiScale * (i === 0 ? 1 : BABY_SCALE);
+    const scale = koiScale * crew[i].growth;
+    const pop = crew[i].age < 2 ? `<animate attributeName="opacity" values="0;1" dur="2.5s" fill="freeze"/>` : ""; // a newborn fades in
     defs.push(`<path id="route${i}" d="${pathData(route.segs)}" fill="none"/>`);
     fishSvg.push(
-      `<g class="fish"><animateMotion dur="${f1(T)}s" repeatCount="indefinite" rotate="auto" calcMode="linear" keyPoints="${keyPoints}" keyTimes="${keyTimes}"><mpath href="#route${i}" xlink:href="#route${i}"/></animateMotion>`
+      `<g class="fish">${pop}<animateMotion dur="${f1(T)}s" repeatCount="indefinite" rotate="auto" calcMode="linear" keyPoints="${keyPoints}" keyTimes="${keyTimes}"><mpath href="#route${i}" xlink:href="#route${i}"/></animateMotion>`
       + `<g transform="scale(${f3(scale)}) translate(${-pivotX} ${-pivotY})"><use href="#koi-sprite" xlink:href="#koi-sprite"/></g></g>`,
     );
     routes.push({
@@ -533,7 +534,8 @@ export function buildScene({ seed = 1, behavior = "cruise", speed = 1, fish = 1,
   // Layer order: header background < 3D terrain < koi < header text < rest of the card. The koi
   // swims over the terrain (whose bars sway like grass) and under everything else.
   const { terrain, rest: cardRest } = splitTerrain(prepareCard(cardSvg));
-  const grass = terrain && paths.length ? addGrass(terrain, paths[0]) : { svg: terrain, swaying: 0 };
+  let grass = { svg: terrain, swaying: 0 };
+  if (terrain) for (const path of paths) { const g = addGrass(grass.svg, path); grass = { svg: g.svg, swaying: Math.max(grass.swaying, g.swaying) }; } // every fish bends the bars
   const terrainSvg = grass.svg;
     const textAt = bannerInner.indexOf("<text");
   const bannerBack = textAt > 0 ? bannerInner.slice(0, textAt) : bannerInner;
@@ -549,7 +551,7 @@ export function buildScene({ seed = 1, behavior = "cruise", speed = 1, fish = 1,
 <svg class="cd" x="0" y="${SCENE.cardY}" width="1280" height="${SCENE.cardHeight}" viewBox="0 0 1280 850" overflow="hidden">${cardRest}</svg>
 </svg>`;
 
-  return { svg, meta: { routes, bytes: svg.length, fish, speedFactor: factor, swayingBars: grass.swaying } };
+  return { svg, meta: { routes, bytes: svg.length, fish: crew.length, speedFactor: factor, swayingBars: grass.swaying } };
 }
 
 // ---------- a fish on its own: a transparent strip that drops into a README ----------
