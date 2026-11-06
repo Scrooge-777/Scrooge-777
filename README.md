@@ -1,11 +1,35 @@
+<div align="right">
+  <a href="#readme-top">
+    <img src="assets/coding-vibe.gif" width="280" alt="Coding Vibe" />
+  </a>
+</div>
+
 <div align="center" id="readme-top">
 
-  <!-- Header + activity card with the roaming koi swimming under them (rebuilt every 5 hours) -->
-  <img src="assets/scene.svg" width="100%" alt="SYSTEM MAINFRAME header and an animated GitHub activity card: 3D contribution terrain, contribution mix radar, top languages and totals, with a koi swimming freely underneath" />
-
-  <sub><em>The koi's size follows total contributions; it picks a new random route every 5 hours. Built with <a href="https://github.com/yalongwastaken/git-koi">git-koi</a> (vendored in <a href="koi/"><code>koi/</code></a>) and <a href="scripts/koi_scene.mjs"><code>scripts/koi_scene.mjs</code></a>.</em></sub>
+  <!-- Venom Header (SVG + CSS Keyframe Animation with Dynamic Color Cycling) -->
+  <a href="#readme-top">
+    <img src="https://capsule-render.vercel.app/api?type=venom&color=auto&height=220&section=header&text=SYSTEM%20MAINFRAME&fontSize=38&fontColor=ffffff&animation=twinkling&fontAlignY=40" width="100%" alt="Header Banner" />
+  </a>
 
 </div>
+
+<br/>
+
+<!-- 3D Activity Landscape (Dynamic Vercel Serverless Rotation - changes theme on every refresh) -->
+<p align="center">
+  <a href="https://scrooge-777.vercel.app/card.svg">
+    <img alt="Interactive 3D Activity Landscape" src="https://scrooge-777.vercel.app/card.svg" width="100%" />
+  </a>
+</p>
+
+<!-- Living Activity Koi (git-koi) -->
+<p align="center">
+  <a href="koi/">
+    <img src="assets/koi.gif" width="220" alt="Activity Koi" />
+  </a>
+  <br/>
+  <sub><em>Living activity koi: scale patterns encode public streaks, colors reflect repository languages, and daily motion tracks GitHub rhythm. Rendered nightly via <a href="koi/">git-koi</a>.</em></sub>
+</p>
 
 <br/>
 
