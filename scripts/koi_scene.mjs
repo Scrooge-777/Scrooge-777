@@ -25,11 +25,13 @@ export const SCENE = { width: 1280, headerHeight: Math.round(HEADER.height * HEA
 export const MODES = { cruise: 1.0, dart: 1.5, feeding: 0.9, rest: 0.5, deep: 0.25 };
 
 const BASE_SPEED = 270; // scene px per second (about two body lengths per second)
-const MARGIN = { x: 70, y: 70 };
+const MARGIN = { x: 60, top: 60, bottom: 40 };
 const KICK_PERIOD = 0.9; // seconds between tail-beat surges
 const SAMPLE_DT = 0.2; // keyframe spacing along the route
 const MAX_CURVATURE = 1 / 110; // tightest turn allowed (1 / radius in px)
 const BABY_SCALE = 0.55;
+// The 3D contribution terrain inside the card (scene px); the koi swims over it and the bars sway.
+const TERRAIN = { x: 170, y: SCENE.cardY + 160, w: 460, h: 280 };
 
 // ---------- helpers ----------
 export function mulberry32(seed) {
@@ -138,11 +140,18 @@ function judge(poly, bounds) {
 // another the moment it gets there. The wander is simulated here, then joined back to its
 // start with one smooth connecting curve, so the baked route loops without a jump.
 export function planRoute(rng) {
-  const bounds = { x0: MARGIN.x, y0: MARGIN.y, x1: SCENE.width - MARGIN.x, y1: SCENE.height - MARGIN.y };
+  const bounds = { x0: MARGIN.x, y0: MARGIN.top, x1: SCENE.width - MARGIN.x, y1: SCENE.height - MARGIN.bottom };
   const STEP = 16; // px of travel per simulation step
   const MAX_TURN = STEP * MAX_CURVATURE; // radians per step
   const MIN_LENGTH = 11000, MAX_LENGTH = 24000;
   const randomSpot = () => {
+    const roll = rng();
+    if (roll < 0.2) { // inside the 3D terrain
+      return [TERRAIN.x + rng() * TERRAIN.w, TERRAIN.y + rng() * TERRAIN.h];
+    }
+    if (roll < 0.32) { // along the row of stat pills at the bottom
+      return [bounds.x0 + rng() * (bounds.x1 - bounds.x0), SCENE.cardY + 800 + rng() * 45];
+    }
     if (rng() < 0.3) { // an edge or corner region
       const cx = rng() < 0.5 ? bounds.x0 + rng() * 200 : bounds.x1 - rng() * 200;
       const cy = rng() < 0.5 ? bounds.y0 + rng() * 260 : bounds.y1 - rng() * 260;
@@ -274,6 +283,82 @@ export function prepareCard(svgText) {
   return inner;
 }
 
+
+// ---------- the 3D terrain: pull it out of the card so the koi can swim over it ----------
+export function splitTerrain(cardInner) {
+  const start = cardInner.indexOf('<g id="terrain-island"');
+  if (start < 0) return { terrain: "", rest: cardInner };
+  const re = /<g\b|<\/g>/g;
+  re.lastIndex = start;
+  let depth = 0, end = -1, m;
+  while ((m = re.exec(cardInner))) {
+    if (m[0] === "</g>") { depth--; if (depth === 0) { end = m.index + 4; break; } } else depth++;
+  }
+  if (end < 0) return { terrain: "", rest: cardInner };
+  return { terrain: cardInner.slice(start, end), rest: cardInner.slice(0, start) + cardInner.slice(end) };
+}
+
+const GRASS = { radius: 150, core: 45, maxDegrees: 12, hertz: 1.4, damping: 0.32, step: 0.05, out: 0.1 };
+
+// Position of a fish at time t on its looping route.
+function fishAt(path, t) {
+  const { samples, duration } = path.sim;
+  const tt = ((t % duration) + duration) % duration;
+  let lo = 0, hi = samples.length - 1;
+  while (hi - lo > 1) { const mid = (lo + hi) >> 1; if (samples[mid].t <= tt) lo = mid; else hi = mid; }
+  const f = (tt - samples[lo].t) / Math.max(1e-9, samples[hi].t - samples[lo].t);
+  return posAt(path.route.poly, samples[lo].s + (samples[hi].s - samples[lo].s) * f);
+}
+
+// Make every terrain bar lean away from the koi as it swims past and spring back with a
+// small wobble, like grass: one rotate animation per bar, only for bars the koi reaches.
+export function addGrass(terrainSvg, path) {
+  const T = path.sim.duration;
+  const steps = Math.round(T / GRASS.step);
+  const fishPath = Array.from({ length: steps }, (_, i) => fishAt(path, i * GRASS.step));
+  const omega = 2 * Math.PI * GRASS.hertz;
+  let swaying = 0;
+  const colRe = /<g class="iso-col" transform="translate\(([\d.]+) ([\d.]+)\) scale\(([\d.]+)\)">([\s\S]*?)<\/g>/g;
+  const out = terrainSvg.replace(colRe, (whole, tx, ty, sc, inner) => {
+    const hMatch = inner.match(/class="c\dl"[^>]*><animate attributeName="height" values="[\d.]+;([\d.]+)"/);
+    const height = hMatch ? Number(hMatch[1]) : 3;
+    const baseY = height * 1.15 + 10, baseX = 9;
+    const centre = [Number(tx) + baseX * Number(sc), SCENE.cardY + Number(ty) + baseY * 0.45 * Number(sc)];
+    const reach = 0.45 + 0.55 * clamp(height / 55, 0, 1); // taller bars sway more
+    const target = (p) => {
+      const d = dist(p, centre);
+      if (d >= GRASS.radius) return 0;
+      const u = clamp((GRASS.radius - d) / (GRASS.radius - GRASS.core), 0, 1);
+      return Math.sign(centre[0] - p[0] || 1) * GRASS.maxDegrees * reach * u * u * (3 - 2 * u);
+    };
+    if (!fishPath.some((p) => dist(p, centre) < GRASS.radius)) return whole;
+    // damped spring, run two loops so the end matches the start
+    let a = 0, v = 0;
+    const series = [];
+    for (let pass = 0; pass < 2; pass++) {
+      for (let i = 0; i < steps; i++) {
+        const acc = omega * omega * (target(fishPath[i]) - a) - 2 * GRASS.damping * omega * v;
+        v += acc * GRASS.step;
+        a += v * GRASS.step;
+        if (pass === 1) series.push(a);
+      }
+    }
+    const every = Math.round(GRASS.out / GRASS.step);
+    const keys = [];
+    for (let i = 0; i < steps; i += every) {
+      const active = Math.abs(series[i]) > 0.12 || Math.abs(series[Math.max(0, i - every)]) > 0.12 || Math.abs(series[Math.min(steps - 1, i + every)]) > 0.12;
+      if (active || i === 0) keys.push([i * GRASS.step, series[i]]);
+    }
+    if (keys[keys.length - 1][0] < T - 1e-6) keys.push([T, series[0]]);
+    if (keys.length < 3) return whole;
+    swaying++;
+    const keyTimes = keys.map(([t]) => f3(clamp(t / T, 0, 1))).join(";");
+    const values = keys.map(([, ang]) => `${Math.round(ang * 100) / 100} ${baseX} ${f1(baseY)}`).join(";");
+    return whole.replace(/<\/g>$/, `<animateTransform attributeName="transform" type="rotate" additive="sum" dur="${f1(T)}s" repeatCount="indefinite" calcMode="linear" keyTimes="${keyTimes}" values="${values}"/></g>`);
+  });
+  return { svg: out, swaying };
+}
+
 // ---------- the scene ----------
 // The header SVG comes from capsule-render. Namespace its ids, classes and keyframes so
 // they cannot clash with the card's, and drop the outer <svg> tag.
@@ -298,6 +383,7 @@ export function buildScene({ seed = 1, behavior = "cruise", speed = 1, fish = 1,
   const flipDur = f3((frames * 70) / 1000);
 
   const routes = [];
+  const paths = [];
   const defs = [];
   const fishSvg = [];
   for (let i = 0; i < fish; i++) {
@@ -305,6 +391,7 @@ export function buildScene({ seed = 1, behavior = "cruise", speed = 1, fish = 1,
     const route = planRoute(rng);
     const sim = simulate(route, rng, factor * (i === 0 ? 1 : 1.12));
     const T = sim.duration;
+    paths.push({ route, sim });
     const keyPoints = sim.samples.map((smp) => f3(clamp(smp.s / route.poly.length, 0, 1))).join(";");
     const keyTimes = sim.samples.map((smp) => f3(clamp(smp.t / T, 0, 1))).join(";");
     const scale = koiScale * (i === 0 ? 1 : BABY_SCALE);
@@ -332,9 +419,12 @@ export function buildScene({ seed = 1, behavior = "cruise", speed = 1, fish = 1,
     + `<animateTransform attributeName="transform" type="translate" calcMode="discrete" dur="${flipDur}s" repeatCount="indefinite" values="${frameVals}"/></image></svg></g>`;
 
   const k = HEADER_SCALE;
-  // Layer order: banner background < koi < banner text < card (so the koi swims under the
-  // title, the graphs and every other drawn element, and shows through the glass panels).
-  const textAt = bannerInner.indexOf("<text");
+  // Layer order: header background < 3D terrain < koi < header text < rest of the card. The koi
+  // swims over the terrain (whose bars sway like grass) and under everything else.
+  const { terrain, rest: cardRest } = splitTerrain(prepareCard(cardSvg));
+  const grass = terrain && paths.length ? addGrass(terrain, paths[0]) : { svg: terrain, swaying: 0 };
+  const terrainSvg = grass.svg;
+    const textAt = bannerInner.indexOf("<text");
   const bannerBack = textAt > 0 ? bannerInner.slice(0, textAt) : bannerInner;
   const bannerFront = textAt > 0 ? bannerInner.slice(textAt) : "";
   const svg = `<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 ${SCENE.width} ${SCENE.height}" width="${SCENE.width}" height="${SCENE.height}" role="img" aria-labelledby="scene-t scene-d">
@@ -342,10 +432,11 @@ export function buildScene({ seed = 1, behavior = "cruise", speed = 1, fish = 1,
 <desc id="scene-d">The profile header and GitHub activity card. Koi swim freely under all of it; their size follows total contributions.</desc>
 <defs>${defs.join("")}${sprites}</defs>
 <g transform="scale(${f3(k)})">${bannerBack}</g>
+<svg class="cd" x="0" y="${SCENE.cardY}" width="1280" height="${SCENE.cardHeight}" viewBox="0 0 1280 850" overflow="hidden">${terrainSvg}</svg>
 <g id="koi">${fishSvg.join("")}</g>
 <g transform="scale(${f3(k)})">${bannerFront}</g>
-<svg class="cd" x="0" y="${SCENE.cardY}" width="1280" height="${SCENE.cardHeight}" viewBox="0 0 1280 850" overflow="hidden">${prepareCard(cardSvg)}</svg>
+<svg class="cd" x="0" y="${SCENE.cardY}" width="1280" height="${SCENE.cardHeight}" viewBox="0 0 1280 850" overflow="hidden">${cardRest}</svg>
 </svg>`;
 
-  return { svg, meta: { routes, bytes: svg.length, fish, speedFactor: factor } };
+  return { svg, meta: { routes, bytes: svg.length, fish, speedFactor: factor, swayingBars: grass.swaying } };
 }
