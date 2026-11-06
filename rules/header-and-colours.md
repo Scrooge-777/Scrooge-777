@@ -7,7 +7,7 @@
 | Part | Value |
 | --- | --- |
 | Text | NYX |
-| Where to change it | `scene/header.svg` (the word between the `<text>` tags) |
+| Where to change it | `src/scene/header.svg` (the word between the `<text>` tags) |
 | Title colour | Light silver `#e2e8f0` |
 | Shape behind it | A dim slate blob `#394254`, so the light title reads on any background |
 

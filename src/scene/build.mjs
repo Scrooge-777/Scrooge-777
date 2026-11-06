@@ -1,8 +1,8 @@
 // Build the README picture: the header and the activity card with the koi family swimming
 // through them.
 //
-//   node scene/build.mjs --profile build/profile.json --card build/card.svg \
-//        --sprite build/sprite.json --header scene/header.svg --out assets/scene.svg [--seed N] [--now 2026-11-07T21:30:00Z]
+//   node src/scene/build.mjs --profile build/profile.json --card build/card.svg \
+//        --sprite build/sprite.json --header src/scene/header.svg --out assets/scene.svg [--seed N] [--now 2026-11-07T21:30:00Z]
 //
 // The route changes every 5 hours: the seed is the profile login plus the number of 5-hour
 // periods since 1970, so runs inside one period reproduce the same picture and only a new

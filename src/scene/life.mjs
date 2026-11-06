@@ -2,7 +2,7 @@
 //
 // A README picture cannot read the clock, so the state is worked out when the picture is built
 // (every 2 hours) from the time in your time zone and from how recently you contributed.
-import { RULES } from "../rules/index.mjs";
+import { RULES } from "../../rules/index.mjs";
 
 export const LIFE = RULES.life;
 export const STATE_ORDER = ["sleep", "rest", "calm", "active"]; // from least to most energetic

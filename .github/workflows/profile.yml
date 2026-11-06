@@ -13,9 +13,16 @@ on:
     branches: [main]
     paths:
       - ".github/workflows/profile.yml"
-      - "card/**"
-      - "scene/**"
-      - "koi/**"
+      - "src/**"
+      - "vendor/**"
+      - "rules/**"
+      - "test/**"
+      - "package.json"
+  pull_request:          # a branch is tested before it is merged; the picture is only built on main
+    paths:
+      - ".github/workflows/profile.yml"
+      - "src/**"
+      - "vendor/**"
       - "rules/**"
       - "test/**"
       - "package.json"
@@ -24,7 +31,7 @@ permissions:
   contents: read
 
 concurrency:
-  group: profile
+  group: profile-${{ github.ref }}
   cancel-in-progress: false
 
 env:
@@ -41,10 +48,11 @@ jobs:
       - name: Unit tests (card data, card layout, koi family, scene)
         run: node --test test/*.test.mjs
       - name: Koi engine tests
-        run: cargo test --manifest-path koi/Cargo.toml --quiet
+        run: cargo test --manifest-path vendor/git-koi/Cargo.toml --quiet
 
   build:
     needs: test
+    if: github.event_name != 'pull_request'
     runs-on: ubuntu-latest
     timeout-minutes: 20
     permissions:
@@ -62,13 +70,13 @@ jobs:
           path: |
             ~/.cargo/registry
             ~/.cargo/git
-            koi/target
-          key: ${{ runner.os }}-koi-${{ hashFiles('koi/Cargo.lock', 'koi/src/**', 'koi/examples/**') }}
+            vendor/git-koi/target
+          key: ${{ runner.os }}-koi-${{ hashFiles('vendor/git-koi/Cargo.lock', 'vendor/git-koi/src/**', 'vendor/git-koi/examples/**') }}
           restore-keys: |
             ${{ runner.os }}-koi-
 
       - name: Build the vendored git-koi engine
-        run: cargo build --release --manifest-path koi/Cargo.toml --bins --examples
+        run: cargo build --release --manifest-path vendor/git-koi/Cargo.toml --bins --examples
 
       - name: Fetch live data and draw the activity card
         env:
@@ -78,28 +86,28 @@ jobs:
           GITHUB_TOKEN: ${{ github.token }}
         run: |
           if [ -z "$PROFILE_TOKEN" ]; then echo "::warning::PROFILE_TOKEN is not set: private contributions are not counted"; fi
-          node card/build.mjs --login "${{ github.repository_owner }}" --out build/card.svg --profile-out build/profile.json
+          node src/card/build.mjs --login "${{ github.repository_owner }}" --out build/card.svg --profile-out build/profile.json
 
       - name: Collect the account snapshot for the koi
         env:
           GH_TOKEN: ${{ secrets.PROFILE_TOKEN || github.token }}
-        run: koi/target/release/git-koi collect "${{ github.repository_owner }}" --output build/snapshot.json
+        run: vendor/git-koi/target/release/git-koi collect "${{ github.repository_owner }}" --output build/snapshot.json
 
       - name: Render the koi at today's size
         run: |
           TOTAL=$(node -e 'console.log(JSON.parse(require("fs").readFileSync("build/profile.json","utf8")).totals.contributions)')
           echo "total contributions: $TOTAL"
-          koi/target/release/examples/roam_sprites build/snapshot.json build/sprites asagi "$TOTAL"
+          vendor/git-koi/target/release/examples/roam_sprites build/snapshot.json build/sprites asagi "$TOTAL"
           python -m pip install --quiet "pillow==12.2.0" "numpy==2.4.6"
-          python scene/strip.py build/sprites "$TOTAL" build/sprite.json
+          python src/scene/strip.py build/sprites "$TOTAL" build/sprite.json
 
       - name: Build the scene
         run: >
-          node scene/build.mjs
+          node src/scene/build.mjs
           --profile build/profile.json
           --card build/card.svg
           --sprite build/sprite.json
-          --header scene/header.svg
+          --header src/scene/header.svg
           --out assets/scene.svg
 
       - name: Commit the picture if it changed

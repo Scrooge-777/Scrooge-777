@@ -4,7 +4,7 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import fs from "node:fs";
 import { RULES } from "../rules/index.mjs";
-import { radarRadius, LEVEL_HEIGHT } from "../card/card.mjs";
+import { radarRadius, LEVEL_HEIGHT } from "../src/card/card.mjs";
 
 const sheet = (name) => fs.readFileSync(new URL(`../rules/${name}`, import.meta.url), "utf8");
 const pad = (h) => `${String(h).padStart(2, "0")}:00`;
@@ -73,12 +73,12 @@ test("activity-card.md matches the card rules and the code", () => {
 
 test("header-and-colours.md names the real palette", () => {
   const t = sheet("header-and-colours.md");
-  const template = fs.readFileSync(new URL("../card/template.svg", import.meta.url), "utf8");
+  const template = fs.readFileSync(new URL("../src/card/template.svg", import.meta.url), "utf8");
   for (const hex of ["#1b1f28", "#394254", "#58657d", "#94a3b8", "#e2e8f0"]) {
     has(t, hex, "palette");
     assert.ok(template.includes(hex), `the card template uses ${hex}`);
   }
-  const header = fs.readFileSync(new URL("../scene/header.svg", import.meta.url), "utf8");
+  const header = fs.readFileSync(new URL("../src/scene/header.svg", import.meta.url), "utf8");
   const title = (header.match(/class="text"[^>]*>([^<]+)</) || [])[1];
   has(t, `| Text | ${title} |`, "title");
 });

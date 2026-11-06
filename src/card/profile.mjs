@@ -7,7 +7,7 @@
 // Days are bucketed in YOUR time zone (PROFILE_TZ, default Asia/Kolkata). Without the Time-Zone
 // header GitHub buckets in UTC, which is why a Kolkata evening could be missing from the card.
 
-import { RULES } from "../rules/index.mjs";
+import { RULES } from "../../rules/index.mjs";
 
 export const QUERY = `
 query ($login: String!) {

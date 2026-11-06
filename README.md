@@ -1,6 +1,6 @@
 <div align="center" id="readme-top">
 
-  <!-- Header + live 3D activity card with a family of koi swimming through them; rebuilt by .github/workflows/profile.yml (see DEVELOPMENT.md) -->
+  <!-- Header + live 3D activity card with a family of koi swimming through them; rebuilt by .github/workflows/profile.yml (see docs/development.md and rules/) -->
   <img src="assets/scene.svg" width="100%" alt="NYX: my live GitHub activity card with a family of koi swimming through it" />
 
 </div>
