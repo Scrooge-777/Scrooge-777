@@ -14,20 +14,13 @@
 
 <br/>
 
-<!-- Interactive 3D GitHub Activity Card (Isometric Terrain + Radar + Languages + KPIs) -->
-<p align="center">
-  <a href="#readme-top">
-    <img alt="Interactive 3D Activity Landscape" src="https://scrooge-777.vercel.app/card.svg" width="90%" />
-  </a>
-</p>
-
-<!-- Living Activity Koi (Self-Hosted Database) -->
+<!-- Living Mainframe Landscape with Autonomous Roaming Activity Koi -->
 <p align="center">
   <a href="koi/">
-    <img src="koi/koi.gif" width="220" alt="SREEHARAN's Activity Koi" />
+    <img alt="Interactive 3D Activity Landscape with Roaming Koi" src="https://scrooge-777.vercel.app/card.svg" width="92%" />
   </a>
   <br/>
-  <sub><em>Living activity koi roaming the mainframe landscape. Scale patterns encode public streaks, colors reflect repository languages, and daily motion tracks GitHub rhythm. Self-hosted database in <a href="koi/">Scrooge-777/koi</a>.</em></sub>
+  <sub><em>Autonomous activity koi roaming freely across the mainframe landscape. Scale patterns encode public streaks, colors reflect repository languages, and daily motion tracks GitHub rhythm. Self-hosted database in <a href="koi/">Scrooge-777/koi</a>.</em></sub>
 </p>
 
 <br/>
