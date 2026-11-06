@@ -71,46 +71,6 @@ fn main() {
 
     let langs_xml = Some(languages::generate_languages_svg(&langs));
 
-    // Check for koi.gif to inline as base64
-    let koi_candidates = [
-        "koi/koi.gif",
-        "../koi/koi.gif",
-        "assets/koi.gif",
-        "C:/Users/SREEHARAN/.gemini/antigravity-cli/scratch/koi.gif",
-        "S:/Works/Projects/portfolio/koi.gif",
-    ];
-    let mut koi_b64 = None;
-    for cand in koi_candidates {
-        if Path::new(cand).exists() {
-            if let Ok(bytes) = fs::read(cand) {
-                let b64 = {
-                    const CHARSET: &[u8] = b"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
-                    let mut res = String::new();
-                    for chunk in bytes.chunks(3) {
-                        let b0 = chunk[0];
-                        let b1 = if chunk.len() > 1 { chunk[1] } else { 0 };
-                        let b2 = if chunk.len() > 2 { chunk[2] } else { 0 };
-                        res.push(CHARSET[(b0 >> 2) as usize] as char);
-                        res.push(CHARSET[(((b0 & 3) << 4) | (b1 >> 4)) as usize] as char);
-                        if chunk.len() > 1 {
-                            res.push(CHARSET[(((b1 & 15) << 2) | (b2 >> 6)) as usize] as char);
-                        } else {
-                            res.push('=');
-                        }
-                        if chunk.len() > 2 {
-                            res.push(CHARSET[(b2 & 63) as usize] as char);
-                        } else {
-                            res.push('=');
-                        }
-                    }
-                    res
-                };
-                koi_b64 = Some(b64);
-                break;
-            }
-        }
-    }
-
     let updated_svg = svg::update_svg_content(
         svg_content,
         None, // Keep current 3D terrain columns if no new GraphQL snapshot
@@ -122,10 +82,15 @@ fn main() {
         s_cnt,
         f_cnt,
         at_val,
-        koi_b64.as_deref(),
     );
 
     fs::write(output_path, &updated_svg).expect("Failed to write output SVG");
+
+    // Mirror to assets if docs was target
+    if output_path == "docs/profile_card.svg" && Path::new("assets").exists() {
+        let _ = fs::write("assets/profile_card.svg", &updated_svg);
+    }
+
     let elapsed = start_time.elapsed();
     println!(">>> Successfully generated and validated: {}", output_path);
     println!(">>> Output Size: {} bytes", updated_svg.len());

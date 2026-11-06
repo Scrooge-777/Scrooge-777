@@ -15,13 +15,13 @@
 
 <br/>
 
-<!-- Living Mainframe Landscape with Autonomous Roaming Activity Koi -->
+<!-- Living Mainframe Landscape -->
 <p align="center">
-  <a href="koi/">
-    <img alt="Interactive 3D Activity Landscape with Roaming Koi" src="docs/profile_card.svg" width="100%" />
+  <a href="assets/">
+    <img alt="Interactive 3D Activity Landscape" src="docs/profile_card.svg" width="100%" />
   </a>
   <br/>
-  <sub><em>Autonomous activity koi roaming freely across the mainframe landscape. Scale patterns encode public streaks, colors reflect repository languages, and daily motion tracks GitHub rhythm. Self-hosted database in <a href="koi/">Scrooge-777/koi</a>.</em></sub>
+  <sub><em>Interactive 3D activity landscape tracking GitHub rhythm, language distribution, and commit dynamics. Self-hosted assets and cutting database in <a href="assets/">assets/</a>.</em></sub>
 </p>
 
 <br/>

@@ -11,7 +11,6 @@ pub fn update_svg_content(
     s_cnt: u32,
     f_cnt: u32,
     at_val: Option<(u32, u32)>,
-    koi_base64: Option<&str>,
 ) -> String {
     // 1. Sync 3D columns
     if let Some(wrapped_island) = terrain_xml {
@@ -55,11 +54,7 @@ pub fn update_svg_content(
 
         let label_x = 992 + 18 * at_contribs.to_string().len() + 8;
         let pill_xml = format!(
-            "<!-- alltime -->\n\
-            <rect x=\"974\" y=\"786\" width=\"214\" height=\"46\" rx=\"14\" class=\"card kpi-pill\"/>\n\
-            <text x=\"992\" y=\"818\" font-size=\"26\" font-weight=\"800\" class=\"strong\">{}</text>\n\
-            <text x=\"{}\" y=\"817\" font-size=\"14\" class=\"weak\">since Sep 2026<title>{} contributions, {} active days</title></text>\n\
-            <!-- /alltime -->\n",
+            "<!-- alltime -->\n            <rect x=\"974\" y=\"786\" width=\"214\" height=\"46\" rx=\"14\" class=\"card kpi-pill\"/>\n            <text x=\"992\" y=\"818\" font-size=\"26\" font-weight=\"800\" class=\"strong\">{}</text>\n            <text x=\"{}\" y=\"817\" font-size=\"14\" class=\"weak\">since Sep 2026<title>{} contributions, {} active days</title></text>\n            <!-- /alltime -->\n",
             at_contribs, label_x, at_contribs, active_days
         );
         svg = svg.replace("</svg>", &format!("{}</svg>", pill_xml));
@@ -75,35 +70,12 @@ pub fn update_svg_content(
     let re_radar_r = Regex::new(r#"(<text[^>]*x="862\.8"[^>]*y="278\.6"[^>]*class="strong">)\d+(</text>)"#).unwrap();
     svg = re_radar_r.replace_all(&svg, format!("${{1}}{}${{2}}", r_cnt)).to_string();
 
-    // 5. Roaming Koi Injection with rotate="auto" and dual ripple wakes
-    if let Some(b64) = koi_base64 {
-        let koi_block = format!(
-            "<!-- Living Roaming Activity Koi -->\n\
-            <g id=\"roaming-koi\">\n\
-              <circle r=\"32\" fill=\"#ffd700\" fill-opacity=\"0.10\" filter=\"url(#soft)\">\n\
-                <animate attributeName=\"r\" values=\"18;44;18\" dur=\"4s\" repeatCount=\"indefinite\"/>\n\
-                <animate attributeName=\"opacity\" values=\"0.25;0.75;0.25\" dur=\"4s\" repeatCount=\"indefinite\"/>\n\
-              </circle>\n\
-              <circle r=\"50\" fill=\"#38bdf8\" fill-opacity=\"0.05\" filter=\"url(#soft)\">\n\
-                <animate attributeName=\"r\" values=\"30;64;30\" dur=\"5s\" repeatCount=\"indefinite\"/>\n\
-                <animate attributeName=\"opacity\" values=\"0.15;0.5;0.15\" dur=\"5s\" repeatCount=\"indefinite\"/>\n\
-              </circle>\n\
-              <image href=\"data:image/gif;base64,{}\" width=\"130\" height=\"130\" x=\"-65\" y=\"-65\"/>\n\
-              <animateMotion\n\
-                path=\"M 640,460 C 780,430 940,460 1060,390 C 1180,310 1190,170 1060,140 C 910,110 760,110 600,120 C 450,130 320,180 250,260 C 180,340 120,440 130,540 C 140,640 90,730 180,750 C 290,770 460,730 640,740 C 850,750 1100,740 1140,620 C 1170,510 990,520 850,490 C 750,470 680,480 640,460 Z\"\n\
-                dur=\"32s\"\n\
-                repeatCount=\"indefinite\"\n\
-                rotate=\"auto\"\n\
-              />\n\
-            </g>\n",
-            b64
-        );
-
-        if svg.contains("id=\"roaming-koi\"") {
-            let re_koi = Regex::new(r"(?s)<!-- Living Roaming Activity Koi -->\s*<g id=\x22roaming-koi\x22>.*?</g>\n?").unwrap();
-            svg = re_koi.replace_all(&svg, "").to_string();
-        }
-        svg = svg.replace("</svg>", &format!("{}</svg>", koi_block));
+    // 5. Purge any floating/roaming koi layer from template
+    if svg.contains("id=\"roaming-koi\"") {
+        let re_koi1 = Regex::new(r"(?s)<!-- Living Roaming Activity Koi -->\s*<g id=\x22roaming-koi\x22>.*?</g>\n?").unwrap();
+        svg = re_koi1.replace_all(&svg, "").to_string();
+        let re_koi2 = Regex::new(r"(?s)<g id=\x22roaming-koi\x22>.*?</g>\n?").unwrap();
+        svg = re_koi2.replace_all(&svg, "").to_string();
     }
 
     svg
