@@ -280,7 +280,8 @@ impl RoundJs for f64 {
 
 // ---------- the whole card ----------
 pub fn render_card(template: &str, profile: &Profile) -> Res<String> {
-    let mut svg = template.replace("@user@", &esc(&profile.login));
+    // The picture must not depend on how git checked the files out (LF on Linux, CRLF on Windows).
+    let mut svg = template.replace("\r\n", "\n").replace("@user@", &esc(&profile.login));
     let parts = [
         ("terrain", build_terrain(&profile.weeks)),
         ("radar", build_radar(&profile.totals)),

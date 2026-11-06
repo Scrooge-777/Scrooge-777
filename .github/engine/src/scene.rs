@@ -580,7 +580,8 @@ const HEADER_TEXT: &str = "#e2e8f0";
 /// The header SVG comes from capsule-render. Namespace its ids, classes and keyframes so they
 /// cannot clash with the card's, and drop the outer `<svg>` tag.
 pub fn prepare_header(svg: &str) -> String {
-    let mut inner = inner_svg(svg);
+    let svg = svg.replace("\r\n", "\n");
+    let mut inner = inner_svg(&svg);
     let swaps: [(&str, String); 8] = [
         (r"\.text\b", ".hd-text".into()),
         (r"\.desc\b", ".hd-desc".into()),
