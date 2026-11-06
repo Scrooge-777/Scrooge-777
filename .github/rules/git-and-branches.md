@@ -13,7 +13,7 @@
 ## The way a change goes in
 
 1. Make a branch from `main`.
-2. Make the change and run the tests (`npm test`).
+2. Make the change and run the tests (`cargo test --manifest-path .github/engine/Cargo.toml`).
 3. Push the branch and open a pull request. The Profile workflow runs the tests on it.
 4. Merge only when the tests are green. Use a squash merge, so `main` gets one tidy commit, and delete the branch.
 
