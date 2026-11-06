@@ -46,9 +46,40 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-cargo-
 
+      - name: Fetch Live GitHub Contribution Calendar
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh api graphql -f query='
+            query {
+              user(login: "${{ github.repository_owner }}") {
+                contributionsCollection {
+                  totalCommitContributions
+                  totalPullRequestContributions
+                  totalIssueContributions
+                  totalRepositoryContributions
+                  restrictedContributionsCount
+                  contributionCalendar {
+                    totalContributions
+                    weeks {
+                      contributionDays {
+                        date
+                        contributionCount
+                        contributionLevel
+                      }
+                    }
+                  }
+                }
+                repositories(first: 100, ownerAffiliations: OWNER) {
+                  totalCount
+                }
+              }
+            }
+          ' > calendar.json
+
       - name: Build & Run 3D Card Generator (Rust Edition)
         run: |
-          cargo run --release --manifest-path card/rust/Cargo.toml
+          cargo run --release --manifest-path card/rust/Cargo.toml -- --calendar calendar.json
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           USERNAME: ${{ github.repository_owner }}

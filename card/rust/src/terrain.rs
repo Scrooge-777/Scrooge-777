@@ -55,7 +55,7 @@ pub fn build_rolling_terrain(calendar_weeks: &[ContributionWeek]) -> Option<Stri
     if let Some(last_week) = weeks.last_mut() {
         while last_week.contribution_days.len() < 7 {
             last_week.contribution_days.push(ContributionDay {
-                date: "2026-11-07".to_string(),
+                date: last_week.contribution_days.last().map(|d| d.date.clone()).unwrap_or_else(|| "2026-11-07".to_string()),
                 contribution_count: 0,
                 contribution_level: "NONE".to_string(),
             });

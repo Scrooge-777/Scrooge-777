@@ -12,17 +12,23 @@ fn main() {
     println!(">>> Card Generator [Rust Edition] - High Performance Engine");
 
     let args: Vec<String> = std::env::args().collect();
-    let template_path = if args.len() > 1 {
+    let template_path = if args.len() > 1 && !args[1].starts_with("--") {
         &args[1]
     } else {
         "docs/profile_card.svg"
     };
 
-    let output_path = if args.len() > 2 {
+    let output_path = if args.len() > 2 && !args[2].starts_with("--") {
         &args[2]
     } else {
         "docs/profile_card.svg"
     };
+
+    let calendar_arg = args
+        .windows(2)
+        .find(|w| w[0] == "--calendar")
+        .map(|w| w[1].as_str())
+        .unwrap_or("calendar.json");
 
     if !Path::new(template_path).exists() {
         eprintln!("Template SVG not found at: {}", template_path);
@@ -31,14 +37,48 @@ fn main() {
 
     let svg_content = fs::read_to_string(template_path).expect("Failed to read template SVG");
 
-    // Standard baseline metrics
-    let c_cnt = 524;
-    let m_cnt = 507;
-    let p_cnt = 9;
-    let r_cnt = 7;
-    let s_cnt = 0;
-    let f_cnt = 0;
-    let at_val = Some((523, 33));
+    // Dynamic extraction from GraphQL calendar.json if present, else fallback
+    let (terrain_xml, c_cnt, m_cnt, p_cnt, r_cnt, s_cnt, f_cnt, at_val) = if Path::new(calendar_arg).exists() {
+        println!(">>> Reading live GraphQL calendar from: {}", calendar_arg);
+        let raw = fs::read_to_string(calendar_arg).expect("Failed to read calendar JSON");
+        let val: serde_json::Value = serde_json::from_str(&raw).expect("Failed to parse calendar JSON");
+
+        let contrib_coll = &val["data"]["user"]["contributionsCollection"];
+        let c_cnt = contrib_coll["contributionCalendar"]["totalContributions"].as_u64().unwrap_or(555) as u32;
+        let pub_commits = contrib_coll["totalCommitContributions"].as_u64().unwrap_or(360);
+        let priv_commits = contrib_coll["restrictedContributionsCount"].as_u64().unwrap_or(183);
+        let m_cnt = (pub_commits + priv_commits) as u32;
+        let p_cnt = contrib_coll["totalPullRequestContributions"].as_u64().unwrap_or(6) as u32;
+        let r_cnt = val["data"]["user"]["repositories"]["totalCount"].as_u64().unwrap_or(7) as u32;
+        let s_cnt = 0;
+        let f_cnt = 0;
+
+        let weeks_val = contrib_coll["contributionCalendar"]["weeks"].clone();
+        let all_weeks: Vec<terrain::ContributionWeek> = serde_json::from_value(weeks_val).unwrap_or_default();
+
+        let mut active_days = 0;
+        for w in &all_weeks {
+            for d in &w.contribution_days {
+                if d.contribution_count > 0 {
+                    active_days += 1;
+                }
+            }
+        }
+
+        let terrain_xml = terrain::build_rolling_terrain(&all_weeks);
+        println!(">>> Dynamically built rolling 3D terrain island with live GraphQL activity");
+        (terrain_xml, c_cnt, m_cnt, p_cnt, r_cnt, s_cnt, f_cnt, Some((c_cnt, active_days)))
+    } else {
+        println!(">>> No calendar JSON found at {}, using current verified baseline", calendar_arg);
+        let c_cnt = 555;
+        let m_cnt = 543;
+        let p_cnt = 6;
+        let r_cnt = 7;
+        let s_cnt = 0;
+        let f_cnt = 0;
+        let at_val = Some((555, 34));
+        (None, c_cnt, m_cnt, p_cnt, r_cnt, s_cnt, f_cnt, at_val)
+    };
 
     // Top Languages
     let langs = vec![
@@ -73,7 +113,7 @@ fn main() {
 
     let updated_svg = svg::update_svg_content(
         svg_content,
-        None, // Keep current 3D terrain columns if no new GraphQL snapshot
+        terrain_xml,
         langs_xml,
         c_cnt,
         m_cnt,
