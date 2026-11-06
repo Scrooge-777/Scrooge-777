@@ -1,5 +1,10 @@
 <div align="center" id="readme-top">
 
+  <!-- Top Corner Coding Animation -->
+  <a href="#readme-top">
+    <img align="right" src="https://user-images.githubusercontent.com/74038190/212749447-bfb7e725-6987-49d9-ae85-2015e3e7cc41.gif" width="130" alt="Coding Vibe" />
+  </a>
+
   <!-- Venom Header (SVG + CSS Keyframe Animation) -->
   <a href="#readme-top">
     <img src="https://capsule-render.vercel.app/api?type=venom&color=auto&height=220&section=header&text=SYSTEM%20MAINFRAME&fontSize=38&fontColor=ffffff&animation=twinkling&fontAlignY=40" width="100%" alt="Header Banner" />
@@ -16,13 +21,13 @@
   </a>
 </p>
 
-<!-- Living Activity Koi (git-koi) -->
+<!-- Living Activity Koi (Self-Hosted Database) -->
 <p align="center">
-  <a href="https://github.com/yalongwastaken/git-koi">
-    <img src="koi/koi.gif" width="256" alt="SREEHARAN's Activity Koi" />
+  <a href="koi/">
+    <img src="koi/koi.gif" width="220" alt="SREEHARAN's Activity Koi" />
   </a>
   <br/>
-  <sub><em>Living activity koi: scale patterns encode public streaks, colors reflect repository languages, and daily motion tracks GitHub rhythm. Rendered nightly via <a href="https://github.com/yalongwastaken/git-koi">git-koi</a>.</em></sub>
+  <sub><em>Living activity koi roaming the mainframe landscape. Scale patterns encode public streaks, colors reflect repository languages, and daily motion tracks GitHub rhythm. Self-hosted database in <a href="koi/">Scrooge-777/koi</a>.</em></sub>
 </p>
 
 <br/>
