@@ -147,10 +147,10 @@ export function planRoute(rng, area = { width: SCENE.width, height: SCENE.height
   const randomSpot = () => {
     const roll = rng();
     if (area.scene && roll < 0.2) { // inside the 3D terrain
-      return [TERRAIN.x + rng() * TERRAIN.w, TERRAIN.y + rng() * TERRAIN.h];
+      return [TERRAIN.x + rng() * TERRAIN.w, (area.cardY ?? SCENE.cardY) + 160 + rng() * TERRAIN.h];
     }
     if (area.scene && roll < 0.32) { // along the row of stat pills at the bottom
-      return [bounds.x0 + rng() * (bounds.x1 - bounds.x0), SCENE.cardY + 800 + rng() * 45];
+      return [bounds.x0 + rng() * (bounds.x1 - bounds.x0), (area.cardY ?? SCENE.cardY) + 800 + rng() * 45];
     }
     if (rng() < 0.3) { // an edge or corner region
       const cx = rng() < 0.5 ? bounds.x0 + rng() * 200 : bounds.x1 - rng() * 200;
@@ -288,6 +288,18 @@ export function prepareCard(svgText) {
 
 
 // ---------- the 3D terrain: pull it out of the card so the koi can swim over it ----------
+export function locateTerrain(cardInner) {
+  const start = cardInner.indexOf('<g id="terrain-island"');
+  if (start < 0) return null;
+  const re = /<g\b|<\/g>/g;
+  re.lastIndex = start;
+  let depth = 0, m;
+  while ((m = re.exec(cardInner))) {
+    if (m[0] === "</g>") { depth--; if (depth === 0) return { start, end: m.index + 4 }; } else depth++;
+  }
+  return null;
+}
+
 export function splitTerrain(cardInner) {
   const start = cardInner.indexOf('<g id="terrain-island"');
   if (start < 0) return { terrain: "", rest: cardInner };
@@ -315,7 +327,7 @@ function fishAt(path, t) {
 
 // Make every terrain bar lean away from the koi as it swims past and spring back with a
 // small wobble, like grass: one rotate animation per bar, only for bars the koi reaches.
-export function addGrass(terrainSvg, path) {
+export function addGrass(terrainSvg, path, cardY = SCENE.cardY) {
   const T = path.sim.duration;
   const steps = Math.round(T / GRASS.step);
   const fishPath = Array.from({ length: steps }, (_, i) => fishAt(path, i * GRASS.step));
@@ -326,7 +338,7 @@ export function addGrass(terrainSvg, path) {
     const hMatch = inner.match(/class="c\dl"[^>]*><animate attributeName="height" values="[\d.]+;([\d.]+)"/);
     const height = hMatch ? Number(hMatch[1]) : 3;
     const baseY = height * 1.15 + 10, baseX = 9;
-    const centre = [Number(tx) + baseX * Number(sc), SCENE.cardY + Number(ty) + baseY * 0.45 * Number(sc)];
+    const centre = [Number(tx) + baseX * Number(sc), cardY + Number(ty) + baseY * 0.45 * Number(sc)];
     const reach = 0.45 + 0.55 * clamp(height / 55, 0, 1); // taller bars sway more
     const target = (p) => {
       const d = dist(p, centre);
@@ -512,4 +524,34 @@ export function buildFishStrip({ seed = 1, speed = 1, sprite, koiScale = 0.6, wi
 <g class="fish"><animateMotion dur="${f1(T)}s" repeatCount="indefinite" rotate="auto" calcMode="linear" keyPoints="${keyPoints}" keyTimes="${keyTimes}"><mpath href="#route0" xlink:href="#route0"/></animateMotion><g transform="scale(${f3(koiScale)}) translate(${-pivotX} ${-pivotY})"><use href="#koi-sprite" xlink:href="#koi-sprite"/></g></g>
 </svg>`;
   return { svg, meta: { duration: T, length: route.poly.length, speed: route.poly.length / T, maxCurvature: route.maxK, coverage: route.coverage, cornersHit: route.cornersHit } };
+}
+
+// ---------- the koi inside the activity card itself ----------
+// The Vercel endpoint behind the README's card (card.svg) fetches docs/profile_card.svg from
+// this repo on every request and re-colours it with a fresh theme, so a fish placed in that
+// file roams the card while the colours still change on every refresh and the endpoint stays
+// exactly as it is. The koi goes right after the 3D terrain: over the bars (which sway like
+// grass as it passes) and under the radar, the donut, the stat pills and every label.
+export function buildCardWithKoi({ seed = 1, speed = 1, sprite, cardSvg, koiScale = 0.6 }) {
+  const loc = locateTerrain(cardSvg);
+  if (!loc) throw new Error("koi: the card has no 3D terrain group to swim over");
+  const area = { width: 1280, height: 850, scene: true, cardY: 0 };
+  const rng = mulberry32(seed >>> 0);
+  const route = planRoute(rng, area);
+  const sim = simulate(route, rng, speed);
+  const T = sim.duration;
+  const [pivotX, pivotY] = sprite.pivot || [sprite.w / 2, sprite.h / 2];
+  const keyPoints = sim.samples.map((smp) => f3(clamp(smp.s / route.poly.length, 0, 1))).join(";");
+  const keyTimes = sim.samples.map((smp) => f3(clamp(smp.t / T, 0, 1))).join(";");
+  const frameVals = Array.from({ length: sprite.frames }, (_, i) => `${-i * sprite.w} 0`).join(";");
+  const terrain = addGrass(cardSvg.slice(loc.start, loc.end), { route, sim }, 0);
+  const layer = `<defs><path id="route0" d="${pathData(route.segs)}" fill="none"/>`
+    + `<g id="koi-sprite"><svg x="0" y="0" width="${sprite.w}" height="${sprite.h}" viewBox="0 0 ${sprite.w} ${sprite.h}" overflow="hidden">`
+    + `<image width="${sprite.w * sprite.frames}" height="${sprite.h}" href="data:image/png;base64,${sprite.b64}" xlink:href="data:image/png;base64,${sprite.b64}">`
+    + `<animateTransform attributeName="transform" type="translate" calcMode="discrete" dur="${f3((sprite.frames * 70) / 1000)}s" repeatCount="indefinite" values="${frameVals}"/></image></svg></g></defs>`
+    + `<g id="koi"><g class="fish"><animateMotion dur="${f1(T)}s" repeatCount="indefinite" rotate="auto" calcMode="linear" keyPoints="${keyPoints}" keyTimes="${keyTimes}"><mpath href="#route0" xlink:href="#route0"/></animateMotion>`
+    + `<g transform="scale(${f3(koiScale)}) translate(${-pivotX} ${-pivotY})"><use href="#koi-sprite" xlink:href="#koi-sprite"/></g></g></g>`;
+  let svg = cardSvg.slice(0, loc.start) + terrain.svg + layer + cardSvg.slice(loc.end);
+  if (!/<svg[^>]*xmlns:xlink=/.test(svg)) svg = svg.replace("<svg ", '<svg xmlns:xlink="http://www.w3.org/1999/xlink" ');
+  return { svg, meta: { duration: T, length: route.poly.length, speed: route.poly.length / T, maxCurvature: route.maxK, coverage: route.coverage, cornersHit: route.cornersHit, swayingBars: terrain.swaying } };
 }

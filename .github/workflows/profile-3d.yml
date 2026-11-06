@@ -11,6 +11,8 @@ on:
     paths:
       - 'card/rust/**'
       - 'card/themes/**'
+      - 'scripts/koi_scene.mjs'
+      - 'scripts/build_koi_scene.mjs'
       - '.github/workflows/profile-3d.yml'
 
 permissions:
@@ -83,6 +85,17 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           USERNAME: ${{ github.repository_owner }}
+
+      - name: Add the roaming koi to the card
+        run: |
+          # The Vercel endpoint behind README card.svg serves docs/profile_card.svg, so the koi
+          # (same route as the Koi workflow chose, size from its last run) goes in that copy.
+          # assets/profile_card.svg stays the plain card.
+          if [ -f assets/koi-sprite.json ] && [ -f assets/koi-state.json ]; then
+            node scripts/build_koi_scene.mjs --mode card               --sprite assets/koi-sprite.json               --state assets/koi-state.json               --card assets/profile_card.svg               --out docs/profile_card.svg
+          else
+            echo "No koi sprite yet; docs/profile_card.svg stays the plain card."
+          fi
 
       - name: Commit & Push changes
         run: |
