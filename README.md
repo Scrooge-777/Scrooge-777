@@ -1,9 +1,3 @@
-<div align="right">
-  <a href="#readme-top">
-    <img src="assets/coding-vibe.gif" width="280" alt="Coding Vibe" />
-  </a>
-</div>
-
 <div align="center" id="readme-top">
 
   <!-- Header + 3D activity card with the roaming koi swimming through them (colours cycle; new random route every 5 hours) -->
