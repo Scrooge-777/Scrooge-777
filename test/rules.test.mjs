@@ -6,7 +6,7 @@ import fs from "node:fs";
 import { RULES } from "../rules/index.mjs";
 import { radarRadius, LEVEL_HEIGHT } from "../src/card/card.mjs";
 
-const sheet = (name) => fs.readFileSync(new URL(`../rules/${name}`, import.meta.url), "utf8");
+const sheet = (name) => fs.readFileSync(new URL(`../rules/${name}`, import.meta.url), "utf8").split(String.fromCharCode(13, 10)).join(String.fromCharCode(10));
 const pad = (h) => `${String(h).padStart(2, "0")}:00`;
 const has = (text, needle, what) => assert.ok(text.includes(needle), `${what}: expected the sheet to say "${needle}"`);
 

@@ -7,6 +7,7 @@
 | Branch | What it is |
 | --- | --- |
 | `main` | What visitors see. Always working. Never force-pushed. |
+| `backup/name` | A frozen copy of something that worked, kept in case it is wanted back. Never merged, never changed. Today: `backup/five-koi`, the picture with five fish. |
 | `feat/name`, `fix/name`, `refactor/name`, `docs/name`, `chore/name` | Where a change is made. Short, lower-case, words joined by dashes. |
 
 ## The way a change goes in
