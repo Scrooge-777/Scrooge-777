@@ -13,15 +13,15 @@ on:
     branches: [main]
     paths:
       - ".github/workflows/profile.yml"
-      - ".github/engine/**"
-      - ".github/vendor/**"
-      - ".github/rules/**"
+      - "engine/**"
+      - "vendor/**"
+      - "rules/**"
   pull_request:          # a branch is tested before it is merged; the picture is only built on main
     paths:
       - ".github/workflows/profile.yml"
-      - ".github/engine/**"
-      - ".github/vendor/**"
-      - ".github/rules/**"
+      - "engine/**"
+      - "vendor/**"
+      - "rules/**"
 
 permissions:
   contents: read
@@ -48,16 +48,16 @@ jobs:
           path: |
             ~/.cargo/registry
             ~/.cargo/git
-            .github/engine/target
-            .github/vendor/git-koi/target
-          key: ${{ runner.os }}-nyx-${{ hashFiles('.github/engine/Cargo.lock', '.github/vendor/git-koi/Cargo.lock') }}
+            engine/target
+            vendor/git-koi/target
+          key: ${{ runner.os }}-nyx-${{ hashFiles('engine/Cargo.lock', 'vendor/git-koi/Cargo.lock') }}
           restore-keys: |
             ${{ runner.os }}-nyx-
 
       - name: Engine tests (card data, card layout, koi family, life, scene, rule sheets, repository)
-        run: cargo test --locked --manifest-path .github/engine/Cargo.toml --quiet
+        run: cargo test --locked --manifest-path engine/Cargo.toml --quiet
       - name: Koi engine tests
-        run: cargo test --manifest-path .github/vendor/git-koi/Cargo.toml --quiet
+        run: cargo test --manifest-path vendor/git-koi/Cargo.toml --quiet
 
   build:
     needs: test
@@ -75,8 +75,8 @@ jobs:
           path: |
             ~/.cargo/registry
             ~/.cargo/git
-            .github/engine/target
-          key: ${{ runner.os }}-nyx-build-${{ hashFiles('.github/engine/Cargo.lock', '.github/vendor/git-koi/Cargo.lock', '.github/engine/src/**', '.github/vendor/git-koi/src/**') }}
+            engine/target
+          key: ${{ runner.os }}-nyx-build-${{ hashFiles('engine/Cargo.lock', 'vendor/git-koi/Cargo.lock', 'engine/src/**', 'vendor/git-koi/src/**') }}
           restore-keys: |
             ${{ runner.os }}-nyx-build-
 
@@ -89,7 +89,7 @@ jobs:
           GH_TOKEN: ${{ secrets.PROFILE_TOKEN || github.token }}
         run: |
           if [ -z "$PROFILE_TOKEN" ]; then echo "::warning::PROFILE_TOKEN is not set: private contributions are not counted"; fi
-          cargo run --locked --release --manifest-path .github/engine/Cargo.toml -- build --login "${{ github.repository_owner }}" --out assets/scene.svg
+          cargo run --locked --release --manifest-path engine/Cargo.toml -- build --login "${{ github.repository_owner }}" --out assets/scene.svg
 
       - name: Commit the picture if it changed
         run: |
