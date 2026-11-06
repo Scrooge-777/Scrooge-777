@@ -1,11 +1,11 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import fs from "node:fs";
-import { normalizeProfile } from "../card/profile.mjs";
-import { renderCard, buildTerrain, buildRadar, buildPills, buildLanguages, radarRadius, sinceLabel, compact, WINDOW_WEEKS } from "../card/card.mjs";
+import { normalizeProfile } from "../src/card/profile.mjs";
+import { renderCard, buildTerrain, buildRadar, buildPills, buildLanguages, radarRadius, sinceLabel, compact, WINDOW_WEEKS } from "../src/card/card.mjs";
 import { graphql } from "./fixture.mjs";
 
-const template = fs.readFileSync(new URL("../card/template.svg", import.meta.url), "utf8");
+const template = fs.readFileSync(new URL("../src/card/template.svg", import.meta.url), "utf8");
 const profile = (o) => normalizeProfile(graphql(o), { login: "me", now: new Date("2026-11-07T12:00:00Z") });
 
 test("the card fills every placeholder and keeps the markup the scene relies on", () => {

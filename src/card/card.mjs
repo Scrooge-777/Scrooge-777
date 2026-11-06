@@ -7,7 +7,7 @@
 //
 // Pure functions: the same profile always gives the same SVG.
 
-import { RULES } from "../rules/index.mjs";
+import { RULES } from "../../rules/index.mjs";
 
 const ACCENT = "#e2e8f0"; // the template's accent colour (Monochrome Platinum)
 

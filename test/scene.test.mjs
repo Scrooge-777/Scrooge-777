@@ -1,8 +1,8 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import fs from "node:fs";
-import { routeSeed, ROUTE_PERIOD_MS, buildScene, SCENE } from "../scene/scene.mjs";
-import { planFamily } from "../scene/family.mjs";
+import { routeSeed, ROUTE_PERIOD_MS, buildScene, SCENE } from "../src/scene/scene.mjs";
+import { planFamily } from "../src/scene/family.mjs";
 
 test("the route seed stays the same for 5 hours and changes after", () => {
   const t0 = Math.floor(Date.parse("2026-11-07T00:00:00Z") / ROUTE_PERIOD_MS) * ROUTE_PERIOD_MS;
@@ -53,8 +53,8 @@ test("family: after 14 idle days the newest fish fades, the parent stays", () =>
 
 test("the scene draws one animated fish per family member, all inside the scene", () => {
   const sprite = { w: 40, h: 20, frames: 8, b64: "AAAA", pivot: [10, 10] };
-  const header = fs.readFileSync(new URL("../scene/header.svg", import.meta.url), "utf8");
-  const card = fs.readFileSync(new URL("../card/template.svg", import.meta.url), "utf8").replace(/<!--@\w+-->/g, "").replace("@user@", "me");
+  const header = fs.readFileSync(new URL("../src/scene/header.svg", import.meta.url), "utf8");
+  const card = fs.readFileSync(new URL("../src/card/template.svg", import.meta.url), "utf8").replace(/<!--@\w+-->/g, "").replace("@user@", "me");
   const family = planFamily(run("2026-10-01", 15), NOW).fish;
   const { svg, meta } = buildScene({ seed: 7, sprite, family, headerSvg: header, cardSvg: card });
   assert.equal((svg.match(/<animateMotion/g) || []).length, family.length);

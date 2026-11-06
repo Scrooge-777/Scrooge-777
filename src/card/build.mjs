@@ -1,7 +1,7 @@
 // Build the activity card from live GitHub data.
 //
-//   node card/build.mjs --login Scrooge-777 --out build/card.svg --profile-out build/profile.json
-//   node card/build.mjs --from-json graphql-response.json ...      (offline: a saved response)
+//   node src/card/build.mjs --login Scrooge-777 --out build/card.svg --profile-out build/profile.json
+//   node src/card/build.mjs --from-json graphql-response.json ...      (offline: a saved response)
 //
 // The token comes from the environment (PROFILE_TOKEN, else GITHUB_TOKEN, else GH_TOKEN), never
 // from an argument. Exits non-zero, writing nothing, if the data is missing or looks wrong.

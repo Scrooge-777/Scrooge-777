@@ -53,6 +53,6 @@ Desktop.ini
 *~
 
 # Git Koi temporary assets
-koi/*.html
-koi/*.png
+vendor/git-koi/*.html
+vendor/git-koi/*.png
 .koi-out/

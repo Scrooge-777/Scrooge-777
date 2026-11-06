@@ -1,11 +1,11 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import fs from "node:fs";
-import { scheduledState, hungerState, planLife, hourIn, STATE_ORDER } from "../scene/life.mjs";
-import { buildScene, planNest, drift, SCENE } from "../scene/scene.mjs";
+import { scheduledState, hungerState, planLife, hourIn, STATE_ORDER } from "../src/scene/life.mjs";
+import { buildScene, planNest, drift, SCENE } from "../src/scene/scene.mjs";
 import { RULES } from "../rules/index.mjs";
-import { normalizeProfile } from "../card/profile.mjs";
-import { renderCard } from "../card/card.mjs";
+import { normalizeProfile } from "../src/card/profile.mjs";
+import { renderCard } from "../src/card/card.mjs";
 import { graphql } from "./fixture.mjs";
 
 const adult = { growth: 1 };
@@ -75,8 +75,8 @@ test("a sleeper drifts in a small oval on the terrain floor, slowly", () => {
   }
 });
 
-const header = fs.readFileSync(new URL("../scene/header.svg", import.meta.url), "utf8");
-const card = renderCard(fs.readFileSync(new URL("../card/template.svg", import.meta.url), "utf8"), normalizeProfile(graphql({ counts: (i) => (i % 2 ? 12 : 3) }), { login: "me", now: new Date("2026-11-07T12:00:00Z") }));
+const header = fs.readFileSync(new URL("../src/scene/header.svg", import.meta.url), "utf8");
+const card = renderCard(fs.readFileSync(new URL("../src/card/template.svg", import.meta.url), "utf8"), normalizeProfile(graphql({ counts: (i) => (i % 2 ? 12 : 3) }), { login: "me", now: new Date("2026-11-07T12:00:00Z") }));
 const sprite = { w: 40, h: 20, frames: 8, b64: "AAAA", pivot: [10, 10] };
 const family = (state) => [0, 1, 2].map((i) => ({ kind: i ? "streak" : "parent", growth: i ? 0.8 : 1, age: i ? 20 : Infinity, life: { state, ...RULES.life.states[state] } }));
 

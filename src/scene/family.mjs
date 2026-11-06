@@ -9,7 +9,7 @@
 //   - a baby starts at 55% of full size and grows to full size over 30 days
 //
 // days: [{ date: "YYYY-MM-DD", count }] in date order; now: a Date.
-import { RULES } from "../rules/index.mjs";
+import { RULES } from "../../rules/index.mjs";
 
 export const FAMILY = RULES.family; // numbers: rules/rules.json, in words: rules/koi-family.md
 

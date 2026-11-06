@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { normalizeProfile, fetchProfile, ProfileError } from "../card/profile.mjs";
+import { normalizeProfile, fetchProfile, ProfileError } from "../src/card/profile.mjs";
 import { graphql } from "./fixture.mjs";
 
 const now = new Date("2026-11-07T12:00:00Z");

@@ -16,7 +16,7 @@
 // swimming cycle (head to the right) from the git-koi `roam_sprites` example.
 // `family` lists the koi to draw (see family.mjs); without it `fish` copies swim.
 
-import { RULES } from "../rules/index.mjs";
+import { RULES } from "../../rules/index.mjs";
 
 // The header is capsule-render's animated "venom" blob (854 x 220), scaled to the card's width.
 export const HEADER = { width: 854, height: 220 };

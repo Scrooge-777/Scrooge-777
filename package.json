@@ -4,6 +4,6 @@
   "description": "Generator for the profile README picture: live activity card plus the roaming koi family.",
   "scripts": {
     "test": "node --test test/*.test.mjs",
-    "card": "node card/build.mjs --out build/card.svg --profile-out build/profile.json"
+    "card": "node src/card/build.mjs --out build/card.svg --profile-out build/profile.json"
   }
 }
