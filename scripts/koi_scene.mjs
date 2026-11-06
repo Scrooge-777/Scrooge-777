@@ -1,5 +1,3 @@
-import { enhanceCard, enhanceTerrain } from "./koi_card_fx.mjs";
-
 // koi_scene.mjs: build the "roaming koi" profile scene as ONE animated SVG.
 //
 // GitHub renders README images with scripts disabled, so a koi cannot be steered live.
@@ -280,8 +278,7 @@ export function scopeCss(css, scope) {
 
 export function prepareCard(svgText) {
   let inner = svgText.replace(/^[\s\S]*?<svg[^>]*>/, "").replace(/<\/svg>\s*$/, "");
-  // drop only the card's own title and description; keep the per-bar and per-slice tooltips
-  inner = inner.replace(/<title id="card-title"[\s\S]*?<\/title>|<desc id="card-desc"[\s\S]*?<\/desc>/g, "");
+  inner = inner.replace(/<title[\s\S]*?<\/title>|<desc[\s\S]*?<\/desc>/g, "");
   inner = inner.replace(/<style>([\s\S]*?)<\/style>/, (m, css) => `<style>${scopeCss(css, "svg.cd")}</style>`);
   return inner;
 }
@@ -425,21 +422,8 @@ export function buildScene({ seed = 1, behavior = "cruise", speed = 1, fish = 1,
   // Layer order: header background < 3D terrain < koi < header text < rest of the card. The koi
   // swims over the terrain (whose bars sway like grass) and under everything else.
   const { terrain, rest: cardRest } = splitTerrain(prepareCard(cardSvg));
-  const grass = terrain && paths.length ? addGrass(enhanceTerrain(terrain), paths[0]) : { svg: terrain, swaying: 0 };
+  const grass = terrain && paths.length ? addGrass(terrain, paths[0]) : { svg: terrain, swaying: 0 };
   const terrainSvg = grass.svg;
-  // radar, donut, legend and stat pills: upgrades on one shared beat, nudged by the same koi
-  let cardFx = { svg: cardRest, report: {} };
-  if (paths.length) {
-    const T0 = paths[0].sim.duration;
-    const trackStep = 0.05;
-    const track = {
-      path: Array.from({ length: Math.round(T0 / trackStep) }, (_, i) => fishAt(paths[0], i * trackStep)),
-      step: trackStep,
-      duration: T0,
-      cardY: SCENE.cardY,
-    };
-    cardFx = enhanceCard(cardRest, terrain, track);
-  }
     const textAt = bannerInner.indexOf("<text");
   const bannerBack = textAt > 0 ? bannerInner.slice(0, textAt) : bannerInner;
   const bannerFront = textAt > 0 ? bannerInner.slice(textAt) : "";
@@ -451,8 +435,8 @@ export function buildScene({ seed = 1, behavior = "cruise", speed = 1, fish = 1,
 <svg class="cd" x="0" y="${SCENE.cardY}" width="1280" height="${SCENE.cardHeight}" viewBox="0 0 1280 850" overflow="hidden">${terrainSvg}</svg>
 <g id="koi">${fishSvg.join("")}</g>
 <g transform="scale(${f3(k)})">${bannerFront}</g>
-<svg class="cd" x="0" y="${SCENE.cardY}" width="1280" height="${SCENE.cardHeight}" viewBox="0 0 1280 850" overflow="hidden">${cardFx.svg}</svg>
+<svg class="cd" x="0" y="${SCENE.cardY}" width="1280" height="${SCENE.cardHeight}" viewBox="0 0 1280 850" overflow="hidden">${cardRest}</svg>
 </svg>`;
 
-  return { svg, meta: { routes, bytes: svg.length, fish, speedFactor: factor, swayingBars: grass.swaying, cardFx: cardFx.report } };
+  return { svg, meta: { routes, bytes: svg.length, fish, speedFactor: factor, swayingBars: grass.swaying } };
 }
