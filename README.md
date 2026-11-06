@@ -1,23 +1,11 @@
 <div align="center" id="readme-top">
 
-  <!-- Header banner (self-hosted animated SVG) -->
-  <img src="assets/banner.svg" width="100%" alt="SYSTEM MAINFRAME" />
+  <!-- Header + activity card with the roaming koi swimming under them (rebuilt every 5 hours) -->
+  <img src="assets/scene.svg" width="100%" alt="SYSTEM MAINFRAME header and an animated GitHub activity card: 3D contribution terrain, contribution mix radar, top languages and totals, with a koi swimming freely underneath" />
+
+  <sub><em>The koi's size follows total contributions; it picks a new random route every 5 hours. Built with <a href="https://github.com/yalongwastaken/git-koi">git-koi</a> (vendored in <a href="koi/"><code>koi/</code></a>) and <a href="scripts/koi_scene.mjs"><code>scripts/koi_scene.mjs</code></a>.</em></sub>
 
 </div>
-
-<br/>
-
-<!-- 3D Activity Landscape -->
-<p align="center">
-  <img alt="Animated 3D landscape of Scrooge-777's recent GitHub activity, with language and skill radar" src="docs/profile_card.svg" width="100%" />
-</p>
-
-<!-- Living Activity Koi (git-koi) -->
-<p align="center">
-  <img src="assets/koi.gif" width="360" alt="A pixel-art koi swimming in a pond; its speed and wake reflect recent GitHub activity" />
-  <br/>
-  <sub><em>Living activity koi: scale patterns encode public streaks, colors reflect repository languages, and daily motion tracks GitHub rhythm. Rendered nightly with <a href="https://github.com/yalongwastaken/git-koi">git-koi</a> (vendored in <a href="koi/"><code>koi/</code></a>) plus a pond layer from <a href="scripts/koi_pond.py"><code>scripts/koi_pond.py</code></a>.</em></sub>
-</p>
 
 <br/>
 
@@ -52,6 +40,6 @@
 <hr/>
 
 <div align="center">
-  <!-- Footer wave (self-hosted animated SVG) -->
-  <img src="assets/footer.svg" width="100%" alt="" />
+  <!-- Venom Footer (SVG + CSS Wave Animation with Dynamic Color Cycling) -->
+  <img src="https://capsule-render.vercel.app/api?type=venom&color=auto&height=100&section=footer" width="100%" alt="" />
 </div>

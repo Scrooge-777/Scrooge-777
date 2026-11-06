@@ -17,6 +17,9 @@ const PELVIC_SHARE_OF_SIDE_FIN_OPENING: f64 = 0.5;
 const WHISKER_SWAY_RADIANS: f64 = 0.15;
 const WHISKER_SWAY_LAG_RADIANS: f64 = 0.6;
 
+/// Roaming swims in place; one body-wave cycle is the whole loop.
+const ROAM_FRAME_COUNT: u32 = 8;
+
 /// Rest and surface feeding share this loop.
 const REST_FRAME_COUNT: u32 = 90;
 const REST_DEPTH: f64 = 0.22;
@@ -167,6 +170,9 @@ pub struct SwimPose {
     pub feeding_phase: Option<f64>,
     /// How far the mouth is open, from zero closed to one wide open.
     pub mouth_opening: f64,
+    /// Multiplies the still pose's gentle body bend; zero swims dead straight, which
+    /// a caller that steers the sprite along its own path needs.
+    pub bend_scale: f64,
 }
 
 /// The still image: hovering at the surface without turning or drifting, with the
@@ -187,6 +193,7 @@ pub(crate) const STILL_POSE: SwimPose = SwimPose {
     whisker_sway_radians: 0.0,
     feeding_phase: None,
     mouth_opening: 0.0,
+    bend_scale: 1.0,
 };
 
 /// Frames in a behavior's loop at FRAMES_PER_SECOND.
@@ -195,6 +202,7 @@ pub fn frame_count(behavior: Behavior) -> u32 {
         Behavior::Cruise => CRUISE_STYLE.loop_frame_count,
         Behavior::Dart => DART_STYLE.loop_frame_count,
         Behavior::Rest | Behavior::SurfaceFeeding => REST_FRAME_COUNT,
+        Behavior::Roam => ROAM_FRAME_COUNT,
         Behavior::DeepRest => DEEP_REST_FRAME_COUNT,
     }
 }
@@ -244,6 +252,7 @@ pub fn calculate_swim_pose(behavior: Behavior, frame_index: u32) -> SwimPose {
             * (drive.wave_phase_radians - WHISKER_SWAY_LAG_RADIANS).sin(),
         feeding_phase: drive.feeding_phase,
         mouth_opening: drive.mouth_opening,
+        bend_scale: if behavior == Behavior::Roam { 0.0 } else { 1.0 },
     }
 }
 
@@ -286,6 +295,30 @@ fn calculate_drive(behavior: Behavior, loop_frame: u32) -> Drive {
             ..calculate_rest_drive(loop_frame, 0.0)
         },
         Behavior::DeepRest => calculate_deep_rest_drive(loop_frame),
+        Behavior::Roam => calculate_roam_drive(loop_frame),
+    }
+}
+
+/// Swims in place, straight ahead, with the cruise stroke's full tail beat: one body
+/// wave per loop, so the sprite closes seamlessly and any course can carry it.
+fn calculate_roam_drive(loop_frame: u32) -> Drive {
+    let frame = f64::from(loop_frame);
+    let wave_turn = TAU * frame / f64::from(ROAM_FRAME_COUNT);
+    Drive {
+        course: Course::Hover {
+            // Cancels the still pose's fixed -0.08 rad heading so the nose points exactly
+            // along the direction of travel.
+            heading_offset_radians: 0.08,
+            drift_pixels: [0.0; 2],
+        },
+        depth: 0.0,
+        wave_phase_radians: STILL_POSE.wave_phase_radians + wave_turn,
+        wave_strength: 0.8,
+        tail_spread_radians: 0.08,
+        stroke_opening_radians: 0.2,
+        right_fin_offset_radians: 0.06 * wave_turn.sin(),
+        feeding_phase: None,
+        mouth_opening: 0.0,
     }
 }
 

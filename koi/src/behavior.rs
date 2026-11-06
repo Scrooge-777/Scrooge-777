@@ -15,6 +15,9 @@ pub enum Behavior {
     Dart,
     /// One slow lap; the everyday swim.
     Cruise,
+    /// Swims in place with the cruise body wave, head to the right, so a caller can
+    /// move the sprite along any path. Never chosen by `select_behavior`.
+    Roam,
 }
 
 const DEEP_REST_QUIET_DAYS: u32 = 60;

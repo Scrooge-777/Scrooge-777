@@ -192,6 +192,7 @@ fn describe_behavior(behavior: Behavior) -> &'static str {
         Behavior::SurfaceFeeding => "surface feeding",
         Behavior::Dart => "dart",
         Behavior::Cruise => "cruise",
+        Behavior::Roam => "roam",
     }
 }
 

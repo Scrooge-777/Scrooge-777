@@ -752,7 +752,7 @@ fn build_spine(koi_anatomy: &KoiAnatomy, swim_pose: &SwimPose) -> Vec<CurvePoint
                 let backward_angle_radians = HEADING_RADIANS
                     + heading_offset_radians
                     + PI
-                    + BEND_RADIANS * point_index as f64 / point_count as f64;
+                    + BEND_RADIANS * swim_pose.bend_scale * point_index as f64 / point_count as f64;
                 let [previous_x, previous_y] = center_points[point_index - 1].position;
                 center_points.push(CurvePoint {
                     position: [
