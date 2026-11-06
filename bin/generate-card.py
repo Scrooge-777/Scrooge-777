@@ -473,6 +473,41 @@ def update_svg(svg_path, stats):
             '<svg xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="card-title card-desc"', 1)
         svg = re.sub(r'(<svg[^>]*>)', r'\1\n<title id="card-title">GitHub activity card for Scrooge-777</title>\n<desc id="card-desc">Isometric terrain of contributions, contribution-mix radar, top languages, and totals.</desc>', svg, count=1)
 
+    # 6. Ensure living roaming activity koi animation is present
+    if 'id="roaming-koi"' not in svg:
+        repo_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        koi_candidates = [
+            os.path.join(repo_root, 'koi', 'koi.gif'),
+            os.path.join(os.getcwd(), 'koi', 'koi.gif')
+        ]
+        koi_data_b64 = None
+        for kp in koi_candidates:
+            if os.path.exists(kp):
+                import base64
+                with open(kp, 'rb') as kf:
+                    koi_data_b64 = base64.b64encode(kf.read()).decode('ascii')
+                break
+        if koi_data_b64:
+            roaming_block = f'''<!-- Living Roaming Activity Koi -->
+<g id="roaming-koi">
+  <circle r="32" fill="#ffd700" fill-opacity="0.10" filter="url(#soft)">
+    <animate attributeName="r" values="18;42;18" dur="4s" repeatCount="indefinite"/>
+    <animate attributeName="opacity" values="0.3;0.7;0.3" dur="4s" repeatCount="indefinite"/>
+  </circle>
+  <circle r="48" fill="#38bdf8" fill-opacity="0.05" filter="url(#soft)">
+    <animate attributeName="r" values="32;60;32" dur="5s" repeatCount="indefinite"/>
+    <animate attributeName="opacity" values="0.2;0.5;0.2" dur="5s" repeatCount="indefinite"/>
+  </circle>
+  <image href="data:image/gif;base64,{koi_data_b64}" width="130" height="130" x="-65" y="-65"/>
+  <animateMotion
+    path="M 640,460 C 780,430 940,460 1060,390 C 1180,310 1190,170 1060,140 C 910,110 760,110 600,120 C 450,130 320,180 250,260 C 180,340 120,440 130,540 C 140,640 90,730 180,750 C 290,770 460,730 640,740 C 850,750 1100,740 1140,620 C 1170,510 990,520 850,490 C 750,470 680,480 640,460 Z"
+    dur="32s"
+    repeatCount="indefinite"
+  />
+</g>
+'''
+            svg = svg.replace('</svg>', roaming_block + '</svg>')
+
     ET.fromstring(svg)
     with open(svg_path, 'w', encoding='utf-8') as f:
         f.write(svg)
