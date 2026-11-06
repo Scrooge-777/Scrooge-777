@@ -477,7 +477,8 @@ export function prepareHeader(svgText) {
     .replace(/\btwinkling\b/g, "hd-twinkling").replace(/\bmyPath\b/g, "hd-myPath")
     // percentages would resolve against the whole scene, so pin them to the header's own size
     .replace(/x="50%"/g, `x="${HEADER.width / 2}"`).replace(/y="40%"/g, `y="${HEADER.height * 0.4}"`);
-  inner = inner.replace(/(<path id="hd-myPath" fill="(#[0-9a-fA-F]{6})"[^>]*>)/, (m, open) => open.replace(/fill="#[0-9a-fA-F]{6}"/, `fill="${PLATINUM.accent}"`));
+  inner = inner.replace(/(<path id="hd-myPath" fill="(#[0-9a-fA-F]{6})"[^>]*>)/, (m, open) => open.replace(/fill="#[0-9a-fA-F]{6}"/, `fill="${PLATINUM.c1t}"`)); // a dim slate blob, so the light title reads everywhere
+  inner = inner.replace(/fill:#ffffff;/gi, `fill:${PLATINUM.accent};`);
   return inner;
 }
 

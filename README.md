@@ -1,7 +1,7 @@
 <div align="center" id="readme-top">
 
   <!-- Header + 3D activity card with the roaming koi swimming through them (colours cycle; new random route every 5 hours) -->
-  <img src="assets/scene.svg" width="100%" alt="SYSTEM MAINFRAME header and the animated GitHub activity card with a koi swimming freely through it; the 3D contribution bars sway like grass as it passes" />
+  <img src="assets/scene.svg" width="100%" alt="SCROOGE-777 // SYSTEMS LAB header and the animated GitHub activity card with a koi swimming freely through it; the 3D contribution bars sway like grass as it passes" />
 
 </div>
 
