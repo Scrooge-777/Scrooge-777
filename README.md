@@ -1,18 +1,15 @@
-<div align="right">
+<div id="readme-top">
+  <!-- Pinned Top-Right Developer Animation (Transparent Background) -->
   <a href="#readme-top">
-    <img src="assets/coding-vibe.gif" width="220" alt="Coding Vibe" />
+    <img align="right" src="assets/coding-vibe.gif" width="220" alt="Coding Vibe" />
+  </a>
+  <!-- Seamless Wave Header (Dark Mode Palette & Clean Title) -->
+  <a href="#readme-top">
+    <img src="https://capsule-render.vercel.app/api?type=waving&color=0:0d1117,50:161b22,100:0d1117&height=220&section=header&text=SYSTEM%20ARCHITECTURE&fontSize=38&fontColor=ffffff&animation=twinkling&fontAlignY=40" width="72%" alt="Header Banner" />
   </a>
 </div>
 
-<div align="center" id="readme-top">
-
-  <!-- Venom Header (SVG + CSS Keyframe Animation) -->
-  <a href="#readme-top">
-    <img src="https://capsule-render.vercel.app/api?type=venom&color=auto&height=220&section=header&text=SYSTEM%20MAINFRAME&fontSize=38&fontColor=ffffff&animation=twinkling&fontAlignY=40" width="100%" alt="Header Banner" />
-  </a>
-
-</div>
-
+<br clear="both"/>
 <br/>
 
 <!-- Living Mainframe Landscape -->
@@ -59,8 +56,8 @@
 <hr/>
 
 <div align="center">
-  <!-- Venom Footer (SVG + CSS Wave Animation) -->
+  <!-- Waving Footer (Matching Dark Mode Theme) -->
   <a href="#readme-top">
-    <img src="https://capsule-render.vercel.app/api?type=venom&color=auto&height=100&section=footer" width="100%" alt="Venom Footer" />
+    <img src="https://capsule-render.vercel.app/api?type=waving&color=0:0d1117,50:161b22,100:0d1117&height=100&section=footer" width="100%" alt="Footer Wave" />
   </a>
 </div>
