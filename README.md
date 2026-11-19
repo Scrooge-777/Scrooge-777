@@ -34,6 +34,11 @@ The first run downloads Corda and Gradle dependencies (several hundred MB) and t
   (and 8081/8082 if needed) -> Port Visibility -> Public. The portal is then reachable at
   `https://<codespace-name>-8083.app.github.dev` while the codespace is running.
 
+* **Temporary live demo of the real network (no setup):** push any commit to the `certverify-live` branch.
+  GitHub Actions builds the CorDapp, starts the four nodes and three portals, adds the sample certificate and
+  opens a public Cloudflare address for each portal for 60 minutes. The addresses are written to
+  `live-links.md` on the `live-links` branch and to the run summary.
+
 ## Verified results
 
 Every push runs `.github/workflows/build.yml` on GitHub Actions (Ubuntu, Temurin JDK 17):
