@@ -1,0 +1,29 @@
+[37m[INFO] 06:39:41,588 [main] webserver.ServerKt. - Starting ServerKt v1.0 using Java 17.0.21 with PID 8695 (/home/runner/work/Scrooge-777/Scrooge-777/clients/build/libs/clients-1.0.jar started by runner in /home/runner/work/Scrooge-777/Scrooge-777)
+[m[37m[INFO] 06:39:41,598 [main] webserver.ServerKt. - No active profile set, falling back to 1 default profile: "default"
+[m[37m[INFO] 06:39:45,577 [main] tomcat.TomcatWebServer. - Tomcat initialized with port 8081 (http)
+[mNov 19, 2026 6:39:45 AM org.apache.coyote.AbstractProtocol init
+INFO: Initializing ProtocolHandler ["http-nio-8081"]
+Nov 19, 2026 6:39:45 AM org.apache.catalina.core.StandardService startInternal
+INFO: Starting service [Tomcat]
+Nov 19, 2026 6:39:45 AM org.apache.catalina.core.StandardEngine startInternal
+INFO: Starting Servlet engine: [Apache Tomcat/10.1.20]
+Nov 19, 2026 6:39:45 AM org.apache.catalina.core.ApplicationContext log
+INFO: Initializing Spring embedded WebApplicationContext
+[37m[INFO] 06:39:45,764 [main] context.ServletWebServerApplicationContext. - Root WebApplicationContext: initialization completed in 3763 ms
+[m[37m[INFO] 06:39:50,986 [main] internal.RPCClient. - Startup took 3925 msec
+[m[37m[INFO] 06:39:51,092 [main] servlet.WelcomePageHandlerMapping. - Adding welcome page: class path resource [static/index.html]
+[mNov 19, 2026 6:39:51 AM org.apache.coyote.AbstractProtocol start
+INFO: Starting ProtocolHandler ["http-nio-8081"]
+[37m[INFO] 06:39:52,058 [main] tomcat.TomcatWebServer. - Tomcat started on port 8081 (http) with context path ''
+[m[37m[INFO] 06:39:52,104 [main] webserver.ServerKt. - Started ServerKt in 12.003 seconds (process running for 18.849)
+[mNov 19, 2026 6:39:53 AM org.apache.catalina.core.ApplicationContext log
+INFO: Initializing Spring DispatcherServlet 'dispatcherServlet'
+[37m[INFO] 06:39:53,623 [http-nio-8081-exec-2] servlet.DispatcherServlet. - Initializing Servlet 'dispatcherServlet'
+[m[37m[INFO] 06:39:53,625 [http-nio-8081-exec-2] servlet.DispatcherServlet. - Completed initialization in 1 ms
+[m[31m[WARN] 06:39:58,714 [http-nio-8081-exec-4] webserver.CertificateController. - Request failed
+[m net.corda.core.flows.FlowException: Certificate VU-2026-CSE-0142 has already been issued. Certificate numbers must be unique.
+[31m[WARN] 06:39:58,816 [http-nio-8081-exec-5] webserver.CertificateController. - Request failed
+[m net.corda.core.contracts.TransactionVerificationException$ContractRejection: Contract verification failed: Failed requirement: CGPA must be between 0.0 and 10.0, contract: com.certverify.contracts.CertificateContract, transaction: 3FAD27279D113FC15799E62398E306D7F8967F486E49CAD94BFB593F69129383
+Caused by: net.corda.core.CordaRuntimeException: java.lang.IllegalArgumentException: Failed requirement: CGPA must be between 0.0 and 10.0
+[31m[WARN] 06:40:05,049 [http-nio-8081-exec-7] webserver.CertificateController. - Request failed
+[m net.corda.core.flows.FlowException: Certificate VU-2026-CSE-0142 is already revoked.

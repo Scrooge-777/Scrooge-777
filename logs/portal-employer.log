@@ -1,0 +1,23 @@
+[37m[INFO] 06:39:41,375 [main] webserver.ServerKt. - Starting ServerKt v1.0 using Java 17.0.21 with PID 8697 (/home/runner/work/Scrooge-777/Scrooge-777/clients/build/libs/clients-1.0.jar started by runner in /home/runner/work/Scrooge-777/Scrooge-777)
+[m[37m[INFO] 06:39:41,381 [main] webserver.ServerKt. - No active profile set, falling back to 1 default profile: "default"
+[m[37m[INFO] 06:39:45,493 [main] tomcat.TomcatWebServer. - Tomcat initialized with port 8083 (http)
+[mNov 19, 2026 6:39:45 AM org.apache.coyote.AbstractProtocol init
+INFO: Initializing ProtocolHandler ["http-nio-8083"]
+Nov 19, 2026 6:39:45 AM org.apache.catalina.core.StandardService startInternal
+INFO: Starting service [Tomcat]
+Nov 19, 2026 6:39:45 AM org.apache.catalina.core.StandardEngine startInternal
+INFO: Starting Servlet engine: [Apache Tomcat/10.1.20]
+Nov 19, 2026 6:39:45 AM org.apache.catalina.core.ApplicationContext log
+INFO: Initializing Spring embedded WebApplicationContext
+[37m[INFO] 06:39:45,637 [main] context.ServletWebServerApplicationContext. - Root WebApplicationContext: initialization completed in 3784 ms
+[m[37m[INFO] 06:39:50,865 [main] internal.RPCClient. - Startup took 4055 msec
+[m[37m[INFO] 06:39:51,059 [main] servlet.WelcomePageHandlerMapping. - Adding welcome page: class path resource [static/index.html]
+[mNov 19, 2026 6:39:52 AM org.apache.coyote.AbstractProtocol start
+INFO: Starting ProtocolHandler ["http-nio-8083"]
+[37m[INFO] 06:39:52,061 [main] tomcat.TomcatWebServer. - Tomcat started on port 8083 (http) with context path ''
+[m[37m[INFO] 06:39:52,091 [main] webserver.ServerKt. - Started ServerKt in 12.202 seconds (process running for 18.829)
+[mNov 19, 2026 6:39:54 AM org.apache.catalina.core.ApplicationContext log
+INFO: Initializing Spring DispatcherServlet 'dispatcherServlet'
+[37m[INFO] 06:39:54,473 [http-nio-8083-exec-2] servlet.DispatcherServlet. - Initializing Servlet 'dispatcherServlet'
+[m[37m[INFO] 06:39:54,474 [http-nio-8083-exec-2] servlet.DispatcherServlet. - Completed initialization in 1 ms
+[m

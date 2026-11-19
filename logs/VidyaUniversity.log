@@ -1,0 +1,21 @@
+
+   ______               __
+  / ____/     _________/ /___ _
+ / /     __  / ___/ __  / __ `/         Quantum computer jokes are both
+/ /___  /_/ / /  / /_/ / /_/ /           funny and not funny at the same time.
+\____/     /_/   \__,_/\__,_/
+
+--- Corda Community Edition 4.12 (d5824e4) -------------------------------------------------------------
+
+
+Logs can be found in                    : /home/runner/work/Scrooge-777/Scrooge-777/build/nodes/VidyaUniversity/logs
+! ATTENTION: This node is running in development mode!  This is not safe for production deployment.
+Advertised P2P messaging addresses      : localhost:10005
+RPC connection address                  : localhost:10006
+RPC admin connection address            : localhost:10046
+Loaded 2 CorDapp(s)                     : Contract CorDapp: Academic Certificate Contracts version 1 by vendor CertVerify Project with licence Apache License, Version 2.0, Workflow CorDapp: Academic Certificate Flows version 1 by vendor CertVerify Project with licence Apache License, Version 2.0
+Node for "Vidya University" started up and registered in 41.14 sec
+Running P2PMessaging loop
+[1;31m[ERROR] 06:39:58+0000 [Node thread-1] verification.Verifier. - Error validating transaction 3FAD27279D113FC15799E62398E306D7F8967F486E49CAD94BFB593F69129383.
+[m[1;31m[ERROR] 06:39:58+0000 [Node thread-1] verification.Verifier. - Error validating transaction 3FAD27279D113FC15799E62398E306D7F8967F486E49CAD94BFB593F69129383.
+[m

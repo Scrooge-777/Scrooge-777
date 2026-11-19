@@ -1,0 +1,5 @@
+total 252468
+drwxr-xr-x 2 runner runner      4096 Nov 19 06:36 .
+drwxr-xr-x 7 runner runner      4096 Nov 19 06:36 ..
+-rw-r--r-- 1 runner runner     46254 Nov 19 06:36 clients-1.0-plain.jar
+-rw-r--r-- 1 runner runner 258468965 Nov 19 06:36 clients-1.0.jar

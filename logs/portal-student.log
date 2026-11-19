@@ -1,0 +1,24 @@
+[37m[INFO] 06:39:41,724 [main] webserver.ServerKt. - Starting ServerKt v1.0 using Java 17.0.21 with PID 8696 (/home/runner/work/Scrooge-777/Scrooge-777/clients/build/libs/clients-1.0.jar started by runner in /home/runner/work/Scrooge-777/Scrooge-777)
+[m[37m[INFO] 06:39:41,728 [main] webserver.ServerKt. - No active profile set, falling back to 1 default profile: "default"
+[m[37m[INFO] 06:39:45,611 [main] tomcat.TomcatWebServer. - Tomcat initialized with port 8082 (http)
+[mNov 19, 2026 6:39:45 AM org.apache.coyote.AbstractProtocol init
+INFO: Initializing ProtocolHandler ["http-nio-8082"]
+Nov 19, 2026 6:39:45 AM org.apache.catalina.core.StandardService startInternal
+INFO: Starting service [Tomcat]
+Nov 19, 2026 6:39:45 AM org.apache.catalina.core.StandardEngine startInternal
+INFO: Starting Servlet engine: [Apache Tomcat/10.1.20]
+Nov 19, 2026 6:39:45 AM org.apache.catalina.core.ApplicationContext log
+INFO: Initializing Spring embedded WebApplicationContext
+[37m[INFO] 06:39:45,762 [main] context.ServletWebServerApplicationContext. - Root WebApplicationContext: initialization completed in 3598 ms
+[m[37m[INFO] 06:39:50,666 [main] internal.RPCClient. - Startup took 3698 msec
+[m[37m[INFO] 06:39:50,812 [main] servlet.WelcomePageHandlerMapping. - Adding welcome page: class path resource [static/index.html]
+[mNov 19, 2026 6:39:51 AM org.apache.coyote.AbstractProtocol start
+INFO: Starting ProtocolHandler ["http-nio-8082"]
+[37m[INFO] 06:39:51,573 [main] tomcat.TomcatWebServer. - Tomcat started on port 8082 (http) with context path ''
+[m[37m[INFO] 06:39:51,631 [main] webserver.ServerKt. - Started ServerKt in 11.666 seconds (process running for 18.374)
+[mNov 19, 2026 6:39:54 AM org.apache.catalina.core.ApplicationContext log
+INFO: Initializing Spring DispatcherServlet 'dispatcherServlet'
+[37m[INFO] 06:39:54,069 [http-nio-8082-exec-2] servlet.DispatcherServlet. - Initializing Servlet 'dispatcherServlet'
+[m[37m[INFO] 06:39:54,070 [http-nio-8082-exec-2] servlet.DispatcherServlet. - Completed initialization in 1 ms
+[m[31m[WARN] 06:40:03,325 [http-nio-8082-exec-4] webserver.CertificateController. - Request failed
+[m net.corda.core.flows.FlowException: Only the issuing university (O=Vidya University, L=Bengaluru, C=IN) can revoke certificate VU-2026-CSE-0142.
