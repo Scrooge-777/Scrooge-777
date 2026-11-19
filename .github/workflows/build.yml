@@ -26,6 +26,12 @@ jobs:
           set -o pipefail
           ./gradlew --no-daemon clean build deployNodes :clients:bootJar 2>&1 | tee build-output.txt
 
+      - name: Start the four nodes and three portals
+        run: scripts/start-network.sh
+
+      - name: End-to-end test through the portals' REST APIs
+        run: python3 scripts/e2e_test.py
+
       - name: Summarise test results
         if: always()
         run: |
@@ -44,12 +50,13 @@ jobs:
           print("\n".join(rows))
           PY
           cat test-summary.md >> "$GITHUB_STEP_SUMMARY"
-          ls build/nodes >> "$GITHUB_STEP_SUMMARY" 2>/dev/null || true
+          cat e2e-report.md >> "$GITHUB_STEP_SUMMARY" 2>/dev/null || true
 
       - name: Save results to the ci-results branch
         if: always()
         run: |
-          mkdir -p /tmp/out && cp test-summary.md build-output.txt /tmp/out/ 2>/dev/null || true
+          mkdir -p /tmp/out && cp test-summary.md build-output.txt e2e-report.md /tmp/out/ 2>/dev/null || true
+          mkdir -p /tmp/out/logs && cp build/demo-logs/*.log /tmp/out/logs/ 2>/dev/null || true
           for f in */build/test-results/test/*.xml; do cp "$f" /tmp/out/ 2>/dev/null || true; done
           ls build/nodes > /tmp/out/nodes.txt 2>/dev/null || true
           ls -la clients/build/libs > /tmp/out/jars.txt 2>/dev/null || true
