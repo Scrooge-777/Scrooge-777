@@ -1,0 +1,70 @@
+name: Build and test CorDapp
+
+on:
+  push:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Java 17 (required by Corda 4.12)
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Build, run all contract and flow tests, create the four nodes
+        run: |
+          chmod +x gradlew
+          set -o pipefail
+          ./gradlew --no-daemon clean build deployNodes :clients:bootJar 2>&1 | tee build-output.txt
+
+      - name: Summarise test results
+        if: always()
+        run: |
+          python3 - <<'PY' > test-summary.md
+          import glob, xml.etree.ElementTree as ET
+          rows, total, failed = [], 0, 0
+          for f in sorted(glob.glob('*/build/test-results/test/*.xml')):
+              r = ET.parse(f).getroot()
+              for tc in r.iter('testcase'):
+                  total += 1
+                  bad = tc.find('failure') is not None or tc.find('error') is not None
+                  failed += bad
+                  rows.append(f"| {r.get('name').split('.')[-1]} | {tc.get('name')} | {'FAIL' if bad else 'PASS'} | {float(tc.get('time') or 0):.2f} |")
+          print(f"# Test results\n\n**{total - failed} passed, {failed} failed, {total} total**\n")
+          print("| Suite | Test | Result | Seconds |\n|---|---|---|---|")
+          print("\n".join(rows))
+          PY
+          cat test-summary.md >> "$GITHUB_STEP_SUMMARY"
+          ls build/nodes >> "$GITHUB_STEP_SUMMARY" 2>/dev/null || true
+
+      - name: Save results to the ci-results branch
+        if: always()
+        run: |
+          mkdir -p /tmp/out && cp test-summary.md build-output.txt /tmp/out/ 2>/dev/null || true
+          for f in */build/test-results/test/*.xml; do cp "$f" /tmp/out/ 2>/dev/null || true; done
+          ls build/nodes > /tmp/out/nodes.txt 2>/dev/null || true
+          ls -la clients/build/libs > /tmp/out/jars.txt 2>/dev/null || true
+          cd /tmp/out
+          git init -q -b ci-results
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A && git commit -qm "CI results for ${GITHUB_SHA}"
+          git push -f "https://x-access-token:${{ github.token }}@github.com/${GITHUB_REPOSITORY}.git" ci-results
+
+      - name: Upload test reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-reports
+          path: |
+            */build/reports/tests/test
+            build-output.txt
