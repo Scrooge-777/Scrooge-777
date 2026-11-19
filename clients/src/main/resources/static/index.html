@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>CertVerify · Corda Certificate Portal</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<header class="topbar">
+  <div class="brand">
+    <span class="seal" aria-hidden="true">✓</span>
+    <div>
+      <div class="brand-name">CertVerify</div>
+      <div class="brand-sub">Academic certificates on Corda</div>
+    </div>
+  </div>
+  <div class="node" id="node">
+    <span class="dot"></span><span id="nodeName">Connecting…</span>
+    <span class="role" id="nodeRole"></span>
+  </div>
+</header>
+
+<nav class="tabs" role="tablist">
+  <button class="tab" data-tab="vault" role="tab">Certificates</button>
+  <button class="tab" data-tab="issue" role="tab">Issue</button>
+  <button class="tab" data-tab="verify" role="tab">Verify</button>
+</nav>
+
+<main>
+  <!-- Certificates in this node's vault -->
+  <section class="panel" id="tab-vault">
+    <div class="panel-head">
+      <div>
+        <h1>Certificates in this vault</h1>
+        <p class="hint" id="vaultHint">Everything this node can see on the ledger.</p>
+      </div>
+      <button class="btn ghost" id="refresh">Refresh</button>
+    </div>
+    <div id="certList" class="cards"></div>
+  </section>
+
+  <!-- Issue (university) -->
+  <section class="panel" id="tab-issue" hidden>
+    <h1>Issue a certificate</h1>
+    <p class="hint">Only a university node can issue. The PDF is hashed in your browser — the file itself never leaves this computer and never goes on the ledger.</p>
+    <form id="issueForm" class="form">
+      <div class="grid">
+        <label>Certificate number<input name="certificateId" required placeholder="VU-2026-CSE-0142"></label>
+        <label>Student node<select name="student" id="studentSelect" required></select></label>
+        <label>Student name<input name="studentName" required placeholder="Asha Rao"></label>
+        <label>Roll number<input name="rollNumber" required placeholder="1VU22CS042"></label>
+        <label>Program<input name="program" required placeholder="B.Tech"></label>
+        <label>Specialization<input name="specialization" required placeholder="Computer Science and Engineering"></label>
+        <label>CGPA (0–10)<input name="cgpa" type="number" min="0" max="10" step="0.01" required placeholder="8.74"></label>
+        <label>Year of passing<input name="yearOfPassing" type="number" min="1950" max="2100" required placeholder="2026"></label>
+      </div>
+      <label class="drop">
+        <input type="file" id="issueFile" accept="application/pdf,image/*,.txt" required>
+        <span>Certificate document (PDF)</span>
+        <code id="issueHash" class="hash">No file selected</code>
+      </label>
+      <button class="btn primary" type="submit">Issue on ledger</button>
+    </form>
+  </section>
+
+  <!-- Verify (employer / anyone) -->
+  <section class="panel" id="tab-verify" hidden>
+    <h1>Verify a certificate</h1>
+    <p class="hint">Asks the issuing university's node directly. Upload the document the candidate gave you to prove it hasn't been altered and to see its details.</p>
+    <form id="verifyForm" class="form">
+      <div class="grid">
+        <label>Certificate number<input name="certificateId" required placeholder="VU-2026-CSE-0142"></label>
+        <label>Issuing university<select name="university" id="universitySelect" required></select></label>
+      </div>
+      <label class="drop">
+        <input type="file" id="verifyFile" accept="application/pdf,image/*,.txt">
+        <span>Certificate document (optional, recommended)</span>
+        <code id="verifyHash" class="hash">No file selected — status check only</code>
+      </label>
+      <button class="btn primary" type="submit">Verify with issuer</button>
+    </form>
+    <div id="verifyResult"></div>
+  </section>
+</main>
+
+<dialog id="historyDialog">
+  <div class="dialog-head">
+    <h2 id="historyTitle">History</h2>
+    <button class="btn ghost" id="closeHistory" aria-label="Close">✕</button>
+  </div>
+  <ol id="historyList" class="timeline"></ol>
+</dialog>
+
+<div id="toast" class="toast" role="status" hidden></div>
+
+<script src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,1151 @@
+<!doctype html>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CertVerify Network Model</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,650&family=JetBrains+Mono:wght@400;500&family=Public+Sans:wght@400;500;600;700&display=swap">
+<style>
+/* Layout: a registrar's console. Left = the network and its ledger activity; right = the console of the node you are
+   operating; below = the attack lab. Diplomas render as small certificates, hashes and tx ids in mono. */
+:root {
+  --ground: #eef2f0;
+  --surface: #ffffff;
+  --surface-2: #f5f8f7;
+  --ink: #14211e;
+  --muted: #576964;
+  --line: #d3ddd9;
+  --accent: #0b6e5f;
+  --accent-ink: #ffffff;
+  --accent-soft: #dcefe9;
+  --seal: #a07b22;
+  --seal-soft: #f4ecd6;
+  --good: #1d7746;
+  --good-soft: #e1f2e7;
+  --bad: #b42318;
+  --bad-soft: #fbe6e3;
+  --warn: #875800;
+  --warn-soft: #faefd4;
+  --packet: #0b6e5f;
+  --font-display: "Fraunces", Georgia, "Times New Roman", serif;
+  --font-body: "Public Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  --radius: 10px;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --ground: #0e1513; --surface: #15201c; --surface-2: #1b2723; --ink: #e3ebe8; --muted: #98aba5; --line: #2b3a35;
+    --accent: #3db39c; --accent-ink: #04201a; --accent-soft: #143a32; --seal: #d4ad53; --seal-soft: #352b13;
+    --good: #4cc283; --good-soft: #13301f; --bad: #f07a6e; --bad-soft: #3b1713; --warn: #e2b04c; --warn-soft: #33270d;
+    --packet: #3db39c; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --ground: #0e1513; --surface: #15201c; --surface-2: #1b2723; --ink: #e3ebe8; --muted: #98aba5; --line: #2b3a35;
+  --accent: #3db39c; --accent-ink: #04201a; --accent-soft: #143a32; --seal: #d4ad53; --seal-soft: #352b13;
+  --good: #4cc283; --good-soft: #13301f; --bad: #f07a6e; --bad-soft: #3b1713; --warn: #e2b04c; --warn-soft: #33270d;
+  --packet: #3db39c; color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+body { background: var(--ground); color: var(--ink); font-family: var(--font-body); font-size: 15px; line-height: 1.5; }
+.wrap { max-width: 1240px; margin: 0 auto; padding-inline: 20px; padding-block: 0 40px; }
+h1, h2, h3 { margin: 0; text-wrap: balance; }
+h2 { font-size: 1.05rem; font-weight: 700; }
+h3 { font-size: .8rem; font-weight: 700; text-transform: uppercase; letter-spacing: .07em; color: var(--muted); }
+p { margin: 0; }
+.mono { font-family: var(--font-mono); font-size: .78rem; }
+.muted { color: var(--muted); }
+button, input, select { font: inherit; color: inherit; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+/* header */
+.bar { display: flex; flex-wrap: wrap; gap: 12px 20px; align-items: center; justify-content: space-between; padding-block: 18px; }
+.brand { display: flex; align-items: center; gap: 12px; }
+.brand svg { flex: none; }
+.brand-name { font-family: var(--font-display); font-weight: 650; font-size: 1.55rem; letter-spacing: -.01em; }
+.brand-sub { color: var(--muted); font-size: .85rem; }
+.bar-actions { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+.toggle { display: inline-flex; gap: 8px; align-items: center; font-size: .85rem; color: var(--muted); cursor: pointer; }
+
+/* buttons & fields */
+.btn { border: 1px solid var(--line); background: var(--surface); padding: 7px 14px; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: .88rem; }
+.btn:hover { border-color: var(--accent); }
+.btn.primary { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
+.btn.primary:hover { filter: brightness(1.07); }
+.btn.danger { color: var(--bad); border-color: color-mix(in srgb, var(--bad) 45%, var(--line)); }
+.btn.small { padding: 4px 10px; font-size: .8rem; }
+.btn:disabled { opacity: .55; cursor: progress; }
+label.field { display: flex; flex-direction: column; gap: 4px; font-size: .78rem; font-weight: 600; color: var(--muted); min-width: 0; }
+input[type=text], input[type=number], select {
+  background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 8px 10px; font-size: .9rem; font-weight: 400; color: var(--ink); width: 100%; min-width: 0;
+}
+.fields { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 12px; }
+
+/* layout */
+.main { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); gap: 20px; align-items: start; }
+@media (max-width: 900px) { .main { grid-template-columns: minmax(0, 1fr); } }
+.panel { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 18px; display: flex; flex-direction: column; gap: 14px; min-width: 0; }
+.stack { display: flex; flex-direction: column; gap: 14px; min-width: 0; }
+
+/* network map */
+.map { width: 100%; height: auto; display: block; }
+.map .wire { fill: none; stroke: var(--line); stroke-width: 2; }
+.map .wire.live { stroke: var(--accent); }
+.map .node-dot { fill: var(--surface-2); stroke: var(--muted); stroke-width: 1.5; }
+.map .node-g.active .node-dot { fill: var(--accent-soft); stroke: var(--accent); stroke-width: 2.5; }
+.map .node-g { cursor: pointer; }
+.map .node-label { fill: var(--ink); font-size: 12px; font-weight: 600; font-family: var(--font-body); }
+.map .node-role { fill: var(--muted); font-size: 10.5px; font-family: var(--font-body); }
+.map .node-ini { fill: var(--ink); font-size: 13px; font-weight: 700; font-family: var(--font-body); }
+.map .packet { fill: var(--packet); }
+.map .packet-label { fill: var(--accent); font-size: 10.5px; font-weight: 600; font-family: var(--font-body); }
+
+/* activity log */
+.log { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; max-height: 420px; overflow-y: auto; border-top: 1px solid var(--line); }
+.log li { display: grid; grid-template-columns: 18px minmax(0, 1fr); gap: 8px; padding: 8px 2px; border-bottom: 1px solid var(--line); font-size: .84rem; }
+.log .ico { font-weight: 700; text-align: center; }
+.log .ok .ico { color: var(--good); }
+.log .fail .ico { color: var(--bad); }
+.log .info .ico { color: var(--muted); }
+.log .who { font-weight: 600; }
+.log .tx { background: none; border: 0; padding: 0; color: var(--accent); cursor: pointer; text-decoration: underline; text-underline-offset: 2px; }
+.log .ex { font-size: .7rem; color: var(--seal); font-weight: 700; text-transform: uppercase; letter-spacing: .06em; margin-left: 6px; }
+
+/* inspector */
+.inspector { background: var(--surface-2); border: 1px solid var(--line); border-radius: 8px; padding: 14px; display: flex; flex-direction: column; gap: 10px; font-size: .85rem; }
+.inspector .row { display: grid; grid-template-columns: 110px minmax(0, 1fr); gap: 8px; }
+.inspector .row > :first-child { color: var(--muted); font-weight: 600; font-size: .78rem; }
+.inspector .mono { word-break: break-all; }
+.inspector-head { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+
+/* node switcher */
+.seg { display: flex; flex-wrap: wrap; gap: 6px; }
+.seg button { border: 1px solid var(--line); background: var(--surface); padding: 8px 12px; border-radius: 999px; cursor: pointer; display: inline-flex; gap: 8px; align-items: center; font-size: .86rem; font-weight: 600; }
+.seg button .role { font-weight: 500; color: var(--muted); font-size: .76rem; }
+.seg button[aria-selected=true] { background: var(--ink); color: var(--surface); border-color: var(--ink); }
+.seg button[aria-selected=true] .role { color: color-mix(in srgb, var(--surface) 70%, var(--ink)); }
+.node-head { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 6px 16px; align-items: baseline; }
+.node-head .x500 { font-family: var(--font-mono); font-size: .75rem; color: var(--muted); word-break: break-all; }
+
+/* pills */
+.pill { display: inline-block; padding: 2px 9px; border-radius: 999px; font-size: .72rem; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; white-space: nowrap; }
+.pill.good { background: var(--good-soft); color: var(--good); }
+.pill.bad { background: var(--bad-soft); color: var(--bad); }
+.pill.warn { background: var(--warn-soft); color: var(--warn); }
+.pill.neutral { background: var(--surface-2); color: var(--muted); border: 1px solid var(--line); }
+
+/* tables */
+.table-wrap { overflow-x: auto; border: 1px solid var(--line); border-radius: 8px; }
+table { border-collapse: collapse; width: 100%; font-size: .84rem; font-variant-numeric: tabular-nums; }
+th, td { text-align: left; padding: 8px 10px; border-bottom: 1px solid var(--line); vertical-align: middle; }
+th { font-size: .72rem; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); background: var(--surface-2); font-weight: 700; }
+tr:last-child td { border-bottom: 0; }
+tr.consumed td { color: var(--muted); }
+tr.consumed td .cert-no { text-decoration: line-through; }
+.empty { padding: 18px; text-align: center; color: var(--muted); font-size: .88rem; }
+
+/* diploma */
+.diplomas { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 14px; }
+.diploma { position: relative; background: var(--surface-2); border: 1px solid var(--line); border-radius: 6px; padding: 16px 16px 14px; display: flex; flex-direction: column; gap: 6px; overflow: hidden; }
+.diploma::before { content: ""; position: absolute; inset: 5px; border: 1px solid color-mix(in srgb, var(--seal) 45%, transparent); border-radius: 3px; pointer-events: none; }
+.diploma .uni { font-family: var(--font-display); font-weight: 650; font-size: .95rem; letter-spacing: .02em; text-transform: uppercase; }
+.diploma .certifies { font-size: .74rem; color: var(--muted); }
+.diploma .holder { font-family: var(--font-display); font-weight: 500; font-size: 1.35rem; line-height: 1.2; }
+.diploma .degree { font-size: .86rem; }
+.diploma .meta { display: flex; flex-wrap: wrap; gap: 4px 14px; font-size: .78rem; color: var(--muted); font-variant-numeric: tabular-nums; }
+.diploma .seal { position: absolute; right: 14px; top: 12px; width: 46px; height: 46px; }
+.diploma .hash { font-family: var(--font-mono); font-size: .68rem; color: var(--muted); word-break: break-all; border-top: 1px dashed var(--line); padding-top: 6px; margin-top: 2px; }
+.diploma.revoked .seal { opacity: .3; }
+.diploma.revoked::after { content: "REVOKED"; position: absolute; right: -34px; top: 22px; transform: rotate(35deg); background: var(--bad); color: var(--surface); font-size: .68rem; font-weight: 700; letter-spacing: .12em; padding: 3px 40px; }
+.diploma .actions { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-top: 6px; position: relative; }
+.diploma .actions select { width: auto; }
+.diploma .edited { background: var(--warn-soft); color: var(--warn); border-radius: 3px; padding: 0 3px; }
+
+/* verification result */
+.verdict { border-radius: 10px; padding: 16px; display: flex; flex-direction: column; gap: 10px; border: 1px solid; }
+.verdict.VALID { background: var(--good-soft); border-color: var(--good); }
+.verdict.REVOKED, .verdict.HASH_MISMATCH { background: var(--bad-soft); border-color: var(--bad); }
+.verdict.NOT_FOUND { background: var(--warn-soft); border-color: var(--warn); }
+.verdict .title { font-family: var(--font-display); font-weight: 650; font-size: 1.3rem; }
+.verdict.VALID .title { color: var(--good); }
+.verdict.REVOKED .title, .verdict.HASH_MISMATCH .title { color: var(--bad); }
+.verdict.NOT_FOUND .title { color: var(--warn); }
+.facts { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 8px 14px; font-size: .86rem; }
+.facts span { display: block; font-size: .68rem; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); font-weight: 700; }
+.radios { display: flex; flex-direction: column; gap: 8px; font-size: .88rem; }
+.radios label { display: flex; gap: 8px; align-items: flex-start; cursor: pointer; }
+.radios input { margin-top: 4px; }
+.radios label { flex-wrap: wrap; }
+.radios input[type=file] { max-width: 100%; min-width: 0; margin-top: 0; }
+.doc-hash { font-family: var(--font-mono); font-size: .74rem; color: var(--muted); word-break: break-all; }
+
+/* stats */
+.stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px; }
+.stat { background: var(--surface-2); border: 1px solid var(--line); border-radius: 8px; padding: 12px; }
+.stat b { display: block; font-size: 1.5rem; font-variant-numeric: tabular-nums; }
+.stat span { font-size: .78rem; color: var(--muted); }
+
+/* attack lab */
+.lab { margin-top: 24px; display: flex; flex-direction: column; gap: 14px; }
+.lab-head { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: end; gap: 10px; }
+.lab-title { font-family: var(--font-display); font-weight: 650; font-size: 1.35rem; }
+.attacks { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 14px; }
+.attack { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 16px; display: flex; flex-direction: column; gap: 10px; }
+.attack .who { font-size: .72rem; text-transform: uppercase; letter-spacing: .07em; font-weight: 700; color: var(--muted); }
+.attack h4 { margin: 0; font-size: 1rem; }
+.attack p { font-size: .86rem; color: var(--muted); }
+.attack .outcome { border-radius: 8px; padding: 10px 12px; font-size: .84rem; display: flex; flex-direction: column; gap: 4px; }
+.attack .outcome.blocked { background: var(--good-soft); color: var(--ink); }
+.attack .outcome.blocked b { color: var(--good); }
+.attack .outcome.allowed { background: var(--bad-soft); }
+.attack .foot { margin-top: auto; display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+
+.note { font-size: .82rem; color: var(--muted); max-width: 75ch; }
+.inline-confirm { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; margin-top: 6px; }
+.inline-confirm input { flex: 1 1 160px; }
+.toast { position: fixed; left: 50%; bottom: calc(18px + env(safe-area-inset-bottom, 0px)); transform: translateX(-50%); background: var(--ink); color: var(--surface); padding: 10px 16px; border-radius: 8px; font-size: .88rem; max-width: calc(100vw - 32px); z-index: 10; }
+.toast.error { background: var(--bad); }
+footer { margin-top: 28px; padding-top: 16px; border-top: 1px solid var(--line); }
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; } }
+</style>
+
+<div class="wrap">
+  <header class="bar">
+    <div class="brand">
+      <svg width="44" height="44" viewBox="0 0 44 44" aria-hidden="true">
+        <circle cx="22" cy="22" r="20" fill="var(--seal-soft)" stroke="var(--seal)" stroke-width="1.5"></circle>
+        <circle cx="22" cy="22" r="14.5" fill="none" stroke="var(--seal)" stroke-width="1" stroke-dasharray="2 2.2"></circle>
+        <path d="M15 22.5l4.5 4.5 9.5-10" fill="none" stroke="var(--accent)" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"></path>
+      </svg>
+      <div>
+        <h1 class="brand-name">CertVerify</h1>
+        <div class="brand-sub">A working model of the Corda certificate network, running in your browser</div>
+      </div>
+    </div>
+    <div class="bar-actions">
+      <label class="toggle"><input type="checkbox" id="animate" checked> Animate messages</label>
+      <button class="btn" id="reset" type="button">Reset network</button>
+    </div>
+  </header>
+
+  <div class="main">
+    <section class="panel" aria-labelledby="net-h">
+      <div class="node-head">
+        <h2 id="net-h">Network</h2>
+        <span class="muted" style="font-size:.8rem">Click a node to operate it</span>
+      </div>
+      <svg class="map" id="map" viewBox="0 0 400 268" role="img" aria-label="Four Corda nodes and the channels between them">
+        <path class="wire" id="w-uni-stu" d="M78 96 L192 96"></path>
+        <path class="wire" id="w-stu-emp" d="M208 96 L322 96"></path>
+        <path class="wire" id="w-uni-emp" d="M70 70 Q200 -6 330 70"></path>
+        <path class="wire" id="w-uni-not" d="M78 112 L192 206"></path>
+        <g class="node-g" data-node="uni" tabindex="0" role="button" aria-label="Operate Vidya University">
+          <circle class="node-dot" cx="70" cy="96" r="26"></circle><text class="node-ini" x="70" y="101" text-anchor="middle">VU</text>
+          <text class="node-label" x="70" y="140" text-anchor="middle">Vidya University</text><text class="node-role" x="70" y="154" text-anchor="middle">issuer</text>
+        </g>
+        <g class="node-g" data-node="stu" tabindex="0" role="button" aria-label="Operate StudentWallet">
+          <circle class="node-dot" cx="200" cy="96" r="26"></circle><text class="node-ini" x="200" y="101" text-anchor="middle">SW</text>
+          <text class="node-label" x="200" y="140" text-anchor="middle">StudentWallet</text><text class="node-role" x="200" y="154" text-anchor="middle">holder</text>
+        </g>
+        <g class="node-g" data-node="emp" tabindex="0" role="button" aria-label="Operate TechCorp Employer">
+          <circle class="node-dot" cx="330" cy="96" r="26"></circle><text class="node-ini" x="330" y="101" text-anchor="middle">TC</text>
+          <text class="node-label" x="330" y="140" text-anchor="middle">TechCorp Employer</text><text class="node-role" x="330" y="154" text-anchor="middle">verifier</text>
+        </g>
+        <g class="node-g" data-node="notary" tabindex="0" role="button" aria-label="Operate the Notary">
+          <circle class="node-dot" cx="200" cy="222" r="22"></circle><text class="node-ini" x="200" y="227" text-anchor="middle">N</text>
+          <text class="node-label" x="262" y="220" text-anchor="start">Notary</text><text class="node-role" x="262" y="234" text-anchor="start">uniqueness</text>
+        </g>
+        <g id="packets"></g>
+      </svg>
+      <div class="node-head"><h3>Ledger activity</h3><span class="muted" style="font-size:.78rem">newest first · click a tx to inspect it</span></div>
+      <div id="inspector" class="inspector" hidden></div>
+      <ol class="log" id="log" aria-live="polite"></ol>
+    </section>
+
+    <section class="stack">
+      <div class="seg" role="tablist" aria-label="Choose which node to operate">
+        <button role="tab" data-node="uni" aria-selected="false">Vidya University <span class="role">issuer</span></button>
+        <button role="tab" data-node="stu" aria-selected="false">StudentWallet <span class="role">holder</span></button>
+        <button role="tab" data-node="emp" aria-selected="false">TechCorp Employer <span class="role">verifier</span></button>
+        <button role="tab" data-node="notary" aria-selected="false">Notary <span class="role">consensus</span></button>
+      </div>
+      <div class="panel" id="console"></div>
+    </section>
+  </div>
+
+  <section class="lab" aria-labelledby="lab-h">
+    <div class="lab-head">
+      <div>
+        <h2 class="lab-title" id="lab-h">Attack lab</h2>
+        <p class="muted">Six ways someone might try to cheat the system. Each one runs against the live network above, and the log shows which check stops it.</p>
+      </div>
+      <button class="btn" id="run-all" type="button">Run all six</button>
+    </div>
+    <div class="attacks" id="attacks"></div>
+  </section>
+
+  <footer>
+    <p class="note">This model re-implements the CorDapp's contract rules, flows, notary and vault logic in JavaScript, with real SHA-256 hashing and ECDSA P-256 signatures from your browser's Web Crypto. Each node holds its own private key, and every node that receives a transaction re-checks its id, its signatures, its back-chain and the contract before storing it. Records marked Example were created when the page loaded. Nothing leaves this page; Reset network starts over with fresh keys.</p>
+  </footer>
+</div>
+<div id="toast" class="toast" role="status" hidden></div>
+
+<script>
+"use strict";
+// CORE-START ===========================================================================================
+// Ledger core: crypto, transactions, CertificateContract, notary, vaults and the four flows.
+const enc = new TextEncoder();
+const toHex = buf => Array.from(new Uint8Array(buf), b => b.toString(16).padStart(2, "0")).join("");
+const fromHex = h => new Uint8Array((h.match(/../g) || []).map(x => parseInt(x, 16)));
+async function sha256Hex(data) {
+  const bytes = typeof data === "string" ? enc.encode(data) : data;
+  return toHex(await crypto.subtle.digest("SHA-256", bytes));
+}
+function canonical(v) {
+  if (Array.isArray(v)) return "[" + v.map(canonical).join(",") + "]";
+  if (v && typeof v === "object") return "{" + Object.keys(v).sort().map(k => JSON.stringify(k) + ":" + canonical(v[k])).join(",") + "}";
+  return JSON.stringify(v === undefined ? null : v);
+}
+const clone = v => JSON.parse(JSON.stringify(v));
+function newId() {
+  if (crypto.randomUUID) return crypto.randomUUID();
+  const b = crypto.getRandomValues(new Uint8Array(16));
+  return toHex(b).replace(/^(.{8})(.{4})(.{4})(.{4})(.{12})$/, "$1-$2-$3-$4-$5");
+}
+const refKey = r => r.txhash + ":" + r.index;
+const today = () => new Date().toISOString().slice(0, 10);
+
+class FlowError extends Error { constructor(msg, layer) { super(msg); this.layer = layer || "Flow check"; } }
+
+// UI hooks (no-ops in tests)
+const hooks = { log: () => {}, send: async () => {}, changed: () => {} };
+
+const network = { nodes: {}, byKey: {}, notary: null };
+
+class CordaNode {
+  constructor(id, org, locality, role) {
+    this.id = id; this.org = org; this.locality = locality; this.role = role;
+    this.name = `O=${org}, L=${locality}, C=IN`;
+    this.vault = [];          // {ref, state, consumed, consumedBy, recordedAt, relevant}
+    this.txs = new Map();     // txId -> signed transaction
+    this.docs = new Map();    // certificateId -> {text, hash}   (off-ledger documents)
+    this.sharedWith = new Map(); // certificateId -> Set(org)  (student-side bookkeeping)
+  }
+  async init() {
+    const kp = await crypto.subtle.generateKey({ name: "ECDSA", namedCurve: "P-256" }, true, ["sign", "verify"]);
+    this.privateKey = kp.privateKey; this.publicKey = kp.publicKey;
+    this.key = (await sha256Hex(await crypto.subtle.exportKey("raw", kp.publicKey))).slice(0, 24);
+    network.byKey[this.key] = this;
+  }
+  get party() { return { name: this.name, key: this.key }; }
+  async sign(txId) {
+    const sig = await crypto.subtle.sign({ name: "ECDSA", hash: "SHA-256" }, this.privateKey, enc.encode(txId));
+    return { by: this.key, sig: toHex(sig) };
+  }
+  latest(certificateId) {
+    return this.vault.find(e => !e.consumed && e.state.linearId.externalId === certificateId) || null;
+  }
+  everSeen(certificateId) { return this.vault.some(e => e.state.linearId.externalId === certificateId); }
+  record(stx, allVisible) {
+    if (this.txs.has(stx.id)) return;
+    this.txs.set(stx.id, stx);
+    for (const input of stx.core.inputs) {
+      const e = this.vault.find(v => refKey(v.ref) === refKey(input));
+      if (e) { e.consumed = true; e.consumedBy = stx.id; }
+    }
+    stx.core.outputs.forEach((state, index) => {
+      const relevant = state.university.key === this.key || state.student.key === this.key;
+      if (relevant || allVisible) {
+        this.vault.push({ ref: { txhash: stx.id, index }, state: clone(state), consumed: false, consumedBy: null, recordedAt: new Date().toISOString(), relevant });
+      }
+    });
+  }
+}
+
+class NotaryNode extends CordaNode {
+  constructor() { super("notary", "Notary", "Mumbai", "notary"); this.spent = new Map(); this.notarised = []; }
+  // Non-validating notary: checks the tx id and that no input has been consumed before, then signs.
+  async notarise(stx) {
+    if (await sha256Hex(canonical(stx.core)) !== stx.id) throw new FlowError("Notary: transaction id does not match its contents.", "Notary");
+    for (const input of stx.core.inputs) {
+      const prior = this.spent.get(refKey(input));
+      if (prior && prior !== stx.id) {
+        throw new FlowError(`Notary rejected a double-spend: input ${short(input.txhash)}:${input.index} was already consumed by tx ${short(prior)}.`, "Notary");
+      }
+    }
+    for (const input of stx.core.inputs) this.spent.set(refKey(input), stx.id);
+    this.notarised.push({ id: stx.id, command: stx.core.command, at: new Date().toISOString(), inputs: stx.core.inputs.map(refKey) });
+    return this.sign(stx.id);
+  }
+}
+
+const short = h => (h || "").slice(0, 8);
+const orgOf = key => (network.byKey[key] ? network.byKey[key].org : "unknown party");
+
+// ---------------- CertificateContract (same rules and messages as the Kotlin contract) ----------------
+class ContractError extends Error { constructor(msg) { super("Failed requirement: " + msg); this.layer = "Contract"; } }
+const req = (msg, cond) => { if (!cond) throw new ContractError(msg); };
+const SHA256_HEX = /^[0-9a-f]{64}$/;
+const blank = s => typeof s !== "string" || s.trim() === "";
+
+function checkCertificateData(c) {
+  req("Certificate ID must not be blank", !blank(c.certificateId));
+  req("Certificate ID must be the state's external ID", c.linearId && c.linearId.externalId === c.certificateId);
+  req("Student name must not be blank", !blank(c.studentName));
+  req("Roll number must not be blank", !blank(c.rollNumber));
+  req("Program must not be blank", !blank(c.program));
+  req("Specialization must not be blank", !blank(c.specialization));
+  req("CGPA must be between 0.0 and 10.0", typeof c.cgpa === "number" && c.cgpa >= 0 && c.cgpa <= 10);
+  req("Year of passing must be between 1950 and 2100", Number.isInteger(c.yearOfPassing) && c.yearOfPassing >= 1950 && c.yearOfPassing <= 2100);
+  req("Issue date must not be before the year of passing", Number(String(c.issueDate).slice(0, 4)) >= c.yearOfPassing);
+  req("Document hash must be a lowercase hex SHA-256 digest", SHA256_HEX.test(c.documentHash));
+  req("University and student must be different parties", c.university.key !== c.student.key);
+}
+
+function verifyContract(core, inputStates) {
+  const signers = core.requiredSigners;
+  if (core.command === "Issue") {
+    req("No certificate may be consumed when issuing", inputStates.length === 0);
+    req("Exactly one certificate must be issued", core.outputs.length === 1);
+    const c = core.outputs[0];
+    req("A newly issued certificate must have status ISSUED", c.status === "ISSUED");
+    req("A newly issued certificate must not carry a revocation reason", c.revocationReason == null);
+    checkCertificateData(c);
+    req("The issuing university must sign the transaction", signers.includes(c.university.key));
+  } else if (core.command === "Revoke") {
+    req("Exactly one certificate must be consumed when revoking", inputStates.length === 1);
+    req("Exactly one certificate must be produced when revoking", core.outputs.length === 1);
+    const input = inputStates[0], output = core.outputs[0];
+    req("Only an ISSUED certificate can be revoked", input.status === "ISSUED");
+    req("The output certificate must have status REVOKED", output.status === "REVOKED");
+    const reason = output.revocationReason;
+    req("A revocation reason must be given", typeof reason === "string" && reason.trim() !== "");
+    req("Revocation must not change any other certificate field",
+      canonical(output) === canonical({ ...input, status: "REVOKED", revocationReason: reason }));
+    req("The issuing university must sign the revocation", signers.includes(input.university.key));
+  } else {
+    throw new ContractError("Unrecognised command: " + core.command);
+  }
+}
+
+// ---------------- transactions ----------------
+async function buildTx(core) { return { core, id: await sha256Hex(canonical(core)), sigs: [], notarySig: null }; }
+
+async function sigValid(sig, txId) {
+  const node = network.byKey[sig.by];
+  if (!node) return false;
+  try {
+    return await crypto.subtle.verify({ name: "ECDSA", hash: "SHA-256" }, node.publicKey, fromHex(sig.sig), enc.encode(txId));
+  } catch (e) { return false; }
+}
+
+// What every receiving node runs: id, signatures, notary signature, contract.
+async function verifyTransaction(stx, inputStates) {
+  if (await sha256Hex(canonical(stx.core)) !== stx.id) {
+    throw new FlowError("Transaction id does not match its contents: the record was altered after it was signed.", "Signature check");
+  }
+  for (const key of stx.core.requiredSigners) {
+    const sig = stx.sigs.find(s => s.by === key);
+    if (!sig || !(await sigValid(sig, stx.id))) {
+      throw new FlowError(`Missing or invalid signature from ${orgOf(key)}: the record was not signed by the party it names.`, "Signature check");
+    }
+  }
+  if (stx.core.inputs.length > 0) {
+    if (!stx.notarySig || stx.notarySig.by !== network.notary.key || !(await sigValid(stx.notarySig, stx.id))) {
+      throw new FlowError("Missing or invalid notary signature.", "Notary");
+    }
+  }
+  verifyContract(stx.core, inputStates);
+}
+
+function inputsFor(stx, txSource) {
+  return stx.core.inputs.map(ref => {
+    const prev = txSource.get(ref.txhash);
+    if (!prev) throw new FlowError(`Back-chain transaction ${short(ref.txhash)} is unavailable.`, "Back-chain");
+    return prev.core.outputs[ref.index];
+  });
+}
+
+// Download and verify every ancestor the receiver does not already have (ResolveTransactionsFlow).
+async function resolveBackChain(stx, sender, receiver) {
+  for (const ref of stx.core.inputs) {
+    if (receiver.txs.has(ref.txhash)) continue;
+    const prev = sender.txs.get(ref.txhash);
+    if (!prev) throw new FlowError(`Back-chain transaction ${short(ref.txhash)} could not be fetched from ${sender.org}.`, "Back-chain");
+    await hooks.send(receiver.id, sender.id, "fetch back-chain");
+    await resolveBackChain(prev, sender, receiver);
+    await verifyTransaction(prev, inputsFor(prev, receiver.txs));
+    receiver.txs.set(prev.id, prev); // stored as validated history; its states are not added to the vault
+    hooks.log({ node: receiver, kind: "ok", text: `verified back-chain tx`, tx: prev.id });
+  }
+}
+
+// ---------------- verification decision (CertificateVerifier.evaluate) ----------------
+function evaluate(request, entry, issuer, now) {
+  const cert = entry ? entry.state : null;
+  const id = request.certificateId;
+  const supplied = (request.documentHash || "").trim().toLowerCase();
+  const result = (outcome, message, disclose) => ({
+    certificateId: id, outcome, issuer: issuer.org, message, detailsDisclosed: disclose,
+    studentName: disclose ? cert.studentName : null, rollNumber: disclose ? cert.rollNumber : null,
+    program: disclose ? cert.program : null, specialization: disclose ? cert.specialization : null,
+    cgpa: disclose ? cert.cgpa : null, yearOfPassing: disclose ? cert.yearOfPassing : null,
+    issueDate: disclose ? cert.issueDate : null, revocationReason: disclose ? cert.revocationReason : null,
+    ledgerTransactionId: cert ? entry.ref.txhash : null, checkedAt: now
+  });
+  if (!cert || cert.university.key !== issuer.key) return result("NOT_FOUND", `${issuer.org} has no record of certificate ${id}.`, false);
+  const hashSupplied = supplied.length > 0;
+  const matches = hashSupplied && supplied === cert.documentHash;
+  if (hashSupplied && !matches) return result("HASH_MISMATCH", `The document does not match the certificate issued by ${issuer.org}. It may have been altered.`, false);
+  if (cert.status === "REVOKED") return result("REVOKED", `Certificate ${id} was issued by ${issuer.org} but has been REVOKED.`, matches);
+  return result("VALID", matches
+    ? `Certificate ${id} is genuine and valid. The document matches the ledger record.`
+    : `Certificate ${id} is valid. Provide the certificate document to confirm it and see its details.`, matches);
+}
+
+// ---------------- documents (off-ledger) ----------------
+function documentText(f, universityOrg) {
+  return [
+    universityOrg.toUpperCase() + ", BENGALURU",
+    "DEGREE CERTIFICATE",
+    "Certificate No: " + f.certificateId,
+    "This is to certify that " + f.studentName.toUpperCase() + " (Roll No. " + f.rollNumber + ")",
+    "has been awarded the degree of " + f.program + " in " + f.specialization,
+    "with a CGPA of " + Number(f.cgpa).toFixed(2) + " on a 10-point scale.",
+    "Year of passing: " + f.yearOfPassing,
+    "Date of issue: " + f.issueDate,
+    "Registrar"
+  ].join("\n");
+}
+function editedText(text) {
+  return text.replace(/CGPA of [0-9.]+/, m => {
+    const v = Number(m.slice(8));
+    return "CGPA of " + Math.min(10, v + 1.06).toFixed(2);
+  });
+}
+
+// ---------------- flows ----------------
+async function issueFlow(uni, f, student, documentHash, docText) {
+  const id = (f.certificateId || "").trim();
+  if (!id) throw new FlowError("Certificate ID must not be blank.");
+  if (student.key === uni.key) throw new FlowError("A university cannot issue a certificate to itself.");
+  if (uni.everSeen(id)) throw new FlowError(`Certificate ${id} has already been issued. Certificate numbers must be unique.`);
+  const state = {
+    certificateId: id, studentName: f.studentName.trim(), rollNumber: f.rollNumber.trim(), program: f.program.trim(),
+    specialization: f.specialization.trim(), cgpa: Number(f.cgpa), yearOfPassing: Number(f.yearOfPassing),
+    issueDate: f.issueDate || today(), documentHash: documentHash.trim().toLowerCase(),
+    university: uni.party, student: student.party, status: "ISSUED", revocationReason: null,
+    linearId: { externalId: id, id: newId() }
+  };
+  const stx = await buildTx({ inputs: [], outputs: [state], command: "Issue", requiredSigners: [uni.key], notary: network.notary.key });
+  verifyContract(stx.core, []);
+  stx.sigs.push(await uni.sign(stx.id));
+  hooks.log({ node: uni, kind: "ok", text: `built and signed Issue for ${id}; contract passed`, tx: stx.id });
+  hooks.log({ node: uni, kind: "info", text: "no inputs, so no notarisation is needed" });
+  await hooks.send(uni.id, student.id, "FinalityFlow");
+  await verifyTransaction(stx, []);
+  student.record(stx, false);
+  uni.record(stx, false);
+  if (docText != null) { student.docs.set(id, { text: docText, hash: state.documentHash }); uni.docs.set(id, { text: docText, hash: state.documentHash }); }
+  hooks.log({ node: student, kind: "ok", text: `checked signature and contract; recorded ${id}`, tx: stx.id });
+  hooks.changed();
+  return stx;
+}
+
+async function revokeFlow(uni, certificateId, reason) {
+  const id = certificateId.trim();
+  if (!reason || !reason.trim()) throw new FlowError("A revocation reason must be given.");
+  const current = uni.latest(id);
+  if (!current) throw new FlowError(`No certificate with ID ${id} was found.`);
+  const cert = current.state;
+  if (cert.university.key !== uni.key) throw new FlowError(`Only the issuing university (${orgOf(cert.university.key)}) can revoke certificate ${id}.`);
+  if (cert.status !== "ISSUED") throw new FlowError(`Certificate ${id} is already revoked.`);
+  const out = { ...clone(cert), status: "REVOKED", revocationReason: reason.trim() };
+  const stx = await buildTx({ inputs: [current.ref], outputs: [out], command: "Revoke", requiredSigners: [uni.key], notary: network.notary.key });
+  verifyContract(stx.core, [cert]);
+  stx.sigs.push(await uni.sign(stx.id));
+  hooks.log({ node: uni, kind: "ok", text: `built and signed Revoke for ${id}; contract passed`, tx: stx.id });
+  return finaliseWithNotary(uni, stx, network.nodes[nodeIdByKey(cert.student.key)]);
+}
+
+async function finaliseWithNotary(uni, stx, student) {
+  await hooks.send(uni.id, "notary", "notarise");
+  stx.notarySig = await network.notary.notarise(stx);
+  network.notary.txs.set(stx.id, stx);
+  hooks.log({ node: network.notary, kind: "ok", text: "inputs unspent; notary signed", tx: stx.id });
+  await hooks.send("notary", uni.id, "notary signature");
+  await hooks.send(uni.id, student.id, "FinalityFlow");
+  await resolveBackChain(stx, uni, student);
+  await verifyTransaction(stx, inputsFor(stx, student.txs));
+  student.record(stx, false);
+  uni.record(stx, false);
+  hooks.log({ node: student, kind: "ok", text: `checked signatures and contract; recorded ${stx.core.outputs[0].status.toLowerCase()} ${stx.core.outputs[0].certificateId}`, tx: stx.id });
+  hooks.changed();
+  return stx;
+}
+
+function nodeIdByKey(key) { return network.byKey[key].id; }
+
+async function shareFlow(sender, certificateId, verifier, { withDocument = true } = {}) {
+  const id = certificateId.trim();
+  const current = sender.latest(id);
+  if (!current) throw new FlowError(`No certificate with ID ${id} was found.`);
+  const cert = current.state;
+  if (sender.key !== cert.student.key && sender.key !== cert.university.key) {
+    throw new FlowError(`Only the student or the issuing university may share certificate ${id}.`);
+  }
+  if (verifier.key === sender.key) throw new FlowError("Cannot share a certificate with yourself.");
+  const stx = sender.txs.get(current.ref.txhash);
+  await hooks.send(sender.id, verifier.id, "SendTransactionFlow");
+  await receiveShared(stx, sender, verifier);
+  if (withDocument && sender.docs.has(id)) verifier.docs.set(id, sender.docs.get(id));
+  if (!sender.sharedWith.has(id)) sender.sharedWith.set(id, new Set());
+  sender.sharedWith.get(id).add(verifier.org);
+  hooks.changed();
+  return `Certificate ${id} shared with ${verifier.org}.`;
+}
+
+// ReceiveTransactionFlow(checkSufficientSignatures = true, statesToRecord = ALL_VISIBLE)
+async function receiveShared(stx, sender, verifier) {
+  await resolveBackChain(stx, sender, verifier);
+  await verifyTransaction(stx, inputsFor(stx, verifier.txs));
+  verifier.record(stx, true);
+  hooks.log({ node: verifier, kind: "ok", text: `verified back-chain, signatures and contract; stored ${stx.core.outputs[0].certificateId}`, tx: stx.id });
+}
+
+async function verifyFlow(verifier, certificateId, university, documentHash) {
+  const id = certificateId.trim();
+  if (!id) throw new FlowError("Certificate ID must not be blank.");
+  const request = { certificateId: id, documentHash: (documentHash || "").trim().toLowerCase() };
+  await hooks.send(verifier.id, university.id, "verify(id, hash)");
+  if (request.certificateId.length > 64) throw new FlowError("Certificate ID is too long.");
+  const result = evaluate(request, university.latest(id), university, new Date().toISOString());
+  hooks.log({ node: university, kind: result.outcome === "VALID" ? "ok" : "info", text: `answered ${id}: ${result.outcome}${result.detailsDisclosed ? " with details" : ""}` });
+  await hooks.send(university.id, verifier.id, result.outcome);
+  if (result.certificateId !== id) throw new FlowError("University answered for a different certificate.");
+  return result;
+}
+
+async function createNetwork() {
+  network.nodes = {}; network.byKey = {};
+  const uni = new CordaNode("uni", "Vidya University", "Bengaluru", "issuer");
+  const stu = new CordaNode("stu", "StudentWallet", "Bengaluru", "holder");
+  const emp = new CordaNode("emp", "TechCorp Employer", "Hyderabad", "verifier");
+  const notary = new NotaryNode();
+  for (const n of [uni, stu, emp, notary]) { await n.init(); network.nodes[n.id] = n; }
+  network.notary = notary;
+  return network;
+}
+
+// ---------------- attack scenarios ----------------
+// Issues a fresh lab certificate when an attack needs a valid one and none is left.
+async function labCertificate() {
+  const { uni, stu } = network.nodes;
+  const existing = stu.vault.find(e => !e.consumed && e.state.status === "ISSUED" && e.state.student.key === stu.key);
+  if (existing) return existing;
+  const n = (attacks.counter = (attacks.counter || 0) + 1);
+  const f = { certificateId: "LAB-" + String(n).padStart(3, "0"), studentName: "Lab Student", rollNumber: "LAB" + n, program: "B.Sc", specialization: "Physics", cgpa: 7.5, yearOfPassing: 2026, issueDate: today() };
+  const text = documentText(f, uni.org);
+  await issueFlow(uni, f, stu, await sha256Hex(text), text);
+  return stu.latest(f.certificateId);
+}
+
+const attacks = [
+  {
+    id: "forge", who: "StudentWallet", title: "Forge a certificate in the university's name",
+    text: "The student builds an Issue transaction naming Vidya University as issuer, signs it with the student's own key and shares it with the employer.",
+    run: async () => {
+      const { stu, emp, uni } = network.nodes;
+      const fake = { certificateId: "VU-2026-CSE-9999", studentName: "Asha Rao", rollNumber: "1VU22CS042", program: "M.Tech",
+        specialization: "Artificial Intelligence", cgpa: 9.9, yearOfPassing: 2026, issueDate: today(),
+        documentHash: await sha256Hex("forged document"), university: uni.party, student: stu.party, status: "ISSUED",
+        revocationReason: null, linearId: { externalId: "VU-2026-CSE-9999", id: newId() } };
+      const stx = await buildTx({ inputs: [], outputs: [fake], command: "Issue", requiredSigners: [stu.key], notary: network.notary.key });
+      stx.sigs.push(await stu.sign(stx.id));
+      hooks.log({ node: stu, kind: "info", text: "attacker signs a fake Issue for VU-2026-CSE-9999" });
+      await hooks.send(stu.id, emp.id, "SendTransactionFlow");
+      await receiveShared(stx, stu, emp);
+    }
+  },
+  {
+    id: "tamper", who: "StudentWallet", title: "Raise the CGPA in a genuine ledger record",
+    text: "The student copies a genuine issuance transaction from their vault, changes the CGPA to 9.90, recomputes the transaction id and sends it on.",
+    run: async () => {
+      const { stu, emp } = network.nodes;
+      const entry = await labCertificate();
+      const genuine = stu.txs.get(entry.ref.txhash);
+      const forged = clone(genuine);
+      forged.core.outputs[entry.ref.index].cgpa = 9.9;
+      forged.id = await sha256Hex(canonical(forged.core));
+      hooks.log({ node: stu, kind: "info", text: `attacker edits CGPA to 9.90 and recomputes the id` });
+      await hooks.send(stu.id, emp.id, "SendTransactionFlow");
+      await receiveShared(forged, stu, emp);
+    }
+  },
+  {
+    id: "pdf", who: "Candidate", title: "Submit an edited certificate PDF",
+    text: "The candidate edits the CGPA on the PDF and gives it to the employer, who verifies it with the university.",
+    run: async () => {
+      const { stu, emp, uni } = network.nodes;
+      const entry = await labCertificate();
+      const doc = stu.docs.get(entry.state.certificateId);
+      const edited = editedText(doc ? doc.text : "certificate");
+      const r = await verifyFlow(emp, entry.state.certificateId, uni, await sha256Hex(edited));
+      if (r.outcome === "HASH_MISMATCH") throw new FlowError(r.message, "Hash check");
+    }
+  },
+  {
+    id: "double", who: "Vidya University", title: "Revoke the same certificate twice",
+    text: "A buggy or malicious registrar client builds a second revocation that consumes the original, already-spent ISSUED state.",
+    run: async () => {
+      const { uni, stu } = network.nodes;
+      const n = (attacks.counter = (attacks.counter || 0) + 1);
+      const id = "LAB-DS-" + String(n).padStart(3, "0");
+      const f = { certificateId: id, studentName: "Lab Student", rollNumber: "LAB" + n, program: "B.Sc", specialization: "Physics", cgpa: 7.5, yearOfPassing: 2026, issueDate: today() };
+      const text = documentText(f, uni.org);
+      await issueFlow(uni, f, stu, await sha256Hex(text), text);
+      const original = uni.latest(id);
+      await revokeFlow(uni, id, "Issued in error");
+      hooks.log({ node: uni, kind: "info", text: `attacker re-spends the ISSUED state of ${id}` });
+      const out = { ...clone(original.state), status: "REVOKED", revocationReason: "Second revocation" };
+      const stx = await buildTx({ inputs: [original.ref], outputs: [out], command: "Revoke", requiredSigners: [uni.key], notary: network.notary.key });
+      verifyContract(stx.core, [original.state]);
+      stx.sigs.push(await uni.sign(stx.id));
+      await hooks.send(uni.id, "notary", "notarise");
+      stx.notarySig = await network.notary.notarise(stx);
+    }
+  },
+  {
+    id: "regrade", who: "Vidya University", title: "Change grades while revoking",
+    text: "A registrar tries to slip a CGPA change into a revocation transaction, so the history shows a different grade.",
+    run: async () => {
+      const { uni, stu } = network.nodes;
+      const entry = uni.latest((await labCertificate()).state.certificateId);
+      const out = { ...clone(entry.state), status: "REVOKED", revocationReason: "Re-evaluation", cgpa: 9.5 };
+      const stx = await buildTx({ inputs: [entry.ref], outputs: [out], command: "Revoke", requiredSigners: [uni.key], notary: network.notary.key });
+      stx.sigs.push(await uni.sign(stx.id));
+      hooks.log({ node: uni, kind: "info", text: `attacker builds Revoke of ${entry.state.certificateId} with CGPA 9.50` });
+      await hooks.send(uni.id, stu.id, "FinalityFlow");
+      verifyContract(stx.core, [entry.state]); // the student's node re-runs the contract before accepting it
+    }
+  },
+  {
+    id: "vouch", who: "StudentWallet", title: "Get a node other than the issuer to vouch",
+    text: "The employer is told to verify with the student's own node, which does hold a copy of the certificate.",
+    run: async () => {
+      const { stu, emp } = network.nodes;
+      const entry = await labCertificate();
+      const r = await verifyFlow(emp, entry.state.certificateId, stu, entry.state.documentHash);
+      if (r.outcome === "NOT_FOUND") throw new FlowError(r.message, "Issuer check");
+    }
+  }
+];
+
+// Runs an attack; returns {blocked, layer, message}
+async function runAttack(a) {
+  try {
+    await a.run();
+    return { blocked: false, layer: "", message: "The attack was not stopped." };
+  } catch (e) {
+    if (e.layer === "Setup") return { blocked: false, layer: "Setup", message: e.message, setup: true };
+    return { blocked: true, layer: e.layer || "Check", message: e.message };
+  }
+}
+// CORE-END ============================================================================================
+
+// ---------------- UI ----------------
+const $ = s => document.querySelector(s);
+const esc = v => String(v == null ? "" : v).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+const ui = { active: "emp", lastVerify: null, revoking: null, attackResults: {}, issueFile: null, verifyFile: null, docChoice: "candidate", busy: false, example: false, inspecting: null };
+const logEntries = [];
+const reducedMotion = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+if (reducedMotion) $("#animate").checked = false;
+
+function toast(msg, error) {
+  const t = $("#toast");
+  t.textContent = msg; t.className = "toast" + (error ? " error" : ""); t.hidden = false;
+  clearTimeout(toast.timer); toast.timer = setTimeout(() => (t.hidden = true), 4200);
+}
+
+hooks.log = e => {
+  logEntries.unshift({ ...e, nodeOrg: e.node.org, example: ui.example, at: new Date() });
+  if (logEntries.length > 200) logEntries.pop();
+  renderLog();
+};
+hooks.changed = () => renderConsole();
+
+const wires = { "uni-stu": "#w-uni-stu", "stu-emp": "#w-stu-emp", "uni-emp": "#w-uni-emp", "uni-notary": "#w-uni-not" };
+hooks.send = (from, to, label) => new Promise(resolve => {
+  if (!$("#animate").checked || ui.example) return resolve();
+  let sel = wires[from + "-" + to], reverse = false;
+  if (!sel) { sel = wires[to + "-" + from]; reverse = true; }
+  const path = sel && $(sel);
+  if (!path) return resolve();
+  const len = path.getTotalLength();
+  const ns = "http://www.w3.org/2000/svg";
+  const dot = document.createElementNS(ns, "circle"); dot.setAttribute("r", "6"); dot.setAttribute("class", "packet");
+  const txt = document.createElementNS(ns, "text"); txt.setAttribute("class", "packet-label"); txt.setAttribute("text-anchor", "middle"); txt.textContent = label;
+  $("#packets").append(dot, txt); path.classList.add("live");
+  const dur = 650, t0 = performance.now();
+  const step = now => {
+    const k = Math.min(1, (now - t0) / dur);
+    const p = path.getPointAtLength((reverse ? 1 - k : k) * len);
+    dot.setAttribute("cx", p.x); dot.setAttribute("cy", p.y);
+    txt.setAttribute("x", p.x); txt.setAttribute("y", p.y - 11);
+    if (k < 1) requestAnimationFrame(step);
+    else { dot.remove(); txt.remove(); path.classList.remove("live"); resolve(); }
+  };
+  requestAnimationFrame(step);
+});
+
+function renderLog() {
+  $("#log").innerHTML = logEntries.length ? logEntries.map((e, i) => `
+    <li class="${e.kind}"><span class="ico" aria-hidden="true">${e.kind === "ok" ? "\u2713" : e.kind === "fail" ? "\u2715" : "\u00b7"}</span>
+      <div><span class="who">${esc(e.nodeOrg)}</span> ${esc(e.text)}${e.tx ? ` <button class="tx mono" data-tx="${e.tx}">tx ${short(e.tx)}</button>` : ""}${e.example ? `<span class="ex">Example</span>` : ""}</div></li>`).join("")
+    : `<li class="info"><span class="ico">\u00b7</span><div class="muted">No activity yet.</div></li>`;
+}
+
+$("#log").addEventListener("click", e => { const b = e.target.closest("[data-tx]"); if (b) inspect(b.dataset.tx); });
+
+async function inspect(txId) {
+  const holder = Object.values(network.nodes).find(n => n.txs.has(txId));
+  const box = $("#inspector");
+  if (!holder) { box.hidden = true; return; }
+  const stx = holder.txs.get(txId);
+  const sigRows = [];
+  for (const key of stx.core.requiredSigners) {
+    const s = stx.sigs.find(x => x.by === key);
+    sigRows.push(`${esc(orgOf(key))} <span class="pill ${s && await sigValid(s, stx.id) ? "good" : "bad"}">${s && await sigValid(s, stx.id) ? "valid" : "missing"}</span>`);
+  }
+  const notaryRow = stx.core.inputs.length === 0 ? `<span class="muted">not needed: no inputs</span>`
+    : `Notary <span class="pill ${stx.notarySig && await sigValid(stx.notarySig, stx.id) ? "good" : "bad"}">${stx.notarySig ? "valid" : "missing"}</span>`;
+  const out = stx.core.outputs[0];
+  const storedBy = Object.values(network.nodes).filter(n => n.txs.has(txId)).map(n => n.org).join(", ");
+  box.innerHTML = `
+    <div class="inspector-head"><b>${esc(stx.core.command)} transaction</b><button class="btn small" id="close-insp" type="button">Close</button></div>
+    <div class="row"><div>Tx id</div><div class="mono">${stx.id}</div></div>
+    <div class="row"><div>Inputs</div><div class="mono">${stx.core.inputs.length ? stx.core.inputs.map(r => short(r.txhash) + ":" + r.index).join(", ") : "none"}</div></div>
+    <div class="row"><div>Output</div><div>${esc(out.certificateId)} \u00b7 ${esc(out.studentName)} \u00b7 CGPA ${Number(out.cgpa).toFixed(2)} \u00b7 <span class="pill ${out.status === "ISSUED" ? "good" : "bad"}">${out.status}</span></div></div>
+    <div class="row"><div>Signed by</div><div>${sigRows.join("<br>")}</div></div>
+    <div class="row"><div>Notary</div><div>${notaryRow}</div></div>
+    <div class="row"><div>Document hash</div><div class="mono">${out.documentHash}</div></div>
+    <div class="row"><div>Stored by</div><div>${esc(storedBy)}</div></div>`;
+  box.hidden = false;
+  $("#close-insp").onclick = () => (box.hidden = true);
+}
+
+// ---------- node console ----------
+function setActive(id) {
+  ui.active = id; ui.revoking = null;
+  document.querySelectorAll(".seg button").forEach(b => b.setAttribute("aria-selected", String(b.dataset.node === id)));
+  document.querySelectorAll(".map .node-g").forEach(g => g.classList.toggle("active", g.dataset.node === id));
+  renderConsole();
+}
+document.querySelectorAll(".seg button").forEach(b => b.addEventListener("click", () => setActive(b.dataset.node)));
+document.querySelectorAll(".map .node-g").forEach(g => {
+  g.addEventListener("click", () => setActive(g.dataset.node));
+  g.addEventListener("keydown", e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); setActive(g.dataset.node); } });
+});
+
+const sealSvg = `<svg class="seal" viewBox="0 0 46 46" aria-hidden="true"><circle cx="23" cy="23" r="21" fill="var(--seal-soft)" stroke="var(--seal)" stroke-width="1.2"/><circle cx="23" cy="23" r="15.5" fill="none" stroke="var(--seal)" stroke-width=".8" stroke-dasharray="1.6 1.8"/><text x="23" y="27" text-anchor="middle" font-size="11" font-weight="700" fill="var(--seal)" font-family="Fraunces, Georgia, serif">VU</text></svg>`;
+
+function diploma(entry, node, opts = {}) {
+  const c = entry.state;
+  const revoked = c.status === "REVOKED";
+  return `<article class="diploma ${revoked ? "revoked" : ""}">
+    ${sealSvg}
+    <div class="uni">${esc(orgOf(c.university.key))}</div>
+    <div class="certifies">certifies that</div>
+    <div class="holder">${esc(c.studentName)}</div>
+    <div class="degree">${esc(c.program)} in ${esc(c.specialization)}</div>
+    <div class="meta"><span>No. ${esc(c.certificateId)}</span><span>CGPA ${Number(c.cgpa).toFixed(2)}</span><span>Passed ${c.yearOfPassing}</span><span>Issued ${esc(c.issueDate)}</span></div>
+    ${revoked ? `<div class="meta"><span>Revoked: ${esc(c.revocationReason)}</span></div>` : ""}
+    <div class="hash">SHA-256 ${c.documentHash}</div>
+    ${opts.actions || ""}
+  </article>`;
+}
+
+function vaultTable(node) {
+  const rows = node.vault.slice().reverse();
+  if (!rows.length) return `<div class="table-wrap"><div class="empty">This vault is empty.</div></div>`;
+  return `<div class="table-wrap"><table><thead><tr><th>State ref</th><th>Certificate</th><th>Status</th><th>Why stored</th><th>State</th></tr></thead><tbody>
+    ${rows.map(e => `<tr class="${e.consumed ? "consumed" : ""}">
+      <td><button class="tx mono" style="background:none;border:0;padding:0;color:var(--accent);cursor:pointer;text-decoration:underline" data-tx="${e.ref.txhash}">${short(e.ref.txhash)}:${e.ref.index}</button></td>
+      <td><span class="cert-no">${esc(e.state.certificateId)}</span></td>
+      <td><span class="pill ${e.state.status === "ISSUED" ? "good" : "bad"}">${e.state.status}</span></td>
+      <td class="muted">${e.relevant ? "participant" : "shared with us"}</td>
+      <td class="muted">${e.consumed ? "consumed" : "current"}</td></tr>`).join("")}
+  </tbody></table></div>`;
+}
+
+function nodeHead(node, blurb) {
+  return `<div class="node-head"><h2>${esc(node.org)}</h2><span class="x500">${esc(node.name)}</span></div>
+    <p class="muted" style="font-size:.88rem">${blurb}</p>
+    <div class="mono muted">public key fingerprint ${node.key}</div>`;
+}
+
+function renderConsole() {
+  const n = network.nodes[ui.active];
+  if (!n) return;
+  const el = $("#console");
+  const keep = captureForm();
+  if (ui.active === "uni") el.innerHTML = uniConsole(n);
+  if (ui.active === "stu") el.innerHTML = stuConsole(n);
+  if (ui.active === "emp") el.innerHTML = empConsole(n);
+  if (ui.active === "notary") el.innerHTML = notaryConsole(n);
+  restoreForm(keep);
+  bindConsole();
+}
+
+function captureForm() {
+  const v = {};
+  document.querySelectorAll("#console input[id], #console select[id]").forEach(i => {
+    if (i.type === "file") return;
+    v[i.id] = i.type === "radio" || i.type === "checkbox" ? i.checked : i.value;
+  });
+  return v;
+}
+function restoreForm(v) {
+  for (const [id, val] of Object.entries(v)) {
+    const i = document.getElementById(id);
+    if (!i) continue;
+    if (i.type === "radio" || i.type === "checkbox") i.checked = val; else i.value = val;
+  }
+}
+
+function nextCertNo() {
+  const uni = network.nodes.uni;
+  let max = 142;
+  for (const e of uni.vault) { const m = /^VU-2026-CSE-(\d{4})$/.exec(e.state.certificateId); if (m) max = Math.max(max, Number(m[1])); }
+  return "VU-2026-CSE-" + String(max + 1).padStart(4, "0");
+}
+
+function uniConsole(n) {
+  const issued = n.vault.filter(e => !e.consumed && e.state.university.key === n.key).reverse();
+  return `${nodeHead(n, "Issues certificates and is the only party whose signature the contract accepts for issuing or revoking them. Answers verification requests from its own vault.")}
+    <form id="issue-form" class="stack" autocomplete="off">
+      <h3>Issue a certificate</h3>
+      <div class="fields">
+        <label class="field">Certificate number<input type="text" id="f-id" required value="${nextCertNo()}"></label>
+        <label class="field">Student name<input type="text" id="f-name" required value="Kavya Iyer"></label>
+        <label class="field">Roll number<input type="text" id="f-roll" required value="1VU22CS057"></label>
+        <label class="field">Program<input type="text" id="f-program" required value="B.Tech"></label>
+        <label class="field">Specialization<input type="text" id="f-spec" required value="Computer Science and Engineering"></label>
+        <label class="field">CGPA (0\u201310)<input type="number" id="f-cgpa" required step="0.01" value="8.31"></label>
+        <label class="field">Year of passing<input type="number" id="f-year" required value="2026"></label>
+        <label class="field">Issue to<select id="f-student"><option value="stu">StudentWallet</option><option value="emp">TechCorp Employer</option></select></label>
+      </div>
+      <div class="radios">
+        <label><input type="radio" name="docsrc" id="d-gen" checked> Generate the certificate document from these details</label>
+        <label><input type="radio" name="docsrc" id="d-file"> Use my own file (PDF or image)
+          <input type="file" id="f-file" accept="application/pdf,image/*" style="font-size:.8rem"></label>
+      </div>
+      <div><button class="btn primary" type="submit" id="issue-btn">Issue on ledger</button></div>
+    </form>
+    <h3>Certificates issued</h3>
+    ${issued.length ? `<div class="diplomas">${issued.map(e => diploma(e, n, { actions: e.state.status === "ISSUED" ? (ui.revoking === e.state.certificateId
+      ? `<div class="inline-confirm"><input type="text" id="rev-reason" placeholder="Reason for revoking" value="Degree withdrawn after academic misconduct inquiry"><button class="btn danger small" data-confirm-revoke="${esc(e.state.certificateId)}" type="button">Confirm revoke</button><button class="btn small" data-cancel-revoke type="button">Cancel</button></div>`
+      : `<div class="actions"><button class="btn danger small" data-revoke="${esc(e.state.certificateId)}" type="button">Revoke\u2026</button></div>`) : "" })).join("")}</div>`
+      : `<div class="table-wrap"><div class="empty">No certificates issued yet.</div></div>`}
+    <h3>Vault</h3>${vaultTable(n)}`;
+}
+
+function stuConsole(n) {
+  const held = n.vault.filter(e => !e.consumed && e.state.student.key === n.key).reverse();
+  return `${nodeHead(n, "Holds the certificates issued to this student. Nobody else can see them until the student shares one; the receiver then checks the whole history itself.")}
+    <h3>My certificates</h3>
+    ${held.length ? `<div class="diplomas">${held.map(e => {
+      const shared = n.sharedWith.get(e.state.certificateId);
+      return diploma(e, n, { actions: `<div class="actions">
+        ${e.state.status === "ISSUED" ? `<button class="btn primary small" data-share="${esc(e.state.certificateId)}" type="button">Share with TechCorp Employer</button>` : ""}
+        ${shared ? `<span class="muted" style="font-size:.78rem">Shared with ${esc([...shared].join(", "))}</span>` : ""}</div>` });
+    }).join("")}</div>` : `<div class="table-wrap"><div class="empty">No certificates yet. Issue one from Vidya University.</div></div>`}
+    <h3>Vault</h3>${vaultTable(n)}`;
+}
+
+function empConsole(n) {
+  const shared = n.vault.filter(e => !e.consumed).reverse();
+  const v = ui.lastVerify;
+  return `${nodeHead(n, "Verifies certificates by asking the issuing university's node directly, so a revocation shows up at once. Copies shared by candidates are stored after full checks.")}
+    <form id="verify-form" class="stack" autocomplete="off">
+      <h3>Verify a certificate</h3>
+      <div class="fields">
+        <label class="field">Certificate number<input type="text" id="v-id" required value="VU-2026-CSE-0142"></label>
+        <label class="field">Ask this node<select id="v-uni"><option value="uni">Vidya University (issuer)</option><option value="stu">StudentWallet</option></select></label>
+      </div>
+      <div class="radios" role="radiogroup" aria-label="Document to check">
+        <label><input type="radio" name="doc" id="dc-candidate" ${ui.docChoice === "candidate" ? "checked" : ""}> The document the candidate sent us</label>
+        <label><input type="radio" name="doc" id="dc-edited" ${ui.docChoice === "edited" ? "checked" : ""}> The same document with the CGPA edited</label>
+        <label><input type="radio" name="doc" id="dc-file" ${ui.docChoice === "file" ? "checked" : ""}> Upload a file <input type="file" id="v-file" accept="application/pdf,image/*" style="font-size:.8rem"></label>
+        <label><input type="radio" name="doc" id="dc-none" ${ui.docChoice === "none" ? "checked" : ""}> No document, status check only</label>
+      </div>
+      <div><button class="btn primary" type="submit" id="verify-btn">Verify with issuer</button></div>
+    </form>
+    ${v ? verdictCard(v) : ""}
+    <h3>Shared with us</h3>
+    ${shared.length ? `<div class="diplomas">${shared.map(e => diploma(e, n, { actions: `<div class="actions"><span class="muted" style="font-size:.78rem">Snapshot from when it was shared. Verify for the live status.</span></div>` })).join("")}</div>`
+      : `<div class="table-wrap"><div class="empty">No candidate has shared a certificate yet.</div></div>`}
+    <h3>Vault</h3>${vaultTable(n)}`;
+}
+
+function verdictCard(r) {
+  const title = { VALID: "Genuine and valid", REVOKED: "Revoked", HASH_MISMATCH: "Document does not match", NOT_FOUND: "No such certificate" }[r.outcome];
+  return `<div class="verdict ${r.outcome}">
+    <div class="title">${title}</div>
+    <p>${esc(r.message)}</p>
+    ${r.detailsDisclosed ? `<div class="facts">
+      <div><span>Student</span>${esc(r.studentName)}</div><div><span>Roll number</span>${esc(r.rollNumber)}</div>
+      <div><span>Program</span>${esc(r.program)}</div><div><span>Specialization</span>${esc(r.specialization)}</div>
+      <div><span>CGPA</span>${Number(r.cgpa).toFixed(2)}</div><div><span>Year of passing</span>${r.yearOfPassing}</div>
+      <div><span>Issued</span>${esc(r.issueDate)}</div>${r.revocationReason ? `<div><span>Revocation reason</span>${esc(r.revocationReason)}</div>` : ""}</div>`
+      : `<p class="muted" style="font-size:.84rem">Personal details withheld: they are only released when the document's hash matches the ledger.</p>`}
+    <div class="doc-hash">Checked hash ${esc(r.checkedHash || "none supplied")}</div>
+    <div class="muted" style="font-size:.8rem">Answered by ${esc(r.issuer)} at ${new Date(r.checkedAt).toLocaleTimeString()}${r.ledgerTransactionId ? ` \u00b7 ledger tx <span class="mono">${short(r.ledgerTransactionId)}</span>` : ""}</div>
+  </div>`;
+}
+
+function notaryConsole(n) {
+  const spent = [...n.spent.entries()].reverse();
+  return `${nodeHead(n, "A non-validating notary. It never sees why a transaction is valid; it only checks that none of its inputs has been consumed before, then signs. That is what makes a revocation final.")}
+    <div class="stats">
+      <div class="stat"><b>${n.notarised.length}</b><span>transactions notarised</span></div>
+      <div class="stat"><b>${n.spent.size}</b><span>states consumed</span></div>
+    </div>
+    <h3>Consumed states</h3>
+    ${spent.length ? `<div class="table-wrap"><table><thead><tr><th>State ref</th><th>Consumed by tx</th></tr></thead><tbody>
+      ${spent.map(([ref, tx]) => `<tr><td class="mono">${short(ref.split(":")[0])}:${ref.split(":")[1]}</td><td><button class="tx mono" style="background:none;border:0;padding:0;color:var(--accent);cursor:pointer;text-decoration:underline" data-tx="${tx}">${short(tx)}</button></td></tr>`).join("")}
+    </tbody></table></div>` : `<div class="table-wrap"><div class="empty">Nothing consumed yet. Issuing needs no notary; revoking does.</div></div>`}`;
+}
+
+async function busy(btn, fn) {
+  if (ui.busy) return;
+  ui.busy = true; if (btn) btn.disabled = true;
+  try { await fn(); } catch (e) {
+    hooks.log({ node: network.nodes[ui.active], kind: "fail", text: e.message });
+    toast(e.message, true);
+  } finally { ui.busy = false; if (btn) btn.disabled = false; renderAttacks(); }
+}
+
+async function fileHash(input) {
+  const f = input && input.files && input.files[0];
+  if (!f) return null;
+  return sha256Hex(await f.arrayBuffer());
+}
+
+function bindConsole() {
+  const el = $("#console");
+  el.querySelectorAll("[data-tx]").forEach(b => b.addEventListener("click", () => inspect(b.dataset.tx)));
+  const issue = $("#issue-form");
+  if (issue) issue.addEventListener("submit", e => {
+    e.preventDefault();
+    busy($("#issue-btn"), async () => {
+      const uni = network.nodes.uni;
+      const f = { certificateId: $("#f-id").value, studentName: $("#f-name").value, rollNumber: $("#f-roll").value, program: $("#f-program").value,
+        specialization: $("#f-spec").value, cgpa: parseFloat($("#f-cgpa").value), yearOfPassing: parseInt($("#f-year").value, 10), issueDate: today() };
+      let hash, text = null;
+      if ($("#d-file").checked) {
+        hash = await fileHash($("#f-file"));
+        if (!hash) throw new FlowError("Choose a file, or switch to generating the document.");
+      } else { text = documentText(f, uni.org); hash = await sha256Hex(text); }
+      const student = network.nodes[$("#f-student").value];
+      await issueFlow(uni, f, student, hash, text);
+      toast(`Issued ${f.certificateId.trim()} to ${student.org}.`);
+      const idInput = $("#f-id"); if (idInput) idInput.value = nextCertNo();
+    });
+  });
+  el.querySelectorAll("[data-revoke]").forEach(b => b.addEventListener("click", () => { ui.revoking = b.dataset.revoke; renderConsole(); }));
+  el.querySelectorAll("[data-cancel-revoke]").forEach(b => b.addEventListener("click", () => { ui.revoking = null; renderConsole(); }));
+  el.querySelectorAll("[data-confirm-revoke]").forEach(b => b.addEventListener("click", () => busy(b, async () => {
+    const id = b.dataset.confirmRevoke, reason = $("#rev-reason").value;
+    await revokeFlow(network.nodes.uni, id, reason);
+    ui.revoking = null; renderConsole();
+    toast(`Revoked ${id}.`);
+  })));
+  el.querySelectorAll("[data-share]").forEach(b => b.addEventListener("click", () => busy(b, async () => {
+    const msg = await shareFlow(network.nodes.stu, b.dataset.share, network.nodes.emp);
+    toast(msg);
+  })));
+  ["candidate", "edited", "file", "none"].forEach(k => { const r = document.getElementById("dc-" + k); if (r) r.addEventListener("change", () => (ui.docChoice = k)); });
+  const vf = $("#v-file"); if (vf) vf.addEventListener("change", () => { $("#dc-file").checked = true; ui.docChoice = "file"; });
+  const ff = $("#f-file"); if (ff) ff.addEventListener("change", () => { $("#d-file").checked = true; });
+  const verify = $("#verify-form");
+  if (verify) verify.addEventListener("submit", e => {
+    e.preventDefault();
+    busy($("#verify-btn"), async () => {
+      const emp = network.nodes.emp, id = $("#v-id").value.trim();
+      let hash = "";
+      if (ui.docChoice === "candidate" || ui.docChoice === "edited") {
+        const doc = emp.docs.get(id);
+        if (!doc) throw new FlowError(`No document for ${id} has been sent to TechCorp Employer. Share it from StudentWallet, upload a file, or run a status check.`);
+        hash = ui.docChoice === "candidate" ? doc.hash : await sha256Hex(editedText(doc.text));
+      } else if (ui.docChoice === "file") {
+        hash = await fileHash($("#v-file"));
+        if (!hash) throw new FlowError("Choose a file to upload, or pick another option.");
+      }
+      const result = await verifyFlow(emp, id, network.nodes[$("#v-uni").value], hash);
+      ui.lastVerify = { ...result, checkedHash: hash };
+      renderConsole();
+    });
+  });
+}
+
+// ---------- attack lab ----------
+function renderAttacks() {
+  $("#attacks").innerHTML = attacks.map(a => {
+    const r = ui.attackResults[a.id];
+    return `<article class="attack">
+      <div class="who">Attacker: ${esc(a.who)}</div>
+      <h4>${esc(a.title)}</h4>
+      <p>${esc(a.text)}</p>
+      ${r ? (r.setup ? `<div class="outcome allowed">${esc(r.message)}</div>`
+        : r.blocked ? `<div class="outcome blocked"><b>Blocked by ${esc(r.layer)}</b><span>${esc(r.message)}</span></div>`
+        : `<div class="outcome allowed"><b>Not blocked</b><span>${esc(r.message)}</span></div>`) : ""}
+      <div class="foot"><button class="btn small" data-attack="${a.id}" type="button" ${ui.busy ? "disabled" : ""}>${r ? "Run again" : "Run attack"}</button></div>
+    </article>`;
+  }).join("");
+  $("#attacks").querySelectorAll("[data-attack]").forEach(b => b.addEventListener("click", () => launchAttack(attacks.find(a => a.id === b.dataset.attack), b)));
+}
+
+async function launchAttack(a, btn) {
+  if (ui.busy) return;
+  ui.busy = true; if (btn) btn.disabled = true;
+  const r = await runAttack(a);
+  ui.attackResults[a.id] = r;
+  const who = { forge: "emp", tamper: "emp", pdf: "emp", double: "notary", regrade: "stu", vouch: "emp" }[a.id];
+  hooks.log({ node: network.nodes[who], kind: r.blocked ? "ok" : "fail", text: r.blocked ? `blocked: ${r.message}` : r.message });
+  ui.busy = false; renderAttacks(); renderConsole();
+}
+
+$("#run-all").addEventListener("click", async () => {
+  for (const a of attacks) await launchAttack(a);
+  toast("All six attacks ran. See each card for the check that stopped it.");
+});
+
+// ---------- boot ----------
+async function seed() {
+  ui.example = true;
+  const { uni, stu, emp } = network.nodes;
+  const samples = [
+    { certificateId: "VU-2025-ECE-0077", studentName: "Rahul Menon", rollNumber: "1VU21EC031", program: "B.Tech", specialization: "Electronics and Communication", cgpa: 7.92, yearOfPassing: 2025, issueDate: "2025-08-14" },
+    { certificateId: "VU-2026-CSE-0142", studentName: "Asha Rao", rollNumber: "1VU22CS042", program: "B.Tech", specialization: "Computer Science and Engineering", cgpa: 8.74, yearOfPassing: 2026, issueDate: "2026-07-21" }
+  ];
+  for (const f of samples) { const text = documentText(f, uni.org); await issueFlow(uni, f, stu, await sha256Hex(text), text); }
+  await shareFlow(stu, "VU-2026-CSE-0142", emp);
+  const r = await verifyFlow(emp, "VU-2026-CSE-0142", uni, emp.docs.get("VU-2026-CSE-0142").hash);
+  ui.lastVerify = { ...r, checkedHash: emp.docs.get("VU-2026-CSE-0142").hash };
+  ui.example = false;
+}
+
+async function boot() {
+  logEntries.length = 0; ui.lastVerify = null; ui.attackResults = {}; ui.revoking = null; attacks.counter = 0;
+  $("#inspector").hidden = true;
+  await createNetwork();
+  await seed();
+  renderLog(); renderAttacks(); setActive(ui.active || "emp");
+}
+
+$("#reset").addEventListener("click", () => { if (!ui.busy) boot().then(() => toast("Fresh network with new keys.")); });
+boot().catch(e => { $("#console").innerHTML = `<div class="empty">Could not start the network: ${esc(e.message)}</div>`; });
+</script>

@@ -1,0 +1,56 @@
+apply plugin: 'org.springframework.boot'
+
+sourceSets {
+    main {
+        resources {
+            srcDir rootProject.file("config/dev")
+        }
+    }
+}
+
+dependencies {
+    // Corda dependencies.
+    implementation "$corda_core_release_group:corda-core:$corda_core_release_version"
+    implementation "$corda_release_group:corda-rpc:$corda_release_version"
+
+    // CorDapp dependencies.
+    implementation project(":contracts")
+    implementation project(":workflows")
+    implementation("org.springframework.boot:spring-boot-starter-web:$spring_boot_version") {
+        exclude group: "org.springframework.boot", module: "spring-boot-starter-logging"
+    }
+    implementation "com.fasterxml.jackson.module:jackson-module-kotlin:2.15.4"
+    implementation "com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.15.4"
+    implementation "org.apache.logging.log4j:log4j-slf4j2-impl:${log4j_version}"
+    implementation "org.apache.logging.log4j:log4j-web:${log4j_version}"
+    implementation "org.slf4j:jul-to-slf4j:$slf4j_version"
+}
+
+springBoot {
+    mainClass = "com.certverify.webserver.ServerKt"
+}
+
+/*
+ * One web portal per node. Each Spring Boot instance talks to its own node over RPC.
+ * Start the nodes first (build/nodes/runnodes), then run each task in its own terminal.
+ */
+task runUniversityServer(type: JavaExec, dependsOn: assemble) {
+    classpath = sourceSets.main.runtimeClasspath
+    mainClass = 'com.certverify.webserver.ServerKt'
+    args '--server.port=8081', '--config.rpc.host=localhost', '--config.rpc.port=10006',
+         '--config.rpc.username=user1', '--config.rpc.password=test'
+}
+
+task runStudentServer(type: JavaExec, dependsOn: assemble) {
+    classpath = sourceSets.main.runtimeClasspath
+    mainClass = 'com.certverify.webserver.ServerKt'
+    args '--server.port=8082', '--config.rpc.host=localhost', '--config.rpc.port=10009',
+         '--config.rpc.username=user1', '--config.rpc.password=test'
+}
+
+task runEmployerServer(type: JavaExec, dependsOn: assemble) {
+    classpath = sourceSets.main.runtimeClasspath
+    mainClass = 'com.certverify.webserver.ServerKt'
+    args '--server.port=8083', '--config.rpc.host=localhost', '--config.rpc.port=10012',
+         '--config.rpc.username=user1', '--config.rpc.password=test'
+}

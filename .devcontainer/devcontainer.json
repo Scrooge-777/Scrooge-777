@@ -1,0 +1,12 @@
+{
+  "name": "CertVerify Corda network",
+  "image": "mcr.microsoft.com/devcontainers/java:1-17-bookworm",
+  "hostRequirements": { "cpus": 4, "memory": "16gb" },
+  "forwardPorts": [8081, 8082, 8083],
+  "portsAttributes": {
+    "8081": { "label": "University portal", "onAutoForward": "notify" },
+    "8082": { "label": "Student portal", "onAutoForward": "notify" },
+    "8083": { "label": "Employer portal", "onAutoForward": "openBrowser" }
+  },
+  "postCreateCommand": "chmod +x gradlew run-demo.sh stop-demo.sh"
+}
