@@ -1,0 +1,23 @@
+[37m[INFO] 05:50:13,521 [main] webserver.ServerKt. - Starting ServerKt v1.0 using Java 17.0.21 with PID 10192 (/home/runner/work/Scrooge-777/Scrooge-777/clients/build/libs/clients-1.0.jar started by runner in /home/runner/work/Scrooge-777/Scrooge-777)
+[m[37m[INFO] 05:50:13,522 [main] webserver.ServerKt. - No active profile set, falling back to 1 default profile: "default"
+[m[37m[INFO] 05:50:17,403 [main] tomcat.TomcatWebServer. - Tomcat initialized with port 8082 (http)
+[mNov 19, 2026 5:50:17 AM org.apache.coyote.AbstractProtocol init
+INFO: Initializing ProtocolHandler ["http-nio-8082"]
+Nov 19, 2026 5:50:17 AM org.apache.catalina.core.StandardService startInternal
+INFO: Starting service [Tomcat]
+Nov 19, 2026 5:50:17 AM org.apache.catalina.core.StandardEngine startInternal
+INFO: Starting Servlet engine: [Apache Tomcat/10.1.20]
+Nov 19, 2026 5:50:17 AM org.apache.catalina.core.ApplicationContext log
+INFO: Initializing Spring embedded WebApplicationContext
+[37m[INFO] 05:50:17,550 [main] context.ServletWebServerApplicationContext. - Root WebApplicationContext: initialization completed in 3512 ms
+[m[37m[INFO] 05:50:22,799 [main] internal.RPCClient. - Startup took 3997 msec
+[m[37m[INFO] 05:50:23,052 [main] servlet.WelcomePageHandlerMapping. - Adding welcome page: class path resource [static/index.html]
+[mNov 19, 2026 5:50:24 AM org.apache.coyote.AbstractProtocol start
+INFO: Starting ProtocolHandler ["http-nio-8082"]
+[37m[INFO] 05:50:24,117 [main] tomcat.TomcatWebServer. - Tomcat started on port 8082 (http) with context path ''
+[m[37m[INFO] 05:50:24,139 [main] webserver.ServerKt. - Started ServerKt in 12.724 seconds (process running for 21.479)
+[mNov 19, 2026 5:52:28 AM org.apache.catalina.core.ApplicationContext log
+INFO: Initializing Spring DispatcherServlet 'dispatcherServlet'
+[37m[INFO] 05:52:28,958 [http-nio-8082-exec-2] servlet.DispatcherServlet. - Initializing Servlet 'dispatcherServlet'
+[m[37m[INFO] 05:52:28,959 [http-nio-8082-exec-2] servlet.DispatcherServlet. - Completed initialization in 1 ms
+[m
