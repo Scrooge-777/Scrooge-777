@@ -11,6 +11,7 @@ import net.corda.core.flows.SendTransactionFlow
 import net.corda.core.flows.StartableByRPC
 import net.corda.core.identity.Party
 import net.corda.core.node.StatesToRecord
+import net.corda.core.utilities.unwrap
 
 /**
  * Run by the STUDENT to give a verifier (e.g. an employer) a copy of a certificate.
@@ -45,13 +46,17 @@ class ShareCertificateFlow(
 
         val session = initiateFlow(verifier)
         subFlow(SendTransactionFlow(session, tx))
+        // Wait until the verifier confirms it has checked and stored the certificate, so that when this
+        // flow returns the certificate is guaranteed to be in the verifier's vault.
+        val stored = session.receive<Boolean>().unwrap { it }
+        if (!stored) throw FlowException("${verifier.name.organisation} did not store certificate $id.")
         return "Certificate $id shared with ${verifier.name.organisation}."
     }
 }
 
 /**
  * Run by the VERIFIER: checks the whole chain of custody and stores the certificate even though the
- * verifier is not a participant (StatesToRecord.ALL_VISIBLE).
+ * verifier is not a participant (StatesToRecord.ALL_VISIBLE), then confirms to the sender.
  */
 @InitiatedBy(ShareCertificateFlow::class)
 class ShareCertificateResponder(private val studentSession: FlowSession) : FlowLogic<Unit>() {
@@ -64,5 +69,6 @@ class ShareCertificateResponder(private val studentSession: FlowSession) : FlowL
                 statesToRecord = StatesToRecord.ALL_VISIBLE
             )
         )
+        studentSession.send(true)
     }
 }
