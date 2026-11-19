@@ -1,0 +1,65 @@
+name: Live demo (temporary)
+
+# A time-limited, hands-on test session of the real network: builds the CorDapp, starts the four
+# nodes and three portals, and exposes each portal through a temporary Cloudflare quick tunnel.
+# Runs when the certverify-live branch is pushed. The session stops after DEMO_MINUTES.
+
+on:
+  push:
+    branches: [certverify-live]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+env:
+  DEMO_MINUTES: 60
+
+jobs:
+  live:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - name: Build the nodes and portals
+        run: chmod +x gradlew && ./gradlew --no-daemon deployNodes :clients:bootJar
+      - name: Start the network
+        run: scripts/start-network.sh
+      - name: Add the sample certificate
+        run: scripts/seed-demo.sh
+      - name: Open public tunnels to the three portals
+        run: |
+          curl -sSL -o cloudflared https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-amd64
+          chmod +x cloudflared
+          for p in 8081 8082 8083; do
+            nohup ./cloudflared tunnel --no-autoupdate --url "http://localhost:$p" > "tunnel-$p.log" 2>&1 &
+          done
+          for p in 8081 8082 8083; do
+            for i in $(seq 1 60); do grep -oE 'https://[a-z0-9-]+\.trycloudflare\.com' "tunnel-$p.log" | head -1 > "url-$p.txt" && [ -s "url-$p.txt" ] && break; sleep 2; done
+          done
+          {
+            echo "# CertVerify live demo"
+            echo
+            echo "Started: $(date -u '+%Y-%m-%d %H:%M UTC'). Available for ${DEMO_MINUTES} minutes."
+            echo
+            echo "| Portal | Address |"
+            echo "|---|---|"
+            echo "| University (issue, revoke) | $(cat url-8081.txt) |"
+            echo "| Student (view, share) | $(cat url-8082.txt) |"
+            echo "| Employer (verify) | $(cat url-8083.txt) |"
+          } > live-links.md
+          cat live-links.md >> "$GITHUB_STEP_SUMMARY"
+          mkdir -p /tmp/links && cp live-links.md /tmp/links/ && cd /tmp/links
+          git init -q -b live-links && git config user.name "github-actions[bot]" && git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A && git commit -qm "Live demo links" && git push -qf "https://x-access-token:${{ github.token }}@github.com/${GITHUB_REPOSITORY}.git" live-links
+      - name: Keep the demo running
+        run: |
+          end=$(( $(date +%s) + DEMO_MINUTES * 60 ))
+          while [ "$(date +%s)" -lt "$end" ]; do
+            for p in 8081 8082 8083; do curl -s -o /dev/null "http://localhost:$p/api/me" || echo "portal $p not answering"; done
+            sleep 60
+          done
