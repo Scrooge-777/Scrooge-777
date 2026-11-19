@@ -17,7 +17,8 @@ async def speak(text, out):
     raise SystemExit(f"TTS failed for {out}")
 
 async def main():
-    for name in ("slides", "demo"):
+    names = sys.argv[1:] or ["slides", "demo"]
+    for name in names:
         out_dir = HERE / "out" / "audio" / name
         out_dir.mkdir(parents=True, exist_ok=True)
         for item in json.loads((HERE / f"{name}_narration.json").read_text()):

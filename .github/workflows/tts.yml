@@ -1,0 +1,22 @@
+name: Generate slide narration
+
+on:
+  push:
+    branches: [certverify-tts]
+
+permissions:
+  contents: write
+
+jobs:
+  tts:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - run: pip install -q edge-tts
+      - run: python media/tts.py slides
+      - name: Publish
+        run: |
+          mkdir -p /tmp/t && cp -r media/out/audio /tmp/t/ && cd /tmp/t
+          git init -q -b tts-out && git config user.name "github-actions[bot]" && git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A && git commit -qm "Slide narration" && git push -qf "https://x-access-token:${{ github.token }}@github.com/${GITHUB_REPOSITORY}.git" tts-out
