@@ -16,7 +16,7 @@ jobs:
       - run: |
           pip install -q playwright
           python -m playwright install --with-deps chromium > /dev/null
-      - run: python explorer/capture.py
+      - run: python explorer/shots.py
       - name: Publish
         run: |
           mkdir -p /tmp/t && cp -r explorer/out /tmp/t/ && cd /tmp/t
