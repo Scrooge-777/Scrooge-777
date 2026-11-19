@@ -34,6 +34,19 @@ The first run downloads Corda and Gradle dependencies (several hundred MB) and t
   (and 8081/8082 if needed) -> Port Visibility -> Public. The portal is then reachable at
   `https://<codespace-name>-8083.app.github.dev` while the codespace is running.
 
+## Verified results
+
+Every push runs `.github/workflows/build.yml` on GitHub Actions (Ubuntu, Temurin JDK 17):
+
+* **Build:** `./gradlew clean build deployNodes :clients:bootJar`, which succeeds in about 4 minutes.
+* **Automated tests:** 29 passed, 0 failed (14 contract tests, 15 flow tests on a MockNetwork).
+* **End-to-end test of the running network:** `scripts/start-network.sh` starts the Notary, University,
+  Student and Employer nodes plus the three portals, then `scripts/e2e_test.py` drives them over HTTP:
+  issue, duplicate and invalid-CGPA rejection, privacy before sharing, share, verify (genuine, edited,
+  status-only, wrong issuer), revocation rules, re-verification and audit history. 20 of 20 checks pass.
+
+Results of the latest run are saved to the `ci-results` branch (`test-summary.md`, `e2e-report.md`).
+
 ## How it works
 
 | Node | Role | Can do |
