@@ -1,0 +1,50 @@
+name: Record narration and demo video
+
+on:
+  push:
+    branches: [certverify-media]
+
+permissions:
+  contents: write
+
+jobs:
+  media:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - name: Install tools
+        run: |
+          sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg > /dev/null
+          pip install -q edge-tts playwright
+          python -m playwright install --with-deps chromium > /dev/null
+      - name: Generate narration
+        run: python media/tts.py
+      - name: Build and test
+        run: chmod +x gradlew && ./gradlew --no-daemon clean build deployNodes :clients:bootJar
+      - name: Build title and results pages
+        run: |
+          mkdir -p media/out
+          git show origin/ci-results:e2e-report.md > media/out/e2e-report.md || true
+          python media/make_pages.py
+      - name: Start the network
+        run: scripts/start-network.sh
+      - name: Record the walkthrough
+        run: python media/record_demo.py
+      - name: Publish media
+        if: always()
+        run: |
+          mkdir -p /tmp/media && cp -r media/out/. /tmp/media/
+          mkdir -p /tmp/media/logs && cp build/demo-logs/*.log /tmp/media/logs/ 2>/dev/null || true
+          cd /tmp/media
+          git init -q -b media-out
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A && git commit -qm "Narration and demo recording"
+          git push -qf "https://x-access-token:${{ github.token }}@github.com/${GITHUB_REPOSITORY}.git" media-out

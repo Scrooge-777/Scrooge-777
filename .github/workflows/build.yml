@@ -2,6 +2,7 @@ name: Build and test CorDapp
 
 on:
   push:
+    branches-ignore: [certverify-media, live-links, ci-results, media-out]
   workflow_dispatch:
 
 permissions:
