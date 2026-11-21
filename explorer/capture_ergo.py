@@ -106,21 +106,57 @@ for key, t in (("tx1", t_erg), ("tx2", t_tok), ("tx3", t_con)):
     (OUT / f"raw_{key}.json").write_text(json.dumps(full, indent=1))
 
 miner = item.get("miner") or {}
-addr = miner.get("address")
-address = {}
-if addr:
-    address = {"address": addr, "name": miner.get("name"),
-               "balance": get(f"/addresses/{addr}/balance/confirmed"),
-               "total": get(f"/addresses/{addr}/balance/total")}
-    txs = get(f"/addresses/{addr}/transactions?offset=0&limit=10")
-    address["tx_total"] = txs.get("total")
+
+
+def try_address(addr):
+    """Balance + recent history for one address; None if the explorer cannot serve it."""
+    try:
+        bal = get(f"/addresses/{addr}/balance/confirmed", tries=3)
+        txs = get(f"/addresses/{addr}/transactions?offset=0&limit=5", tries=3)
+    except Exception as e:
+        print("address unavailable", addr[:20], e)
+        return None
     recent = []
     for t in txs.get("items", []):
         recv = sum(o["value"] for o in t["outputs"] if o.get("address") == addr)
         sent = sum(i["value"] for i in t["inputs"] if i.get("address") == addr)
         recent.append({"id": t["id"], "height": t.get("inclusionHeight"), "timestamp": t.get("timestamp"),
                        "received": recv, "sent": sent, "n_in": len(t["inputs"]), "n_out": len(t["outputs"])})
-    address["recent"] = recent
+    return {"address": addr, "balance": bal, "tx_total": txs.get("total"), "recent": recent}
+
+
+# candidates: contract addresses holding tokens in the contract transaction, then the miner's reward
+# address, then the receivers of the payment transactions
+cands = []
+if "tx3" in chosen:
+    for o in chosen["tx3"]["outputs"]:
+        if not is_fee(o) and not is_p2pk(o.get("address")) and o.get("assets"):
+            cands.append(("contract", o["address"]))
+if miner.get("address"):
+    cands.append(("miner", miner["address"]))
+for k in ("tx2", "tx1"):
+    if k in chosen:
+        for o in chosen[k]["outputs"]:
+            if not is_fee(o):
+                cands.append((k + "-receiver", o["address"]))
+address = {}
+seen = set()
+for role, a_ in cands:
+    if a_ in seen or len(a_) > 400:
+        continue
+    seen.add(a_)
+    r_ = try_address(a_)
+    if r_ and r_["tx_total"]:
+        r_["role"] = role
+        address = r_
+        break
+    time.sleep(2)
+addr = address.get("address")
+for extra in ("https://api.ergoplatform.com/api/v0/info", "https://api.ergoplatform.com/api/v0/stats"):
+    try:
+        info[extra.rsplit("/", 1)[1] + "_v0"] = get(extra, tries=3)
+    except Exception as e:
+        print("no", extra, e)
 
 try:
     price = get("https://api.coingecko.com/api/v3/simple/price?ids=ergo&vs_currencies=usd,inr&include_market_cap=true")
