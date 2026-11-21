@@ -1,0 +1,902 @@
+[
+ {
+  "id": "d3be831c95d3d9c499a7d85c56059931b24a541c5349ebeacd52a69ab3a16155",
+  "height": 1921765,
+  "epoch": 1876,
+  "version": 4,
+  "timestamp": 1795283935242,
+  "transactionsCount": 6,
+  "miner": {
+   "address": "88dhgzEuTXaTnTZomXPfuJ67oYJPbrv17yNkLjN6Nj8HxZEUf2iAdiv9gTqmnKKa2i75zmUtDnPQovBb",
+   "name": "DnPQovBb"
+  },
+  "size": 27588,
+  "difficulty": 60551136804864,
+  "minerReward": 3000000000
+ },
+ {
+  "id": "61711edfebc59365450605bfe1c6739ce2c75933c6801a18808da345ce12f0a8",
+  "height": 1921764,
+  "epoch": 1876,
+  "version": 4,
+  "timestamp": 1795283784229,
+  "transactionsCount": 6,
+  "miner": {
+   "address": "88dhgzEuTXaRQTX5KNdnaWTTX7fEZVEQRn6qP4MJotPuRnS3QpoJxYpSaXoU1y7SHp8ZXMp92TH22DBY",
+   "name": "2TH22DBY"
+  },
+  "size": 20477,
+  "difficulty": 60551136804864,
+  "minerReward": 3000000000
+ },
+ {
+  "id": "1c39b8237c0e809c5610fd4f16a1e5c155fba52895c95833b252751ec9efeccf",
+  "height": 1921763,
+  "epoch": 1876,
+  "version": 4,
+  "timestamp": 1795283680267,
+  "transactionsCount": 5,
+  "miner": {
+   "address": "88dhgzEuTXaTnTZomXPfuJ67oYJPbrv17yNkLjN6Nj8HxZEUf2iAdiv9gTqmnKKa2i75zmUtDnPQovBb",
+   "name": "DnPQovBb"
+  },
+  "size": 93435,
+  "difficulty": 60551136804864,
+  "minerReward": 3000000000
+ },
+ {
+  "id": "6d9e80c5a5ed109c2ea51f3d2314010140f8767d575a44341bf2527f8788ef08",
+  "height": 1921762,
+  "epoch": 1876,
+  "version": 4,
+  "timestamp": 1795283624327,
+  "transactionsCount": 6,
+  "miner": {
+   "address": "88dhgzEuTXaSuf5QC1TJDgdxqJMQEQAM6YaTTRqmUDrmPoVky1b16WAK5zMrq3p2mYqpUNKCyi5CLS9V",
+   "name": "yi5CLS9V"
+  },
+  "size": 18333,
+  "difficulty": 60551136804864,
+  "minerReward": 3000000000
+ },
+ {
+  "id": "6df59e4e1c43dc31311e5ec1dd228af0f48f270962b53c8fe5b5911dd1577324",
+  "height": 1921761,
+  "epoch": 1876,
+  "version": 4,
+  "timestamp": 1795283573266,
+  "transactionsCount": 12,
+  "miner": {
+   "address": "88dhgzEuTXaRQTX5KNdnaWTTX7fEZVEQRn6qP4MJotPuRnS3QpoJxYpSaXoU1y7SHp8ZXMp92TH22DBY",
+   "name": "2TH22DBY"
+  },
+  "size": 50184,
+  "difficulty": 60551136804864,
+  "minerReward": 3000000000
+ },
+ {
+  "id": "7da236a74d872aafda9f1ecb46bcd6b33b62bb555faa93f1ebbc504208ccdb16",
+  "height": 1921760,
+  "epoch": 1876,
+  "version": 4,
+  "timestamp": 1795283545628,
+  "transactionsCount": 1,
+  "miner": {
+   "address": "88dhgzEuTXaSHzYbKw9DUrnRfpP1JDrQnkXpdiHfaJ7FZhcMng4239QXgNZ3FxbKoG435t9FBcSYoVEK",
+   "name": "BcSYoVEK"
+  },
+  "size": 3495,
+  "difficulty": 60551136804864,
+  "minerReward": 3000000000
+ },
+ {
+  "id": "f8644b71c0abf0057f11fa3708137e2e996f653370887b8ce35cd890e139b926",
+  "height": 1921759,
+  "epoch": 1876,
+  "version": 4,
+  "timestamp": 1795283468423,
+  "transactionsCount": 15,
+  "miner": {
+   "address": "88dhgzEuTXaRQTX5KNdnaWTTX7fEZVEQRn6qP4MJotPuRnS3QpoJxYpSaXoU1y7SHp8ZXMp92TH22DBY",
+   "name": "2TH22DBY"
+  },
+  "size": 59277,
+  "difficulty": 60551136804864,
+  "minerReward": 3000000000
+ },
+ {
+  "id": "160b234f671495344982622b473d481415ca0199396e786bdbb33ff4915097a9",
+  "height": 1921758,
+  "epoch": 1876,
+  "version": 4,
+  "timestamp": 1795283379021,
+  "transactionsCount": 1,
+  "miner": {
+   "address": "88dhgzEuTXaSHzYbKw9DUrnRfpP1JDrQnkXpdiHfaJ7FZhcMng4239QXgNZ3FxbKoG435t9FBcSYoVEK",
+   "name": "BcSYoVEK"
+  },
+  "size": 3697,
+  "difficulty": 60551136804864,
+  "minerReward": 3000000000
+ },
+ {
+  "id": "a0ea6beb4f09477a2d64d943521e8ee2d7b5ce2b63d2e179de003e28c87d5271",
+  "height": 1921757,
+  "epoch": 1876,
+  "version": 4,
+  "timestamp": 1795283287172,
+  "transactionsCount": 10,
+  "miner": {
+   "address": "88dhgzEuTXaRQTX5KNdnaWTTX7fEZVEQRn6qP4MJotPuRnS3QpoJxYpSaXoU1y7SHp8ZXMp92TH22DBY",
+   "name": "2TH22DBY"
+  },
+  "size": 38816,
+  "difficulty": 60551136804864,
+  "minerReward": 3000000000
+ },
+ {
+  "id": "c60459bef0ed66ba64e1373e2d8c902ffef9e9b26f0c9b498ce2280be18b522c",
+  "height": 1921756,
+  "epoch": 1876,
+  "version": 4,
+  "timestamp": 1795283152501,
+  "transactionsCount": 7,
+  "miner": {
+   "address": "88dhgzEuTXaRQTX5KNdnaWTTX7fEZVEQRn6qP4MJotPuRnS3QpoJxYpSaXoU1y7SHp8ZXMp92TH22DBY",
+   "name": "2TH22DBY"
+  },
+  "size": 107712,
+  "difficulty": 60551136804864,
+  "minerReward": 3000000000
+ },
+ {
+  "id": "ddddf953842807d37568f3c8621eaec2a6c06a7064612aedd30e2d04b1a0a949",
+  "height": 1921755,
+  "epoch": 1876,
+  "version": 4,
+  "timestamp": 1795283081999,
+  "transactionsCount": 6,
+  "miner": {
+   "address": "88dhgzEuTXaTYNVozfX7N4dW1hToq6cRNZByKdjeYrnp6XFovWYndHqCVpDdYv8GYatWX15juuEj4pm6",
+   "name": "uuEj4pm6"
+  },
+  "size": 42261,
+  "difficulty": 60551136804864,
+  "minerReward": 3000000000
+ },
+ {
+  "id": "9d027c2684bfb0f967d505a9253ca30a7c477e4e476049e630a253e0662b3056",
+  "height": 1921754,
+  "epoch": 1876,
+  "version": 4,
+  "timestamp": 1795283033310,
+  "transactionsCount": 16,
+  "miner": {
+   "address": "88dhgzEuTXaTnTZomXPfuJ67oYJPbrv17yNkLjN6Nj8HxZEUf2iAdiv9gTqmnKKa2i75zmUtDnPQovBb",
+   "name": "DnPQovBb"
+  },
+  "size": 62661,
+  "difficulty": 60551136804864,
+  "minerReward": 3000000000
+ },
+ {
+  "id": "62b32d327806502f8bc6a5ae3d0a3ec58db098ed8daa02db7ae5691c94eddf99",
+  "height": 1921753,
+  "epoch": 1876,
+  "version": 4,
+  "timestamp": 1795283000332,
+  "transactionsCount": 1,
+  "miner": {
+   "address": "88dhgzEuTXaSHzYbKw9DUrnRfpP1JDrQnkXpdiHfaJ7FZhcMng4239QXgNZ3FxbKoG435t9FBcSYoVEK",
+   "name": "BcSYoVEK"
+  },
+  "size": 3562,
+  "difficulty": 60551136804864,
+  "minerReward": 3000000000
+ },
+ {
+  "id": "cf8d5a33247b3135dcf4bee46d6712b417a9742ff5f67eee832ce3b5e926cf09",
+  "height": 1921752,
+  "epoch": 1876,
+  "version": 4,
+  "timestamp": 1795282973668,
+  "transactionsCount": 4,
+  "miner": {
+   "address": "88dhgzEuTXaRQTX5KNdnaWTTX7fEZVEQRn6qP4MJotPuRnS3QpoJxYpSaXoU1y7SHp8ZXMp92TH22DBY",
+   "name": "2TH22DBY"
+  },
+  "size": 15659,
+  "difficulty": 60551136804864,
+  "minerReward": 3000000000
+ },
+ {
+  "id": "26118153a4a3dfc00a0b29404ea0e0b9eab9b246c0be51cd2bb2bbfeda4fdb1c",
+  "height": 1921751,
+  "epoch": 1876,
+  "version": 4,
+  "timestamp": 1795282947150,
+  "transactionsCount": 7,
+  "miner": {
+   "address": "88dhgzEuTXaRQTX5KNdnaWTTX7fEZVEQRn6qP4MJotPuRnS3QpoJxYpSaXoU1y7SHp8ZXMp92TH22DBY",
+   "name": "2TH22DBY"
+  },
+  "size": 30761,
+  "difficulty": 60551136804864,
+  "minerReward": 3000000000
+ },
+ {
+  "id": "d84cdac0cfc2699a982c09b8abe213c96acab77624e35e602d895aba74fe7910",
+  "height": 1921750,
+  "epoch": 1876,
+  "version": 4,
+  "timestamp": 1795282894497,
+  "transactionsCount": 8,
+  "miner": {
+   "address": "88dhgzEuTXaToHDgw8xU5BPjjVC6WKLdvAcF7ZhAQEHme7uVUYd7XM6SbyyhCK5mrqzU6WKgi99zk4u9",
+   "name": "i99zk4u9"
+  },
+  "size": 52382,
+  "difficulty": 60551136804864,
+  "minerReward": 3000000000
+ },
+ {
+  "id": "46ce587384ec2893064e332b37e8394ce9ee014c6cf66b03a332aa2bfd73ef69",
+  "height": 1921749,
+  "epoch": 1876,
+  "version": 4,
+  "timestamp": 1795282823412,
+  "transactionsCount": 1,
+  "miner": {
+   "address": "88dhgzEuTXaRQTX5KNdnaWTTX7fEZVEQRn6qP4MJotPuRnS3QpoJxYpSaXoU1y7SHp8ZXMp92TH22DBY",
+   "name": "2TH22DBY"
+  },
+  "size": 3628,
+  "difficulty": 60551136804864,
+  "minerReward": 3000000000
+ },
+ {
+  "id": "ebd77b646be97df76c64ab13309b9cddd53c2496d7455bf529e6a16b56c19fdb",
+  "height": 1921748,
+  "epoch": 1876,
+  "version": 4,
+  "timestamp": 1795282801881,
+  "transactionsCount": 3,
+  "miner": {
+   "address": "88dhgzEuTXaRQTX5KNdnaWTTX7fEZVEQRn6qP4MJotPuRnS3QpoJxYpSaXoU1y7SHp8ZXMp92TH22DBY",
+   "name": "2TH22DBY"
+  },
+  "size": 9040,
+  "difficulty": 60551136804864,
+  "minerReward": 3000000000
+ },
+ {
+  "id": "346a961dc00f9bd6545a7a997bb9dda77a31a793d113f5a1d8a4b3afaa22bd30",
+  "height": 1921747,
+  "epoch": 1876,
+  "version": 4,
+  "timestamp": 1795282693629,
+  "transactionsCount": 13,
+  "miner": {
+   "address": "88dhgzEuTXaToHDgw8xU5BPjjVC6WKLdvAcF7ZhAQEHme7uVUYd7XM6SbyyhCK5mrqzU6WKgi99zk4u9",
+   "name": "i99zk4u9"
+  },
+  "size": 56877,
+  "difficulty": 60551136804864,
+  "minerReward": 3000000000
+ },
+ {
+  "id": "026a3bcad0fad0e277fb730fa08ccdac73d58899ddec8dd09688ce1988369240",
+  "height": 1921746,
+  "epoch": 1876,
+  "version": 4,
+  "timestamp": 1795282610675,
+  "transactionsCount": 9,
+  "miner": {
+   "address": "88dhgzEuTXaTnTZomXPfuJ67oYJPbrv17yNkLjN6Nj8HxZEUf2iAdiv9gTqmnKKa2i75zmUtDnPQovBb",
+   "name": "DnPQovBb"
+  },
+  "size": 39640,
+  "difficulty": 60551136804864,
+  "minerReward": 3000000000
+ },
+ {
+  "id": "9fefecf3b7086f0127d18b0b79dc0e39adaf153514b12e198e17c9e9964485c4",
+  "height": 1921745,
+  "epoch": 1876,
+  "version": 4,
+  "timestamp": 1795282452541,
+  "transactionsCount": 7,
+  "miner": {
+   "address": "88dhgzEuTXaTnTZomXPfuJ67oYJPbrv17yNkLjN6Nj8HxZEUf2iAdiv9gTqmnKKa2i75zmUtDnPQovBb",
+   "name": "DnPQovBb"
+  },
+  "size": 48514,
+  "difficulty": 60551136804864,
+  "minerReward": 3000000000
+ },
+ {
+  "id": "e08ebfa01cbc38b8c6eccbd8a1e8c3922ab3d8769eea4e79a01998f5539821cb",
+  "height": 1921744,
+  "epoch": 1876,
+  "version": 4,
+  "timestamp": 1795282331159,
+  "transactionsCount": 10,
+  "miner": {
+   "address": "88dhgzEuTXaTnTZomXPfuJ67oYJPbrv17yNkLjN6Nj8HxZEUf2iAdiv9gTqmnKKa2i75zmUtDnPQovBb",
+   "name": "DnPQovBb"
+  },
+  "size": 53938,
+  "difficulty": 60551136804864,
+  "minerReward": 3000000000
+ },
+ {
+  "id": "b6a40083f6aabf39c784e8a12c9a8bcb387bb3d144a5f31806c3322b16b40b42",
+  "height": 1921743,
+  "epoch": 1876,
+  "version": 4,
+  "timestamp": 1795282023774,
+  "transactionsCount": 5,
+  "miner": {
+   "address": "88dhgzEuTXaToHDgw8xU5BPjjVC6WKLdvAcF7ZhAQEHme7uVUYd7XM6SbyyhCK5mrqzU6WKgi99zk4u9",
+   "name": "i99zk4u9"
+  },
+  "size": 25671,
+  "difficulty": 60551136804864,
+  "minerReward": 3000000000
+ },
+ {
+  "id": "3ef81b073a1f201154b1f1b28bb57be44a07c44b4fa75aa59217c2f92e3a384f",
+  "height": 1921742,
+  "epoch": 1876,
+  "version": 4,
+  "timestamp": 1795281985363,
+  "transactionsCount": 12,
+  "miner": {
+   "address": "88dhgzEuTXaSuf5QC1TJDgdxqJMQEQAM6YaTTRqmUDrmPoVky1b16WAK5zMrq3p2mYqpUNKCyi5CLS9V",
+   "name": "yi5CLS9V"
+  },
+  "size": 70992,
+  "difficulty": 60551136804864,
+  "minerReward": 3000000000
+ },
+ {
+  "id": "ee696dc36040035549400cd141705f4d98a508cf5a157ccce27b60abfd7d6303",
+  "height": 1921741,
+  "epoch": 1876,
+  "version": 4,
+  "timestamp": 1795281621193,
+  "transactionsCount": 18,
+  "miner": {
+   "address": "88dhgzEuTXaTnTZomXPfuJ67oYJPbrv17yNkLjN6Nj8HxZEUf2iAdiv9gTqmnKKa2i75zmUtDnPQovBb",
+   "name": "DnPQovBb"
+  },
+  "size": 93906,
+  "difficulty": 60551136804864,
+  "minerReward": 3000000000
+ },
+ {
+  "id": "dad2a786161b0ca84af7732cccea26827815f919c00bea25b13871f6d2b62314",
+  "height": 1921740,
+  "epoch": 1876,
+  "version": 4,
+  "timestamp": 1795281605633,
+  "transactionsCount": 1,
+  "miner": {
+   "address": "88dhgzEuTXaSHzYbKw9DUrnRfpP1JDrQnkXpdiHfaJ7FZhcMng4239QXgNZ3FxbKoG435t9FBcSYoVEK",
+   "name": "BcSYoVEK"
+  },
+  "size": 3458,
+  "difficulty": 60551136804864,
+  "minerReward": 3000000000
+ },
+ {
+  "id": "53625f516cdabdd4d4bb16973449114967e3aed4b4489bc7bb658741da639a07",
+  "height": 1921739,
+  "epoch": 1876,
+  "version": 4,
+  "timestamp": 1795281584137,
+  "transactionsCount": 6,
+  "miner": {
+   "address": "88dhgzEuTXaSuf5QC1TJDgdxqJMQEQAM6YaTTRqmUDrmPoVky1b16WAK5zMrq3p2mYqpUNKCyi5CLS9V",
+   "name": "yi5CLS9V"
+  },
+  "size": 14155,
+  "difficulty": 60551136804864,
+  "minerReward": 3000000000
+ },
+ {
+  "id": "67a9e412f0e264941d1bfa7b7861467070fca6a25e287ca4f17eef6ed6776549",
+  "height": 1921738,
+  "epoch": 1876,
+  "version": 4,
+  "timestamp": 1795281554499,
+  "transactionsCount": 9,
+  "miner": {
+   "address": "88dhgzEuTXaRQTX5KNdnaWTTX7fEZVEQRn6qP4MJotPuRnS3QpoJxYpSaXoU1y7SHp8ZXMp92TH22DBY",
+   "name": "2TH22DBY"
+  },
+  "size": 41605,
+  "difficulty": 60551136804864,
+  "minerReward": 3000000000
+ },
+ {
+  "id": "4f1747141966f2431d36e18a51dac868141763bb45f917120aa442799b23e597",
+  "height": 1921737,
+  "epoch": 1876,
+  "version": 4,
+  "timestamp": 1795281476306,
+  "transactionsCount": 3,
+  "miner": {
+   "address": "88dhgzEuTXaSuf5QC1TJDgdxqJMQEQAM6YaTTRqmUDrmPoVky1b16WAK5zMrq3p2mYqpUNKCyi5CLS9V",
+   "name": "yi5CLS9V"
+  },
+  "size": 10663,
+  "difficulty": 60551136804864,
+  "minerReward": 3000000000
+ },
+ {
+  "id": "fe37682dec7f9a7c6c82bf5b1d25080dd02633ec6558d0d6af6c37f04e9e2656",
+  "height": 1921736,
+  "epoch": 1876,
+  "version": 4,
+  "timestamp": 1795281425569,
+  "transactionsCount": 7,
+  "miner": {
+   "address": "88dhgzEuTXaTnTZomXPfuJ67oYJPbrv17yNkLjN6Nj8HxZEUf2iAdiv9gTqmnKKa2i75zmUtDnPQovBb",
+   "name": "DnPQovBb"
+  },
+  "size": 28570,
+  "difficulty": 60551136804864,
+  "minerReward": 3000000000
+ },
+ {
+  "id": "4d45a1069fe84b3768c29063a488848a2a92caf8e844cf385d05f7f424dc1ff7",
+  "height": 1921735,
+  "epoch": 1876,
+  "version": 4,
+  "timestamp": 1795281376945,
+  "transactionsCount": 3,
+  "miner": {
+   "address": "88dhgzEuTXaRQTX5KNdnaWTTX7fEZVEQRn6qP4MJotPuRnS3QpoJxYpSaXoU1y7SHp8ZXMp92TH22DBY",
+   "name": "2TH22DBY"
+  },
+  "size": 7194,
+  "difficulty": 60551136804864,
+  "minerReward": 3000000000
+ },
+ {
+  "id": "094963bea47d1a91d077264961ae12974a1d727b57db58e933b3ebc39217fc0b",
+  "height": 1921734,
+  "epoch": 1876,
+  "version": 4,
+  "timestamp": 1795281301784,
+  "transactionsCount": 6,
+  "miner": {
+   "address": "88dhgzEuTXaToHDgw8xU5BPjjVC6WKLdvAcF7ZhAQEHme7uVUYd7XM6SbyyhCK5mrqzU6WKgi99zk4u9",
+   "name": "i99zk4u9"
+  },
+  "size": 46755,
+  "difficulty": 60551136804864,
+  "minerReward": 3000000000
+ },
+ {
+  "id": "f140e6bcd70e115f3063c4f5645517ea9bfb0cfd984c81f08016a100eb5c72b3",
+  "height": 1921733,
+  "epoch": 1876,
+  "version": 4,
+  "timestamp": 1795281053558,
+  "transactionsCount": 1,
+  "miner": {
+   "address": "88dhgzEuTXaRQTX5KNdnaWTTX7fEZVEQRn6qP4MJotPuRnS3QpoJxYpSaXoU1y7SHp8ZXMp92TH22DBY",
+   "name": "2TH22DBY"
+  },
+  "size": 3595,
+  "difficulty": 60551136804864,
+  "minerReward": 3000000000
+ },
+ {
+  "id": "49728c6df2835e01c933eaf99038eb84b0e6f9623a692b8b1827d44e48fb52b2",
+  "height": 1921732,
+  "epoch": 1876,
+  "version": 4,
+  "timestamp": 1795281044429,
+  "transactionsCount": 17,
+  "miner": {
+   "address": "88dhgzEuTXaRQTX5KNdnaWTTX7fEZVEQRn6qP4MJotPuRnS3QpoJxYpSaXoU1y7SHp8ZXMp92TH22DBY",
+   "name": "2TH22DBY"
+  },
+  "size": 61155,
+  "difficulty": 60551136804864,
+  "minerReward": 3000000000
+ },
+ {
+  "id": "5567acc52a7fbafd676d9e02ac694dea5d1ad8d0fe2ed3397e47cf4a6aabdc3d",
+  "height": 1921731,
+  "epoch": 1876,
+  "version": 4,
+  "timestamp": 1795280818761,
+  "transactionsCount": 18,
+  "miner": {
+   "address": "88dhgzEuTXaToHDgw8xU5BPjjVC6WKLdvAcF7ZhAQEHme7uVUYd7XM6SbyyhCK5mrqzU6WKgi99zk4u9",
+   "name": "i99zk4u9"
+  },
+  "size": 179334,
+  "difficulty": 60551136804864,
+  "minerReward": 3000000000
+ },
+ {
+  "id": "0566a4049a896235e09f984eacd6c9ce6cec296a57c6ffca6f91ff3309955c71",
+  "height": 1921730,
+  "epoch": 1876,
+  "version": 4,
+  "timestamp": 1795280626441,
+  "transactionsCount": 3,
+  "miner": {
+   "address": "88dhgzEuTXaSuf5QC1TJDgdxqJMQEQAM6YaTTRqmUDrmPoVky1b16WAK5zMrq3p2mYqpUNKCyi5CLS9V",
+   "name": "yi5CLS9V"
+  },
+  "size": 8396,
+  "difficulty": 60551136804864,
+  "minerReward": 3000000000
+ },
+ {
+  "id": "61d3821aa147b81827a828d71e5f36cd71da7b8e00614cb557a20f800e0a4a5a",
+  "height": 1921729,
+  "epoch": 1876,
+  "version": 4,
+  "timestamp": 1795280555767,
+  "transactionsCount": 8,
+  "miner": {
+   "address": "88dhgzEuTXaRQTX5KNdnaWTTX7fEZVEQRn6qP4MJotPuRnS3QpoJxYpSaXoU1y7SHp8ZXMp92TH22DBY",
+   "name": "2TH22DBY"
+  },
+  "size": 58572,
+  "difficulty": 60551136804864,
+  "minerReward": 3000000000
+ },
+ {
+  "id": "e958f534e9f6a1c38915579cab4a490f5f27d9a853a4c03f668089ebbdaba255",
+  "height": 1921728,
+  "epoch": 1876,
+  "version": 4,
+  "timestamp": 1795280490780,
+  "transactionsCount": 1,
+  "miner": {
+   "address": "88dhgzEuTXaRQTX5KNdnaWTTX7fEZVEQRn6qP4MJotPuRnS3QpoJxYpSaXoU1y7SHp8ZXMp92TH22DBY",
+   "name": "2TH22DBY"
+  },
+  "size": 3528,
+  "difficulty": 60551136804864,
+  "minerReward": 3000000000
+ },
+ {
+  "id": "f25834e1c7302b515e446c2807a005bbd4d881e52ccd45ab45c79fa083c386f2",
+  "height": 1921727,
+  "epoch": 1876,
+  "version": 4,
+  "timestamp": 1795280479445,
+  "transactionsCount": 19,
+  "miner": {
+   "address": "88dhgzEuTXaRQTX5KNdnaWTTX7fEZVEQRn6qP4MJotPuRnS3QpoJxYpSaXoU1y7SHp8ZXMp92TH22DBY",
+   "name": "2TH22DBY"
+  },
+  "size": 111309,
+  "difficulty": 60551136804864,
+  "minerReward": 3000000000
+ },
+ {
+  "id": "1b4e307fd3126f5db74d613377c43152a0f2c229979ff0b13a7cc9c1730188cd",
+  "height": 1921726,
+  "epoch": 1876,
+  "version": 4,
+  "timestamp": 1795280162569,
+  "transactionsCount": 4,
+  "miner": {
+   "address": "88dhgzEuTXaRQTX5KNdnaWTTX7fEZVEQRn6qP4MJotPuRnS3QpoJxYpSaXoU1y7SHp8ZXMp92TH22DBY",
+   "name": "2TH22DBY"
+  },
+  "size": 18611,
+  "difficulty": 60551136804864,
+  "minerReward": 3000000000
+ },
+ {
+  "id": "9e4279afa98dfae53b7cfaf28af3926ed6307138ce7af4093cb49e3231d43acc",
+  "height": 1921725,
+  "epoch": 1876,
+  "version": 4,
+  "timestamp": 1795280119929,
+  "transactionsCount": 5,
+  "miner": {
+   "address": "88dhgzEuTXaSuf5QC1TJDgdxqJMQEQAM6YaTTRqmUDrmPoVky1b16WAK5zMrq3p2mYqpUNKCyi5CLS9V",
+   "name": "yi5CLS9V"
+  },
+  "size": 21565,
+  "difficulty": 60551136804864,
+  "minerReward": 3000000000
+ },
+ {
+  "id": "63c3c83ddb1aad31c5dd5ec28c5af6643a6f6bff4f6fe7fc9b97192ef86dd8fe",
+  "height": 1921724,
+  "epoch": 1876,
+  "version": 4,
+  "timestamp": 1795280082573,
+  "transactionsCount": 13,
+  "miner": {
+   "address": "88dhgzEuTXaRiLRSYpvTCXWoN3A86gnWs3Z8BWkJGkGMXsR3WzUUyqbB47YAzhhsB6HJdJ4tC5AFYfSc",
+   "name": "C5AFYfSc"
+  },
+  "size": 87930,
+  "difficulty": 60551136804864,
+  "minerReward": 3000000000
+ },
+ {
+  "id": "bfb64ad05d6d6642aaa34889ad449117ad9954295a88cf3d533dca49f7a6e619",
+  "height": 1921723,
+  "epoch": 1876,
+  "version": 4,
+  "timestamp": 1795280036600,
+  "transactionsCount": 1,
+  "miner": {
+   "address": "88dhgzEuTXaRQTX5KNdnaWTTX7fEZVEQRn6qP4MJotPuRnS3QpoJxYpSaXoU1y7SHp8ZXMp92TH22DBY",
+   "name": "2TH22DBY"
+  },
+  "size": 3562,
+  "difficulty": 60551136804864,
+  "minerReward": 3000000000
+ },
+ {
+  "id": "5a94f3be90225d5c01276da49740a85e2d1634fb56e748e3c5126d63fa384fb4",
+  "height": 1921722,
+  "epoch": 1876,
+  "version": 4,
+  "timestamp": 1795279962606,
+  "transactionsCount": 8,
+  "miner": {
+   "address": "88dhgzEuTXaRiLRSYpvTCXWoN3A86gnWs3Z8BWkJGkGMXsR3WzUUyqbB47YAzhhsB6HJdJ4tC5AFYfSc",
+   "name": "C5AFYfSc"
+  },
+  "size": 126189,
+  "difficulty": 60551136804864,
+  "minerReward": 3000000000
+ },
+ {
+  "id": "727586f49936d30f2cfe5a10cb1706b2f841a3eebd328ed74112fb64c3e3ed54",
+  "height": 1921721,
+  "epoch": 1876,
+  "version": 4,
+  "timestamp": 1795279752337,
+  "transactionsCount": 23,
+  "miner": {
+   "address": "88dhgzEuTXaTnTZomXPfuJ67oYJPbrv17yNkLjN6Nj8HxZEUf2iAdiv9gTqmnKKa2i75zmUtDnPQovBb",
+   "name": "DnPQovBb"
+  },
+  "size": 93805,
+  "difficulty": 60551136804864,
+  "minerReward": 3000000000
+ },
+ {
+  "id": "593cd9c71efd02552039046b11dceb392171fa29d51e3a0e6cadb67555f67b95",
+  "height": 1921720,
+  "epoch": 1876,
+  "version": 4,
+  "timestamp": 1795279509822,
+  "transactionsCount": 4,
+  "miner": {
+   "address": "88dhgzEuTXaTnTZomXPfuJ67oYJPbrv17yNkLjN6Nj8HxZEUf2iAdiv9gTqmnKKa2i75zmUtDnPQovBb",
+   "name": "DnPQovBb"
+  },
+  "size": 37535,
+  "difficulty": 60551136804864,
+  "minerReward": 3000000000
+ },
+ {
+  "id": "c9ff5569719dc65719dcd7d1def81e9f4444eacb963aaae3dd56c54a140f4c99",
+  "height": 1921719,
+  "epoch": 1876,
+  "version": 4,
+  "timestamp": 1795279493468,
+  "transactionsCount": 14,
+  "miner": {
+   "address": "88dhgzEuTXaRQTX5KNdnaWTTX7fEZVEQRn6qP4MJotPuRnS3QpoJxYpSaXoU1y7SHp8ZXMp92TH22DBY",
+   "name": "2TH22DBY"
+  },
+  "size": 156152,
+  "difficulty": 60551136804864,
+  "minerReward": 3000000000
+ },
+ {
+  "id": "24b34dfd1f5e762e6f9cead813925c382763b2e98174220a4694f5b3572299ba",
+  "height": 1921718,
+  "epoch": 1876,
+  "version": 4,
+  "timestamp": 1795279442981,
+  "transactionsCount": 1,
+  "miner": {
+   "address": "88dhgzEuTXaQ2HPUskY3hvgMA5uCbQWwZNPbMC1Hem9zM2V9U7KMah7LYWS4Hm4WECGuc22nofdQbHbY",
+   "name": "ofdQbHbY"
+  },
+  "size": 3564,
+  "difficulty": 60551136804864,
+  "minerReward": 3000000000
+ },
+ {
+  "id": "7c1b790f5d385251eb7ad6e6fc870a05d8c11efd7fffa93bce16c4b88426f98b",
+  "height": 1921717,
+  "epoch": 1876,
+  "version": 4,
+  "timestamp": 1795279411066,
+  "transactionsCount": 1,
+  "miner": {
+   "address": "88dhgzEuTXaRQTX5KNdnaWTTX7fEZVEQRn6qP4MJotPuRnS3QpoJxYpSaXoU1y7SHp8ZXMp92TH22DBY",
+   "name": "2TH22DBY"
+  },
+  "size": 3392,
+  "difficulty": 60551136804864,
+  "minerReward": 3000000000
+ },
+ {
+  "id": "8b06eb6d8b456ca92225b858ac1f7d4edae0b6962ab3f717506b89350da6c689",
+  "height": 1921716,
+  "epoch": 1876,
+  "version": 4,
+  "timestamp": 1795279399510,
+  "transactionsCount": 13,
+  "miner": {
+   "address": "88dhgzEuTXaSCUL1odQmqYqnCsMWEcoK2azYJubNPSeGKksTAgDU7gJsP3FCX24tkZi8cwg97ory7tsp",
+   "name": "7ory7tsp"
+  },
+  "size": 89974,
+  "difficulty": 60551136804864,
+  "minerReward": 3000000000
+ },
+ {
+  "id": "28a3003026902a1354fd1db19812595ac0d4bfeaa463944a9def96f2b203e1fd",
+  "height": 1921715,
+  "epoch": 1876,
+  "version": 4,
+  "timestamp": 1795279274453,
+  "transactionsCount": 2,
+  "miner": {
+   "address": "88dhgzEuTXaTnTZomXPfuJ67oYJPbrv17yNkLjN6Nj8HxZEUf2iAdiv9gTqmnKKa2i75zmUtDnPQovBb",
+   "name": "DnPQovBb"
+  },
+  "size": 15578,
+  "difficulty": 60551136804864,
+  "minerReward": 3000000000
+ },
+ {
+  "id": "06310efa0230841e59e1fd34453d6a93e428bcf4ab2c8517f3a913165f87b89e",
+  "height": 1921714,
+  "epoch": 1876,
+  "version": 4,
+  "timestamp": 1795279202154,
+  "transactionsCount": 21,
+  "miner": {
+   "address": "88dhgzEuTXaRQTX5KNdnaWTTX7fEZVEQRn6qP4MJotPuRnS3QpoJxYpSaXoU1y7SHp8ZXMp92TH22DBY",
+   "name": "2TH22DBY"
+  },
+  "size": 130613,
+  "difficulty": 60551136804864,
+  "minerReward": 3000000000
+ },
+ {
+  "id": "6b2bed4a6d9223225937419c164727f0658d1d8a679345326deeef1db7015d79",
+  "height": 1921713,
+  "epoch": 1876,
+  "version": 4,
+  "timestamp": 1795279057841,
+  "transactionsCount": 1,
+  "miner": {
+   "address": "88dhgzEuTXaRQTX5KNdnaWTTX7fEZVEQRn6qP4MJotPuRnS3QpoJxYpSaXoU1y7SHp8ZXMp92TH22DBY",
+   "name": "2TH22DBY"
+  },
+  "size": 3459,
+  "difficulty": 60551136804864,
+  "minerReward": 3000000000
+ },
+ {
+  "id": "4b104756535e074767c9232a78e6271d0c32723691a2e0d0f550947072e7a314",
+  "height": 1921712,
+  "epoch": 1876,
+  "version": 4,
+  "timestamp": 1795278951530,
+  "transactionsCount": 14,
+  "miner": {
+   "address": "88dhgzEuTXaRQTX5KNdnaWTTX7fEZVEQRn6qP4MJotPuRnS3QpoJxYpSaXoU1y7SHp8ZXMp92TH22DBY",
+   "name": "2TH22DBY"
+  },
+  "size": 113468,
+  "difficulty": 60551136804864,
+  "minerReward": 3000000000
+ },
+ {
+  "id": "9527181099a0742418583159099c9e2c314a12e9bcac98fd1283663b0ecc22dd",
+  "height": 1921711,
+  "epoch": 1876,
+  "version": 4,
+  "timestamp": 1795278761150,
+  "transactionsCount": 9,
+  "miner": {
+   "address": "88dhgzEuTXaSuf5QC1TJDgdxqJMQEQAM6YaTTRqmUDrmPoVky1b16WAK5zMrq3p2mYqpUNKCyi5CLS9V",
+   "name": "yi5CLS9V"
+  },
+  "size": 62384,
+  "difficulty": 60551136804864,
+  "minerReward": 3000000000
+ },
+ {
+  "id": "7b3e724499b938d17ac53f80eeceb5ee5bfe91747e2acdc5cce6b80e18d44015",
+  "height": 1921710,
+  "epoch": 1876,
+  "version": 4,
+  "timestamp": 1795278715500,
+  "transactionsCount": 8,
+  "miner": {
+   "address": "88dhgzEuTXaRQTX5KNdnaWTTX7fEZVEQRn6qP4MJotPuRnS3QpoJxYpSaXoU1y7SHp8ZXMp92TH22DBY",
+   "name": "2TH22DBY"
+  },
+  "size": 63914,
+  "difficulty": 60551136804864,
+  "minerReward": 3000000000
+ },
+ {
+  "id": "b382bb7c65f3503f4b9fbb77850d028bda7120d969bba92c1592a90ac373a292",
+  "height": 1921709,
+  "epoch": 1876,
+  "version": 4,
+  "timestamp": 1795278598765,
+  "transactionsCount": 19,
+  "miner": {
+   "address": "88dhgzEuTXaToHDgw8xU5BPjjVC6WKLdvAcF7ZhAQEHme7uVUYd7XM6SbyyhCK5mrqzU6WKgi99zk4u9",
+   "name": "i99zk4u9"
+  },
+  "size": 175040,
+  "difficulty": 60551136804864,
+  "minerReward": 3000000000
+ },
+ {
+  "id": "b1368821ba411c253443fef7fa840a9eb9b3e7d145088f3e3700b7edce090dca",
+  "height": 1921708,
+  "epoch": 1876,
+  "version": 4,
+  "timestamp": 1795278554449,
+  "transactionsCount": 4,
+  "miner": {
+   "address": "88dhgzEuTXaRQTX5KNdnaWTTX7fEZVEQRn6qP4MJotPuRnS3QpoJxYpSaXoU1y7SHp8ZXMp92TH22DBY",
+   "name": "2TH22DBY"
+  },
+  "size": 17671,
+  "difficulty": 60551136804864,
+  "minerReward": 3000000000
+ },
+ {
+  "id": "69f87b515f3749d339bb481d0ca782fc2f0742a04b34d77f2fa22dc3b8854191",
+  "height": 1921707,
+  "epoch": 1876,
+  "version": 4,
+  "timestamp": 1795278508598,
+  "transactionsCount": 5,
+  "miner": {
+   "address": "88dhgzEuTXaQ2HPUskY3hvgMA5uCbQWwZNPbMC1Hem9zM2V9U7KMah7LYWS4Hm4WECGuc22nofdQbHbY",
+   "name": "ofdQbHbY"
+  },
+  "size": 68268,
+  "difficulty": 60551136804864,
+  "minerReward": 3000000000
+ },
+ {
+  "id": "ba9e21348501e848a55219a9025c0d53d2c2019941e7889f01ae39b0ad0aa2ca",
+  "height": 1921706,
+  "epoch": 1876,
+  "version": 4,
+  "timestamp": 1795278460411,
+  "transactionsCount": 13,
+  "miner": {
+   "address": "88dhgzEuTXaRQTX5KNdnaWTTX7fEZVEQRn6qP4MJotPuRnS3QpoJxYpSaXoU1y7SHp8ZXMp92TH22DBY",
+   "name": "2TH22DBY"
+  },
+  "size": 239424,
+  "difficulty": 60551136804864,
+  "minerReward": 3000000000
+ }
+]

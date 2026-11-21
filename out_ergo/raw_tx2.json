@@ -1,0 +1,191 @@
+{
+ "id": "efa65557c77de0fffe15925315176a1d6bb8b0d8527e7c382748b736b1d7ccf2",
+ "blockId": "c60459bef0ed66ba64e1373e2d8c902ffef9e9b26f0c9b498ce2280be18b522c",
+ "inclusionHeight": 1921756,
+ "timestamp": 1795283152501,
+ "index": 4,
+ "globalIndex": 282684,
+ "numConfirmations": 15,
+ "inputs": [
+  {
+   "boxId": "092110e4ead18be82966714f16e8f3f4e78981dfaec6cae820270db02c532f39",
+   "value": 250000,
+   "index": 0,
+   "spendingProof": "120b5d833788f9c94a70ea9415fceea93c5bcdaa6429fb03326f9c5ee97d35619375f508ecec2d0b11ab876f707d6730987754fcdb285557",
+   "outputBlockId": "26118153a4a3dfc00a0b29404ea0e0b9eab9b246c0be51cd2bb2bbfeda4fdb1c",
+   "outputTransactionId": "af06d2fd6f1f8da5e973940d0fbcddd83cc71fd3dc7362f6deff1acf30c81eaa",
+   "outputIndex": 2,
+   "outputGlobalIndex": 1073894,
+   "outputCreatedAt": 1921749,
+   "outputSettledAt": 1921751,
+   "ergoTree": "0008cd02d681efeb2961e5f698fcb0b3a7ee8d65bca8983c9b1e59053a01f245b535af37",
+   "ergoTreeConstants": "[]",
+   "ergoTreeScript": "Right(ConstantNode(SigmaProp(ProveDlog(ECPoint(d681ef,6a61d4,...))),SSigmaProp))",
+   "address": "9g9XpgahDd35GJLkdxL5mb9hqZZVFvRQJS1TmUw2aTaRmSvKovA",
+   "assets": [],
+   "additionalRegisters": {}
+  },
+  {
+   "boxId": "64cf00532f8c3ec1e45bb5fc9e3e8ae8a24637f80e5b8095a50b7e88ace2e6b6",
+   "value": 10000000,
+   "index": 1,
+   "spendingProof": "e61dedad5ded5c5c34e446511813c0a95248dc17773660b57f52d41e23bef6b7b90a43911be7b78d53357d3664e0267d16004821633c86a9",
+   "outputBlockId": "ebd77b646be97df76c64ab13309b9cddd53c2496d7455bf529e6a16b56c19fdb",
+   "outputTransactionId": "40dfdfc85fe7d46710b4aae4fdb51c16fdbaa093880a6a1ee2ef72fdbbf55a3a",
+   "outputIndex": 0,
+   "outputGlobalIndex": 1073851,
+   "outputCreatedAt": 1921747,
+   "outputSettledAt": 1921748,
+   "ergoTree": "0008cd02d681efeb2961e5f698fcb0b3a7ee8d65bca8983c9b1e59053a01f245b535af37",
+   "ergoTreeConstants": "[]",
+   "ergoTreeScript": "Right(ConstantNode(SigmaProp(ProveDlog(ECPoint(d681ef,6a61d4,...))),SSigmaProp))",
+   "address": "9g9XpgahDd35GJLkdxL5mb9hqZZVFvRQJS1TmUw2aTaRmSvKovA",
+   "assets": [],
+   "additionalRegisters": {}
+  },
+  {
+   "boxId": "bd2e1ad56220206713508f081b1decc7ffe45008ff4d60c33c6a0aea639c5734",
+   "value": 24221119000,
+   "index": 2,
+   "spendingProof": "c113e35a9fd34110a45d27d5e334c27cf1fb612134a46b7a86f4bb335d6f0d8282f30d181276fd3979681b3529d75e968f9c10770280d2ce",
+   "outputBlockId": "ebd77b646be97df76c64ab13309b9cddd53c2496d7455bf529e6a16b56c19fdb",
+   "outputTransactionId": "40dfdfc85fe7d46710b4aae4fdb51c16fdbaa093880a6a1ee2ef72fdbbf55a3a",
+   "outputIndex": 2,
+   "outputGlobalIndex": 1073853,
+   "outputCreatedAt": 1921747,
+   "outputSettledAt": 1921748,
+   "ergoTree": "0008cd02d681efeb2961e5f698fcb0b3a7ee8d65bca8983c9b1e59053a01f245b535af37",
+   "ergoTreeConstants": "[]",
+   "ergoTreeScript": "Right(ConstantNode(SigmaProp(ProveDlog(ECPoint(d681ef,6a61d4,...))),SSigmaProp))",
+   "address": "9g9XpgahDd35GJLkdxL5mb9hqZZVFvRQJS1TmUw2aTaRmSvKovA",
+   "assets": [
+    {
+     "tokenId": "1465c9b9de602bd75f8f38df83118e2c8b1d5b2f5518514dd1438149053652a8",
+     "index": 0,
+     "amount": 25000000,
+     "name": "Dark Erdoge",
+     "decimals": 6,
+     "type": "EIP-004"
+    },
+    {
+     "tokenId": "028ec31acacaa6aab6cd89a16cab5f9046cfea701262f8c9532ace433075353a",
+     "index": 1,
+     "amount": 21025,
+     "name": "ClaimRSN.tech",
+     "decimals": 1,
+     "type": "EIP-004"
+    },
+    {
+     "tokenId": "ed2197ebb2b958670cb568aeed54693617a3f3718d16d1a298b8c8d337193da0",
+     "index": 2,
+     "amount": 6105,
+     "name": "ClaimRSN.tech",
+     "decimals": 1,
+     "type": "EIP-004"
+    },
+    {
+     "tokenId": "31ac0f72b036502a17e27ff3bc9eb1b3ae4eef9aa4a3c3bd818475d6326cbd9f",
+     "index": 3,
+     "amount": 6105,
+     "name": "ClaimRSN.tech",
+     "decimals": 1,
+     "type": "EIP-004"
+    }
+   ],
+   "additionalRegisters": {}
+  }
+ ],
+ "dataInputs": [],
+ "outputs": [
+  {
+   "boxId": "2bc070daf5609a5bfea09c3e8cc9cf4999c1400f3a78add072fb43c5640345be",
+   "transactionId": "efa65557c77de0fffe15925315176a1d6bb8b0d8527e7c382748b736b1d7ccf2",
+   "blockId": "c60459bef0ed66ba64e1373e2d8c902ffef9e9b26f0c9b498ce2280be18b522c",
+   "value": 10000000,
+   "index": 0,
+   "globalIndex": 1074007,
+   "creationHeight": 1921754,
+   "settlementHeight": 1921756,
+   "ergoTree": "0008cd02d681efeb2961e5f698fcb0b3a7ee8d65bca8983c9b1e59053a01f245b535af37",
+   "ergoTreeConstants": "[]",
+   "ergoTreeScript": "Right(ConstantNode(SigmaProp(ProveDlog(ECPoint(d681ef,6a61d4,...))),SSigmaProp))",
+   "address": "9g9XpgahDd35GJLkdxL5mb9hqZZVFvRQJS1TmUw2aTaRmSvKovA",
+   "assets": [],
+   "additionalRegisters": {},
+   "spentTransactionId": "25bd06d4f7c3de1af2c81b48db4f82fa12f16cfa26db530680d391918daada33",
+   "mainChain": true
+  },
+  {
+   "boxId": "4fb9d28ac4f09d67dc2d8bf398e38afc45964f8d7df85a26eeb300d8ffab8ff3",
+   "transactionId": "efa65557c77de0fffe15925315176a1d6bb8b0d8527e7c382748b736b1d7ccf2",
+   "blockId": "c60459bef0ed66ba64e1373e2d8c902ffef9e9b26f0c9b498ce2280be18b522c",
+   "value": 1000000,
+   "index": 1,
+   "globalIndex": 1074008,
+   "creationHeight": 1921754,
+   "settlementHeight": 1921756,
+   "ergoTree": "1005040004000e36100204a00b08cd0279be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798ea02d192a39a8cc7a701730073011001020402d19683030193a38cc7b2a57300000193c2b2a57301007473027303830108cdeeac93b1a57304",
+   "ergoTreeConstants": "[\n  0: SInt$ = 0,\n  1: SInt$ = 0,\n  2: Coll[SByte$] = Coll(16,2,4,-96,11,8,-51,2,121,-66,102,126,-7,-36,-69,-84,85,-96,98,-107,-50,-121,11,7,2,-101,-4,-37,45,-50,40,-39,89,-14,-127,91,22,-8,23,-104,-22,2,-47,-110,-93,-102,-116,-57,-89,1,115,0,115,1),\n  3: Coll[SInt$] = Coll(1),\n  4: SInt$ = 1\n]",
+   "ergoTreeScript": "Right(BoolToSigmaProp(AND(ConcreteCollection(WrappedArray(EQ(Height$(163),SelectField(ExtractCreationInfo(ByIndex(Outputs$(165),ConstantPlaceholder(0,SInt$),None)),1)), EQ(ExtractScriptBytes(ByIndex(Outputs$(165),ConstantPlaceholder(1,SInt$),None)),SubstConstants(ConstantPlaceholder(2,Coll[SByte$]),ConstantPlaceholder(3,Coll[SInt$]),ConcreteCollection(WrappedArray(CreateProveDlog(DecodePoint(MinerPubkey$(172)))),SSigmaProp))), EQ(SizeOf(Outputs$(165)),ConstantPlaceholder(4,SInt$))),SBoolean))))",
+   "address": "2iHkR7CWvD1R4j1yZg5bkeDRQavjAaVPeTDFGGLZduHyfWMuYpmhHocX8GJoaieTx78FntzJbCBVL6rf96ocJoZdmWBL2fci7NqWgAirppPQmZ7fN9V6z13Ay6brPriBKYqLp1bT2Fk4FkFLCfdPpe",
+   "assets": [],
+   "additionalRegisters": {},
+   "spentTransactionId": "067fb2f02a3e5a9199df808a462132cbaec2b9cb6517393a154043292d284b36",
+   "mainChain": true
+  },
+  {
+   "boxId": "2e51ca30aa1451ec279b18fcd0a2ed301813fbda9c0b2b7af5ebb2b4dd381fed",
+   "transactionId": "efa65557c77de0fffe15925315176a1d6bb8b0d8527e7c382748b736b1d7ccf2",
+   "blockId": "c60459bef0ed66ba64e1373e2d8c902ffef9e9b26f0c9b498ce2280be18b522c",
+   "value": 24220369000,
+   "index": 2,
+   "globalIndex": 1074009,
+   "creationHeight": 1921754,
+   "settlementHeight": 1921756,
+   "ergoTree": "0008cd02d681efeb2961e5f698fcb0b3a7ee8d65bca8983c9b1e59053a01f245b535af37",
+   "ergoTreeConstants": "[]",
+   "ergoTreeScript": "Right(ConstantNode(SigmaProp(ProveDlog(ECPoint(d681ef,6a61d4,...))),SSigmaProp))",
+   "address": "9g9XpgahDd35GJLkdxL5mb9hqZZVFvRQJS1TmUw2aTaRmSvKovA",
+   "assets": [
+    {
+     "tokenId": "1465c9b9de602bd75f8f38df83118e2c8b1d5b2f5518514dd1438149053652a8",
+     "index": 0,
+     "amount": 25000000,
+     "name": "Dark Erdoge",
+     "decimals": 6,
+     "type": "EIP-004"
+    },
+    {
+     "tokenId": "028ec31acacaa6aab6cd89a16cab5f9046cfea701262f8c9532ace433075353a",
+     "index": 1,
+     "amount": 21025,
+     "name": "ClaimRSN.tech",
+     "decimals": 1,
+     "type": "EIP-004"
+    },
+    {
+     "tokenId": "ed2197ebb2b958670cb568aeed54693617a3f3718d16d1a298b8c8d337193da0",
+     "index": 2,
+     "amount": 6105,
+     "name": "ClaimRSN.tech",
+     "decimals": 1,
+     "type": "EIP-004"
+    },
+    {
+     "tokenId": "31ac0f72b036502a17e27ff3bc9eb1b3ae4eef9aa4a3c3bd818475d6326cbd9f",
+     "index": 3,
+     "amount": 6105,
+     "name": "ClaimRSN.tech",
+     "decimals": 1,
+     "type": "EIP-004"
+    }
+   ],
+   "additionalRegisters": {},
+   "spentTransactionId": "a4c72d96c478350324460bbe99f08583e68308163591e2fdee8b27fdc6060eff",
+   "mainChain": true
+  }
+ ],
+ "size": 621,
+ "_fee": 1000000,
+ "_kind": "token"
+}

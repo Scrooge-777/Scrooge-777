@@ -1,0 +1,8 @@
+{
+ "block": "https://explorer.ergoplatform.com/en/blocks/c60459bef0ed66ba64e1373e2d8c902ffef9e9b26f0c9b498ce2280be18b522c",
+ "tx1": "https://explorer.ergoplatform.com/en/transactions/ff7abe16122af5bd3edfa64c39c77095d7a452b42a07e84814e936a84e8b272c",
+ "tx2": "https://explorer.ergoplatform.com/en/transactions/efa65557c77de0fffe15925315176a1d6bb8b0d8527e7c382748b736b1d7ccf2",
+ "tx3": "https://explorer.ergoplatform.com/en/transactions/067fb2f02a3e5a9199df808a462132cbaec2b9cb6517393a154043292d284b36",
+ "address": "https://explorer.ergoplatform.com/en/addresses/9iH2hy967KpK5E2KeQ4dnuvu29jMy8akqK7LiN6qw8z3RjfpnPV",
+ "sigma_block": "https://sigmaspace.io/en/block/c60459bef0ed66ba64e1373e2d8c902ffef9e9b26f0c9b498ce2280be18b522c"
+}
